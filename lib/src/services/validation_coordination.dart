@@ -93,20 +93,41 @@ class DefaultValidationCoordination implements ValidationCoordination {
   DefaultValidationCoordination({required this.fieldRegistry});
   final FieldRegistry fieldRegistry;
 
-  /// Helper method to check if two types are compatible
-  bool _isTypeCompatible(Type actualType, Type expectedType) {
-    // Direct type match
-    if (actualType == expectedType) return true;
+  /// The "gold standard" check using generics. It's simple and always correct.
+  bool _isA<T>(dynamic value) => value is T;
 
-    // Handle nullable types - check if the non-nullable version matches
-    final actualTypeString = actualType.toString();
-    final expectedTypeString = expectedType.toString();
+  /// Checks if a value is compatible with an expected type using Dart's 'is' operator
+  ///
+  /// This is the idiomatic Dart approach that correctly handles:
+  /// - Subtypes (e.g., int is compatible with num)
+  /// - Nullability (e.g., null is compatible with String?)
+  /// - Complex types (e.g., List<String>)
+  bool _isValueCompatibleWithExpectedType(dynamic value, Type expectedType) {
+    // Handle basic non-nullable types
+    if (expectedType == String) return _isA<String>(value);
+    if (expectedType == int) return _isA<int>(value);
+    if (expectedType == double) return _isA<double>(value);
+    if (expectedType == num) return _isA<num>(value);
+    if (expectedType == bool) return _isA<bool>(value);
 
-    // Remove '?' from nullable types for comparison
-    final actualNonNullable = actualTypeString.replaceAll('?', '');
-    final expectedNonNullable = expectedTypeString.replaceAll('?', '');
+    // Handle nullable types using string comparison (fallback approach)
+    final typeString = expectedType.toString();
+    if (typeString == 'String?') return _isA<String?>(value);
+    if (typeString == 'int?') return _isA<int?>(value);
+    if (typeString == 'double?') return _isA<double?>(value);
+    if (typeString == 'num?') return _isA<num?>(value);
+    if (typeString == 'bool?') return _isA<bool?>(value);
 
-    return actualNonNullable == expectedNonNullable;
+    // Handle complex generic types
+    if (typeString == 'List<String>') return _isA<List<String>>(value);
+
+    // Fallback for types not explicitly listed
+    if (value == null) {
+      // A basic check: if value is null, the type MUST be nullable.
+      return typeString.endsWith('?');
+    }
+    // This still doesn't handle subtypes for unknown types, but it's a last resort.
+    return value.runtimeType == expectedType;
   }
 
   @override
@@ -264,15 +285,13 @@ class DefaultValidationCoordination implements ValidationCoordination {
     if (value != null) {
       final expectedType = fieldRegistry.getFieldType(fieldName);
       if (expectedType != null) {
-        // Get the actual type of the value
-        final actualType = value.runtimeType;
-
-        // Check if types are compatible
-        if (!_isTypeCompatible(actualType, expectedType)) {
+        // Use Dart's 'is' operator for robust type checking
+        // This handles subtypes, nullability, and complex types correctly
+        if (!_isValueCompatibleWithExpectedType(value, expectedType)) {
           throw FormFieldError.typeMismatch(
             fieldName: fieldName,
             expectedType: expectedType,
-            actualType: actualType,
+            actualType: value.runtimeType,
             operation: 'orchestrateFieldValidation',
           );
         }

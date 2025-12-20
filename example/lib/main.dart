@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart'; // <--- 1. Add this import
+import 'package:typed_form_fields/typed_form_fields.dart';
 
+import 'screens/dynamic_form_screen.dart';
 import 'screens/field_wrapper_screen.dart';
 import 'screens/login_form_screen.dart';
 import 'screens/registration_form_screen.dart';
@@ -10,13 +13,28 @@ void main() {
   runApp(const TypedFormFieldsExampleApp());
 }
 
-class TypedFormFieldsExampleApp extends StatelessWidget {
+class TypedFormFieldsExampleApp extends StatefulWidget {
   const TypedFormFieldsExampleApp({super.key});
+
+  @override
+  State<TypedFormFieldsExampleApp> createState() =>
+      _TypedFormFieldsExampleAppState();
+}
+
+class _TypedFormFieldsExampleAppState extends State<TypedFormFieldsExampleApp> {
+  Locale _currentLocale = const Locale('en');
+
+  void _changeLocale(Locale locale) {
+    setState(() {
+      _currentLocale = locale;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Typed Form Fields Examples',
+      locale: _currentLocale,
       theme: ThemeData(
         primarySwatch: Colors.blue,
         useMaterial3: true,
@@ -42,12 +60,32 @@ class TypedFormFieldsExampleApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const ExampleHomeScreen(),
+      // Add localization delegates for validator error messages
+      localizationsDelegates: [
+        ValidatorLocalizationsDelegate.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      // Supported locales for validation messages
+      supportedLocales: const [
+        Locale('en'), // English
+        Locale('es'), // Spanish
+        Locale('fr'), // French
+        Locale('de'), // German
+        Locale('ar'), // Arabic
+      ],
+      home: ExampleHomeScreen(
+        onLocaleChanged: _changeLocale,
+        currentLocale: _currentLocale,
+      ),
       routes: {
         '/registration': (context) => const RegistrationFormScreen(),
         '/login-form': (context) => const LoginFormScreen(),
         '/field-wrapper': (context) => const FieldWrapperScreen(),
-        '/validation-strategies': (context) => const ValidationStrategiesScreen(),
+        '/validation-strategies': (context) =>
+            const ValidationStrategiesScreen(),
+        '/dynamic-form': (context) => const DynamicFormScreen(),
         '/widget-showcase': (context) => const WidgetShowcaseScreen(),
       },
     );
@@ -55,7 +93,14 @@ class TypedFormFieldsExampleApp extends StatelessWidget {
 }
 
 class ExampleHomeScreen extends StatelessWidget {
-  const ExampleHomeScreen({super.key});
+  final Function(Locale) onLocaleChanged;
+  final Locale currentLocale;
+
+  const ExampleHomeScreen({
+    super.key,
+    required this.onLocaleChanged,
+    required this.currentLocale,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -63,6 +108,12 @@ class ExampleHomeScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Typed Form Fields Examples'),
         centerTitle: true,
+        actions: [
+          _LanguageSwitcher(
+            currentLocale: currentLocale,
+            onLocaleChanged: onLocaleChanged,
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -165,6 +216,21 @@ class ExampleHomeScreen extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 12),
+                  _buildExampleCard(
+                    context,
+                    title: 'Dynamic Form',
+                    description:
+                        'Add and remove form fields dynamically with full validation',
+                    icon: Icons.dynamic_form,
+                    route: '/dynamic-form',
+                    features: [
+                      'Dynamic field addition',
+                      'Field removal',
+                      'Type-safe validation',
+                      'Real-time updates',
+                    ],
+                  ),
+                  const SizedBox(height: 12),
 
                   _buildExampleCard(
                     context,
@@ -258,6 +324,78 @@ class ExampleHomeScreen extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _LanguageSwitcher extends StatelessWidget {
+  final Locale currentLocale;
+  final Function(Locale) onLocaleChanged;
+
+  const _LanguageSwitcher({
+    required this.currentLocale,
+    required this.onLocaleChanged,
+  });
+
+  static const Map<String, String> _languageNames = {
+    'en': 'English',
+    'es': 'Español',
+    'fr': 'Français',
+    'de': 'Deutsch',
+    'ar': 'العربية',
+  };
+
+  static const List<Locale> _supportedLocales = [
+    Locale('en'),
+    Locale('es'),
+    Locale('fr'),
+    Locale('de'),
+    Locale('ar'),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return PopupMenuButton<Locale>(
+      icon: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.language),
+          const SizedBox(width: 4),
+          Text(
+            _languageNames[currentLocale.languageCode] ?? 'EN',
+            style: const TextStyle(fontSize: 14),
+          ),
+        ],
+      ),
+      tooltip: 'Change Language',
+      onSelected: (Locale locale) {
+        onLocaleChanged(locale);
+      },
+      itemBuilder: (BuildContext context) {
+        return _supportedLocales.map((Locale locale) {
+          final isSelected = locale.languageCode == currentLocale.languageCode;
+          return PopupMenuItem<Locale>(
+            value: locale,
+            child: Row(
+              children: [
+                if (isSelected)
+                  const Icon(Icons.check, size: 20, color: Colors.blue)
+                else
+                  const SizedBox(width: 20),
+                const SizedBox(width: 8),
+                Text(
+                  _languageNames[locale.languageCode] ?? locale.languageCode,
+                  style: TextStyle(
+                    fontWeight: isSelected
+                        ? FontWeight.bold
+                        : FontWeight.normal,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }).toList();
+      },
     );
   }
 }

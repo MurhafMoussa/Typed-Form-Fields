@@ -27,7 +27,7 @@ class ValidatorLocalizationsDelegate
   }
 
   @override
-  bool shouldReload(ValidatorLocalizationsDelegate old) => false;
+  bool shouldReload(ValidatorLocalizationsDelegate old) => true;
 
   /// List of supported language codes.
   static const List<String> _supportedLocales = [
@@ -35,12 +35,6 @@ class ValidatorLocalizationsDelegate
     'es', // Spanish
     'fr', // French
     'de', // German
-    'it', // Italian
-    'pt', // Portuguese
-    'ru', // Russian
-    'ja', // Japanese
-    'ko', // Korean
-    'zh', // Chinese
     'ar', // Arabic
   ];
 
@@ -48,31 +42,141 @@ class ValidatorLocalizationsDelegate
   ValidatorLocalizations _getLocalizations(Locale locale) {
     switch (locale.languageCode) {
       case 'en':
-        return const DefaultValidatorLocalizations();
+        return const EnglishValidatorLocalizations();
       case 'es':
         return const SpanishValidatorLocalizations();
       case 'fr':
         return const FrenchValidatorLocalizations();
       case 'de':
         return const GermanValidatorLocalizations();
-      case 'it':
-        return const ItalianValidatorLocalizations();
-      case 'pt':
-        return const PortugueseValidatorLocalizations();
-      case 'ru':
-        return const RussianValidatorLocalizations();
-      case 'ja':
-        return const JapaneseValidatorLocalizations();
-      case 'ko':
-        return const KoreanValidatorLocalizations();
-      case 'zh':
-        return const ChineseValidatorLocalizations();
+
       case 'ar':
         return const ArabicValidatorLocalizations();
       default:
-        return const DefaultValidatorLocalizations();
+        return const EnglishValidatorLocalizations();
     }
   }
+}
+
+/// English implementation of [ValidatorLocalizations].
+class EnglishValidatorLocalizations extends ValidatorLocalizations {
+  const EnglishValidatorLocalizations();
+
+  @override
+  Locale get locale => const Locale('en');
+
+  @override
+  String get asyncValidationError => 'The validation failed.';
+
+  @override
+  String get atLeastOneRequiredError =>
+      'At least one field in this group is required.';
+
+  @override
+  String get conditionalValidationError =>
+      'This field is required based on other selections.';
+
+  @override
+  String get dateAfterError => 'The end date must be after the start date.';
+
+  @override
+  String get dateBeforeError => 'The start date must be before the end date.';
+
+  @override
+  String fieldsDifferentError(String fieldName) {
+    return 'This field must be different from $fieldName.';
+  }
+
+  @override
+  String get fieldsMismatchError => 'The fields do not match.';
+
+  @override
+  String greaterThanFieldError(String fieldName) {
+    return 'The value must be greater than $fieldName.';
+  }
+
+  @override
+  String get invalidAlphabeticError => 'Only letters are allowed.';
+
+  @override
+  String get invalidAlphanumericError =>
+      'Only letters and numbers are allowed.';
+
+  @override
+  String get invalidCreditCardError =>
+      'Please enter a valid credit card number.';
+
+  @override
+  String get invalidDateError => 'Please enter a valid date.';
+
+  @override
+  String get invalidEmailError => 'Please enter a valid email address.';
+
+  @override
+  String get invalidIpError => 'Please enter a valid IP address.';
+
+  @override
+  String get invalidJsonError => 'Please enter a valid JSON.';
+
+  @override
+  String get invalidNumberError => 'Please enter a valid number.';
+
+  @override
+  String get invalidPatternError => 'Please enter a valid pattern.';
+
+  @override
+  String get invalidPhoneError => 'Please enter a valid phone number.';
+
+  @override
+  String get invalidUrlError => 'Please enter a valid URL.';
+
+  @override
+  String get invalidUuidError => 'Please enter a valid UUID.';
+
+  @override
+  String lessThanFieldError(String fieldName) {
+    return 'The value must be less than $fieldName.';
+  }
+
+  @override
+  String maxLengthError(int maxLength) {
+    return 'The value must be less than $maxLength.';
+  }
+
+  @override
+  String maxValueError(num maxValue) {
+    return 'The value must be less than $maxValue.';
+  }
+
+  @override
+  String minLengthError(int minLength) {
+    return 'The value must be more than $minLength.';
+  }
+
+  @override
+  String minValueError(num minValue) {
+    return 'The value must be more than $minValue.';
+  }
+
+  @override
+  String get mustBeTrueError => 'This field must be true.';
+
+  @override
+  String get requiredFieldError => 'This field is required.';
+
+  @override
+  String requiredWhenFieldNotEmptyError(String fieldName) {
+    return 'This field is required when $fieldName is not empty.';
+  }
+
+  @override
+  String requiredWhenFieldValueError(String fieldName, String value) {
+    return 'This field is required when $fieldName is $value.';
+  }
+
+  @override
+  String get sumConditionError =>
+      'The sum of the fields must be equal to the condition.';
 }
 
 /// Spanish implementation of [ValidatorLocalizations].
@@ -182,6 +286,9 @@ class SpanishValidatorLocalizations extends ValidatorLocalizations {
 
   @override
   String get asyncValidationError => 'La validación falló.';
+
+  @override
+  String get mustBeTrueError => 'Este campo debe estar marcado.';
 }
 
 /// French implementation of [ValidatorLocalizations].
@@ -291,6 +398,9 @@ class FrenchValidatorLocalizations extends ValidatorLocalizations {
 
   @override
   String get asyncValidationError => 'La validation a échoué.';
+
+  @override
+  String get mustBeTrueError => 'Ce champ doit être coché.';
 }
 
 /// German implementation of [ValidatorLocalizations].
@@ -366,45 +476,48 @@ class GermanValidatorLocalizations extends ValidatorLocalizations {
 
   @override
   String get asyncValidationError => 'Validierung fehlgeschlagen.';
-}
 
-// Placeholder implementations for other languages
-// These can be expanded with proper translations later
-
-class ItalianValidatorLocalizations extends DefaultValidatorLocalizations {
-  const ItalianValidatorLocalizations();
   @override
-  Locale get locale => const Locale('it');
-}
+  String get atLeastOneRequiredError =>
+      'Mindestens ein Feld in dieser Gruppe ist erforderlich.';
 
-class PortugueseValidatorLocalizations extends DefaultValidatorLocalizations {
-  const PortugueseValidatorLocalizations();
   @override
-  Locale get locale => const Locale('pt');
-}
+  String get dateAfterError => 'Die Enddatum muss nach dem Startdatum liegen.';
 
-class RussianValidatorLocalizations extends DefaultValidatorLocalizations {
-  const RussianValidatorLocalizations();
   @override
-  Locale get locale => const Locale('ru');
-}
+  String get dateBeforeError => 'Das Startdatum muss vor dem Enddatum liegen.';
 
-class JapaneseValidatorLocalizations extends DefaultValidatorLocalizations {
-  const JapaneseValidatorLocalizations();
   @override
-  Locale get locale => const Locale('ja');
-}
+  String fieldsDifferentError(String fieldName) {
+    return 'Dieses Feld muss unterschiedlich von $fieldName sein.';
+  }
 
-class KoreanValidatorLocalizations extends DefaultValidatorLocalizations {
-  const KoreanValidatorLocalizations();
   @override
-  Locale get locale => const Locale('ko');
-}
+  String greaterThanFieldError(String fieldName) {
+    return 'Der Wert muss größer als $fieldName sein.';
+  }
 
-class ChineseValidatorLocalizations extends DefaultValidatorLocalizations {
-  const ChineseValidatorLocalizations();
   @override
-  Locale get locale => const Locale('zh');
+  String lessThanFieldError(String fieldName) {
+    return 'Der Wert muss kleiner als $fieldName sein.';
+  }
+
+  @override
+  String get mustBeTrueError => 'Dieses Feld muss ausgewählt sein.';
+
+  @override
+  String requiredWhenFieldNotEmptyError(String fieldName) {
+    return 'Dieses Feld ist erforderlich, wenn $fieldName angegeben ist.';
+  }
+
+  @override
+  String requiredWhenFieldValueError(String fieldName, String value) {
+    return 'Dieses Feld ist erforderlich, wenn $fieldName $value ist.';
+  }
+
+  @override
+  String get sumConditionError =>
+      'Die Summe der Felder muss der Bedingung entsprechen.';
 }
 
 /// Arabic implementation of [ValidatorLocalizations].
@@ -476,4 +589,45 @@ class ArabicValidatorLocalizations extends ValidatorLocalizations {
 
   @override
   String get asyncValidationError => 'فشل في التحقق.';
+
+  @override
+  String get atLeastOneRequiredError =>
+      'يجب أن يكون على الأقل في الحقل في هذه المجموعة.';
+
+  @override
+  String get dateAfterError => 'يجب أن يكون التاريخ بعد التاريخ المبدئي.';
+
+  @override
+  String get dateBeforeError => 'يجب أن يكون التاريخ قبل التاريخ النهائي.';
+
+  @override
+  String fieldsDifferentError(String fieldName) {
+    return 'يجب أن يكون هذا الحقل مختلف عن $fieldName.';
+  }
+
+  @override
+  String greaterThanFieldError(String fieldName) {
+    return 'يجب أن يكون القيمة أكبر من $fieldName.';
+  }
+
+  @override
+  String lessThanFieldError(String fieldName) {
+    return 'يجب أن يكون القيمة أصغر من $fieldName.';
+  }
+
+  @override
+  String get mustBeTrueError => 'يجب أن يكون هذا الحقل محدد.';
+
+  @override
+  String requiredWhenFieldNotEmptyError(String fieldName) {
+    return 'يجب أن يكون هذا الحقل مطلوب عندما يكون $fieldName موجود.';
+  }
+
+  @override
+  String requiredWhenFieldValueError(String fieldName, String value) {
+    return 'يجب أن يكون هذا الحقل مطلوب عندما يكون $fieldName $value.';
+  }
+
+  @override
+  String get sumConditionError => 'يجب أن يكون مجموع الحقول يطابق الشرط.';
 }

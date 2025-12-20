@@ -22,10 +22,10 @@ class TypedCommonValidators {
     String? errorText,
   }) {
     return _RequiredValidator<T>(
-      errorText: errorText ??
-          (context != null
-              ? ValidatorLocalizations.of(context).requiredFieldError
-              : 'This field is required.'),
+      errorText: errorText,
+      fallbackErrorText: context != null
+          ? ValidatorLocalizations.of(context).requiredFieldError
+          : 'This field is required.',
     );
   }
 
@@ -38,10 +38,10 @@ class TypedCommonValidators {
     String? errorText,
   }) {
     return _EmailValidator(
-      errorText: errorText ??
-          (context != null
-              ? ValidatorLocalizations.of(context).invalidEmailError
-              : 'Please enter a valid email address.'),
+      errorText: errorText,
+      fallbackErrorText: context != null
+          ? ValidatorLocalizations.of(context).invalidEmailError
+          : 'Please enter a valid email address.',
     );
   }
 
@@ -57,10 +57,10 @@ class TypedCommonValidators {
   }) {
     return _MinLengthValidator(
       minLength: minLength,
-      errorText: errorText ??
-          (context != null
-              ? ValidatorLocalizations.of(context).minLengthError(minLength)
-              : 'Must be at least $minLength characters long.'),
+      errorText: errorText,
+      fallbackErrorText: context != null
+          ? ValidatorLocalizations.of(context).minLengthError(minLength)
+          : 'Must be at least $minLength characters long.',
     );
   }
 
@@ -91,10 +91,10 @@ class TypedCommonValidators {
   }) {
     return _MaxLengthValidator(
       maxLength: maxLength,
-      errorText: errorText ??
-          (context != null
-              ? ValidatorLocalizations.of(context).maxLengthError(maxLength)
-              : 'Must be at most $maxLength characters long.'),
+      errorText: errorText,
+      fallbackErrorText: context != null
+          ? ValidatorLocalizations.of(context).maxLengthError(maxLength)
+          : 'Must be at most $maxLength characters long.',
     );
   }
 
@@ -110,10 +110,10 @@ class TypedCommonValidators {
   }) {
     return _PatternValidator(
       pattern: pattern,
-      errorText: errorText ??
-          (context != null
-              ? ValidatorLocalizations.of(context).invalidPatternError
-              : 'Please enter a valid format.'),
+      errorText: errorText,
+      fallbackErrorText: context != null
+          ? ValidatorLocalizations.of(context).invalidPatternError
+          : 'Please enter a valid format.',
     );
   }
 
@@ -126,10 +126,10 @@ class TypedCommonValidators {
     String? errorText,
   }) {
     return _NumericValidator(
-      errorText: errorText ??
-          (context != null
-              ? ValidatorLocalizations.of(context).invalidNumberError
-              : 'Please enter a valid number.'),
+      errorText: errorText,
+      fallbackErrorText: context != null
+          ? ValidatorLocalizations.of(context).invalidNumberError
+          : 'Please enter a valid number.',
     );
   }
 
@@ -196,10 +196,10 @@ class TypedCommonValidators {
     String? errorText,
   }) {
     return _PhoneValidator(
-      errorText: errorText ??
-          (context != null
-              ? ValidatorLocalizations.of(context).invalidPhoneError
-              : 'Please enter a valid phone number.'),
+      errorText: errorText,
+      fallbackErrorText: context != null
+          ? ValidatorLocalizations.of(context).invalidPhoneError
+          : 'Please enter a valid phone number.',
     );
   }
 
@@ -308,10 +308,10 @@ class TypedCommonValidators {
     String? errorText,
   }) {
     return _AlphabeticValidator(
-      errorText: errorText ??
-          (context != null
-              ? ValidatorLocalizations.of(context).invalidAlphabeticError
-              : 'Only letters are allowed.'),
+      errorText: errorText,
+      fallbackErrorText: context != null
+          ? ValidatorLocalizations.of(context).invalidAlphabeticError
+          : 'Only letters are allowed.',
     );
   }
 
@@ -327,10 +327,10 @@ class TypedCommonValidators {
     String? errorText,
   }) {
     return _MustBeTrueValidator(
-      errorText: errorText ??
-          (context != null
-              ? ValidatorLocalizations.of(context).mustBeTrueError
-              : 'This field must be checked.'),
+      errorText: errorText,
+      fallbackErrorText: context != null
+          ? ValidatorLocalizations.of(context).mustBeTrueError
+          : 'This field must be checked.',
     );
   }
 }
@@ -338,16 +338,22 @@ class TypedCommonValidators {
 // Private validator implementations
 
 class _RequiredValidator<T> extends Validator<T> {
-  const _RequiredValidator({required this.errorText});
+  const _RequiredValidator({
+    this.errorText,
+    required this.fallbackErrorText,
+  });
 
-  final String errorText;
+  final String? errorText;
+  final String fallbackErrorText;
 
   @override
   String? validate(T? value, BuildContext context) {
-    if (value == null) return errorText;
-    if (value is String && value.isEmpty) return errorText;
-    if (value is Iterable && value.isEmpty) return errorText;
-    if (value is Map && value.isEmpty) return errorText;
+    final localizedError =
+        errorText ?? ValidatorLocalizations.of(context).requiredFieldError;
+    if (value == null) return localizedError;
+    if (value is String && value.isEmpty) return localizedError;
+    if (value is Iterable && value.isEmpty) return localizedError;
+    if (value is Map && value.isEmpty) return localizedError;
     return null;
   }
 }
@@ -364,9 +370,13 @@ class _CustomValidator<T> extends Validator<T> {
 }
 
 class _EmailValidator extends Validator<String> {
-  const _EmailValidator({required this.errorText});
+  const _EmailValidator({
+    this.errorText,
+    required this.fallbackErrorText,
+  });
 
-  final String errorText;
+  final String? errorText;
+  final String fallbackErrorText;
   static final RegExp _emailRegex = RegExp(
     r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
   );
@@ -374,62 +384,94 @@ class _EmailValidator extends Validator<String> {
   @override
   String? validate(String? value, BuildContext context) {
     if (value == null || value.isEmpty) return null;
-    if (!_emailRegex.hasMatch(value)) return errorText;
+    if (!_emailRegex.hasMatch(value)) {
+      return errorText ?? ValidatorLocalizations.of(context).invalidEmailError;
+    }
     return null;
   }
 }
 
 class _MinLengthValidator extends Validator<String> {
-  const _MinLengthValidator({required this.minLength, required this.errorText});
+  const _MinLengthValidator({
+    required this.minLength,
+    this.errorText,
+    required this.fallbackErrorText,
+  });
 
   final int minLength;
-  final String errorText;
+  final String? errorText;
+  final String fallbackErrorText;
 
   @override
   String? validate(String? value, BuildContext context) {
     if (value == null || value.isEmpty) return null;
-    if (value.length < minLength) return errorText;
+    if (value.length < minLength) {
+      return errorText ??
+          ValidatorLocalizations.of(context).minLengthError(minLength);
+    }
     return null;
   }
 }
 
 class _MaxLengthValidator extends Validator<String> {
-  const _MaxLengthValidator({required this.maxLength, required this.errorText});
+  const _MaxLengthValidator({
+    required this.maxLength,
+    this.errorText,
+    required this.fallbackErrorText,
+  });
 
   final int maxLength;
-  final String errorText;
+  final String? errorText;
+  final String fallbackErrorText;
 
   @override
   String? validate(String? value, BuildContext context) {
     if (value == null || value.isEmpty) return null;
-    if (value.length > maxLength) return errorText;
+    if (value.length > maxLength) {
+      return errorText ??
+          ValidatorLocalizations.of(context).maxLengthError(maxLength);
+    }
     return null;
   }
 }
 
 class _PatternValidator extends Validator<String> {
-  const _PatternValidator({required this.pattern, required this.errorText});
+  const _PatternValidator({
+    required this.pattern,
+    this.errorText,
+    required this.fallbackErrorText,
+  });
 
   final RegExp pattern;
-  final String errorText;
+  final String? errorText;
+  final String fallbackErrorText;
 
   @override
   String? validate(String? value, BuildContext context) {
     if (value == null || value.isEmpty) return null;
-    if (!pattern.hasMatch(value)) return errorText;
+    if (!pattern.hasMatch(value)) {
+      return errorText ??
+          ValidatorLocalizations.of(context).invalidPatternError;
+    }
     return null;
   }
 }
 
 class _NumericValidator extends Validator<String> {
-  const _NumericValidator({required this.errorText});
+  const _NumericValidator({
+    this.errorText,
+    required this.fallbackErrorText,
+  });
 
-  final String errorText;
+  final String? errorText;
+  final String fallbackErrorText;
 
   @override
   String? validate(String? value, BuildContext context) {
     if (value == null || value.isEmpty) return null;
-    if (num.tryParse(value) == null) return errorText;
+    if (num.tryParse(value) == null) {
+      return errorText ?? ValidatorLocalizations.of(context).invalidNumberError;
+    }
     return null;
   }
 }
@@ -479,9 +521,13 @@ class _UrlValidator extends Validator<String> {
 }
 
 class _PhoneValidator extends Validator<String> {
-  const _PhoneValidator({required this.errorText});
+  const _PhoneValidator({
+    this.errorText,
+    required this.fallbackErrorText,
+  });
 
-  final String errorText;
+  final String? errorText;
+  final String fallbackErrorText;
   static final RegExp _phoneRegex = RegExp(
     r'^\+?[\d\s\-\(\)]{10,}$',
   );
@@ -489,7 +535,9 @@ class _PhoneValidator extends Validator<String> {
   @override
   String? validate(String? value, BuildContext context) {
     if (value == null || value.isEmpty) return null;
-    if (!_phoneRegex.hasMatch(value)) return errorText;
+    if (!_phoneRegex.hasMatch(value)) {
+      return errorText ?? ValidatorLocalizations.of(context).invalidPhoneError;
+    }
     return null;
   }
 }
@@ -623,27 +671,40 @@ class _AlphanumericValidator extends Validator<String> {
 }
 
 class _AlphabeticValidator extends Validator<String> {
-  const _AlphabeticValidator({required this.errorText});
+  const _AlphabeticValidator({
+    this.errorText,
+    required this.fallbackErrorText,
+  });
 
-  final String errorText;
+  final String? errorText;
+  final String fallbackErrorText;
   static final RegExp _alphabeticRegex = RegExp(r'^[a-zA-Z]+$');
 
   @override
   String? validate(String? value, BuildContext context) {
     if (value == null || value.isEmpty) return null;
-    if (!_alphabeticRegex.hasMatch(value)) return errorText;
+    if (!_alphabeticRegex.hasMatch(value)) {
+      return errorText ??
+          ValidatorLocalizations.of(context).invalidAlphabeticError;
+    }
     return null;
   }
 }
 
 class _MustBeTrueValidator extends Validator<bool> {
-  const _MustBeTrueValidator({required this.errorText});
+  const _MustBeTrueValidator({
+    this.errorText,
+    required this.fallbackErrorText,
+  });
 
-  final String errorText;
+  final String? errorText;
+  final String fallbackErrorText;
 
   @override
   String? validate(bool? value, BuildContext context) {
-    if (value != true) return errorText;
+    if (value != true) {
+      return errorText ?? ValidatorLocalizations.of(context).mustBeTrueError;
+    }
     return null;
   }
 }

@@ -8,3 +8,4 @@ abstract class Validator<T> {
   /// or null if validation passes.
   String? validate(T? value, BuildContext context);
 }
+

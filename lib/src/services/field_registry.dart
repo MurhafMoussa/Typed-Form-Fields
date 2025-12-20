@@ -89,7 +89,7 @@ class DefaultFieldRegistry implements FieldRegistry {
 
   @override
   bool fieldExists(String fieldName) {
-    return _validators.containsKey(fieldName);
+    return _fields.any((field) => field.name == fieldName);
   }
 
   @override

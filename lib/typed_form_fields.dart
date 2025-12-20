@@ -18,6 +18,8 @@ export 'src/services/submission_handling.dart';
 export 'src/services/validation_coordination.dart';
 export 'src/services/validation_debounce.dart';
 export 'src/validators/composite_validator.dart';
+export 'src/validators/validator_localizations.dart';
+export 'src/validators/validator_localizations_delegate.dart';
 // Validators exports
 export 'src/validators/validators.dart';
 export 'src/widgets/typed_checkbox.dart';

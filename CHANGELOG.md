@@ -1,14 +1,42 @@
 # Changelog
 
+## 1.3.2 - Localization Fix & Improvements
+
+### 🌍 **Localization Fixes**
+
+- **Fixed Localization Not Working**: Validators now properly use context at validation time instead of storing messages at creation time
+- **Dynamic Language Switching**: Validation messages now update immediately when language changes
+- **Arabic Localization**: Fixed and completed Arabic translations for all validation messages
+- **Language Switcher**: Added language switcher to example app for easy testing
+
+### 🔧 **Technical Improvements**
+
+- **Validator Architecture**: Updated validators to use `ValidatorLocalizations.of(context)` at validation time
+- **Fallback Support**: Added proper fallback to English when localizations are not found
+- **Context-Aware Validation**: All validators now dynamically get localized messages based on current app locale
+
+### 📚 **Documentation**
+
+- **Updated README**: Added localization setup instructions
+- **Example App**: Enhanced example app with language switcher demonstrating localization
+
+### 🐛 **Bug Fixes**
+
+- Fixed validators not respecting locale changes
+- Fixed Arabic localization returning English messages
+- Fixed `ValidatorLocalizations.of()` returning null in some cases
+
 ## 1.3.1 - Visual Assets & Documentation Enhancement
 
 ### 🎨 **Visual Assets**
+
 - **Validation Strategy Visuals**: Added comprehensive visual representations for all 5 validation strategies
 - **External Asset Links**: Integrated GitHub-hosted visual assets for better pub.dev compatibility
 - **Visual Strategy Comparison**: Enhanced README.md with visual comparison table showing all validation strategies
 - **Improved Package Appeal**: Visual assets make the package more engaging and easier to understand on pub.dev
 
 ### 📚 **Documentation**
+
 - **Enhanced README**: Added visual strategy comparison table with external asset links
 - **Better User Experience**: Visual representations help users quickly understand each validation strategy
 - **Professional Presentation**: Improved package presentation on pub.dev with visual content

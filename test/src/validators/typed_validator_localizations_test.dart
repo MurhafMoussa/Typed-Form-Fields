@@ -135,8 +135,8 @@ void main() {
       expect(find.byType(TestWidget), findsOneWidget);
     });
 
-    group('DefaultValidatorLocalizations', () {
-      const localizations = DefaultValidatorLocalizations();
+    group('EnglishValidatorLocalizations', () {
+      const localizations = EnglishValidatorLocalizations();
 
       test('should have English locale', () {
         expect(localizations.locale, const Locale('en'));
@@ -343,7 +343,7 @@ void main() {
 
     test('should load English localizations', () async {
       final localizations = await delegate.load(const Locale('en'));
-      expect(localizations, isA<DefaultValidatorLocalizations>());
+      expect(localizations, isA<EnglishValidatorLocalizations>());
     });
 
     test('should load Spanish localizations', () async {
@@ -368,7 +368,7 @@ void main() {
 
     test('should load default localizations for unsupported locale', () async {
       final localizations = await delegate.load(const Locale('xx'));
-      expect(localizations, isA<DefaultValidatorLocalizations>());
+      expect(localizations, isA<EnglishValidatorLocalizations>());
     });
 
     test('should not reload delegate', () {

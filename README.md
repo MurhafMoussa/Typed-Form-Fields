@@ -109,7 +109,7 @@ if (state.isValid) {
 - **Debouncing, performance optimizations**
 - **Cross-field, conditional, and composite validation**
 - **Pre-built widgets** for all common form controls
-- **Localization** in 11 languages
+- **Localization** in 5 languages
 
 ## ⚡ **Performance Optimizations**
 
@@ -262,7 +262,7 @@ TypedTimePicker(
 - **Controllers** - Optional `TextEditingController` support with proper disposal
 - **Debouncing** - Configurable update delays
 - **Value Transformation** - Transform values before storing
-- **Localization** - Error messages in 11 languages
+- **Localization** - Error messages in 5 languages
 
 ## ✅ **TypedFieldWrapper<T> - High-Performance Universal Form Integration**
 
@@ -670,12 +670,44 @@ TypedFormProvider.of(context).resetForm();
 
 ## 🌍 **Localization**
 
-Built-in support for 11 languages:
+Built-in support for 5 languages: English, Spanish, French, German, and Arabic.
+
+### **Setup**
+
+To enable localization for validation error messages, add `ValidatorLocalizationsDelegate` to your `MaterialApp`:
 
 ```dart
-// Automatic localization
+import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:typed_form_fields/typed_form_fields.dart';
+
+MaterialApp(
+  localizationsDelegates: [
+    ValidatorLocalizationsDelegate.delegate,
+    GlobalMaterialLocalizations.delegate,
+    GlobalCupertinoLocalizations.delegate,
+    GlobalWidgetsLocalizations.delegate,
+  ],
+  supportedLocales: const [
+    Locale('en'), // English
+    Locale('es'), // Spanish
+    Locale('fr'), // French
+    Locale('de'), // German
+    Locale('ar'), // Arabic
+  ],
+  // ... rest of your app configuration
+)
+```
+
+### **Usage**
+
+Once configured, validation messages will automatically use the current locale:
+
+```dart
+// Automatic localization based on app locale
 TypedCommonValidators.required<String>().validate(null, context)
 // Returns "Este campo es obligatorio." in Spanish
+// Returns "هذا الحقل مطلوب." in Arabic
 ```
 
 ## 🏗 **Architecture**
@@ -689,7 +721,7 @@ TypedCommonValidators.required<String>().validate(null, context)
 - ✅ **BLoC integration** - Reactive state management
 - ✅ **Cross-field validation** - Field interdependencies
 - ✅ **Conditional validation** - Dynamic validation rules
-- ✅ **Localization** - 11 languages supported
+- ✅ **Localization** - 5 languages supported (English, Spanish, French, German, Arabic)
 - ✅ **Performance** - Debouncing, caching, efficient updates
 
 ## 🧪 **Testing & Quality**
