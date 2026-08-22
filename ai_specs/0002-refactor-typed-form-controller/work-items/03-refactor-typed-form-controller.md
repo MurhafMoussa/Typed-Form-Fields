@@ -15,11 +15,11 @@ Refactor `TypedFormController` in `lib/src/core/typed_form_controller.dart` to d
 - `test/src/core/typed_form_controller_test.dart`
 
 ## Acceptance criteria
-- [ ] `TypedFormController` delegates field management to `FormFieldRegistry` and touched tracking to `FormTouchedTracker`.
-- [ ] `FormFieldRegistry` and `FormTouchedTracker` are NOT exported in `lib/typed_form_fields.dart`.
-- [ ] All public API signatures, constructor parameters, and `TypedFormState` remain unchanged.
-- [ ] Existing controller test suite (`test/src/core/typed_form_controller_test.dart`) passes completely without regression.
-- [ ] `flutter analyze` passes with zero issues.
+- [x] `TypedFormController` delegates field management to `FormFieldRegistry` and touched tracking to `FormTouchedTracker`.
+- [x] `FormFieldRegistry` and `FormTouchedTracker` are NOT exported in `lib/typed_form_fields.dart`.
+- [x] All public API signatures, constructor parameters, and `TypedFormState` remain unchanged.
+- [x] Existing controller test suite (`test/src/core/typed_form_controller_test.dart`) passes completely without regression.
+- [x] `flutter analyze` passes with zero issues.
 
 ## Covers
 - User Stories: 1, 2

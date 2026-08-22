@@ -7,6 +7,8 @@ import 'package:typed_form_fields/src/models/models.dart';
 import 'package:typed_form_fields/src/validators/validator.dart';
 
 import 'form_errors.dart';
+import 'form_field_registry.dart';
+import 'form_touched_tracker.dart';
 import 'validation_strategy.dart';
 
 part 'typed_form_state.dart';
@@ -17,59 +19,23 @@ class TypedFormController extends Cubit<TypedFormState> {
     List<FormFieldDefinition> fields = const [],
     ValidationStrategy validationStrategy =
         ValidationStrategy.allFieldsRealTime,
-  }) : super(TypedFormState.initial()) {
-    _fields = List<FormFieldDefinition>.from(fields);
-    _validators = {};
-    _touchedFields = {};
-
-    for (final field in _fields) {
-      _validators[field.name] = field.createValidator();
-      _touchedFields[field.name] = false;
-    }
-
-    final initialValues = <String, Object?>{
-      for (final field in _fields) field.name: field.initialValue
-    };
-    final initialFieldTypes = <String, Type>{
-      for (final field in _fields) field.name: field.valueType
-    };
-
+  })  : _registry = FormFieldRegistry(fields),
+        _touchedTracker = FormTouchedTracker(fields.map((f) => f.name)),
+        super(TypedFormState.initial()) {
     emit(
       TypedFormState(
-        values: initialValues,
+        values: _registry.initialValues,
         errors: const {},
         isValid: validationStrategy.initialValidationState,
         validationStrategy: validationStrategy,
-        fieldTypes: initialFieldTypes,
+        fieldTypes: _registry.fieldTypes,
       ),
     );
   }
 
-  late final List<FormFieldDefinition> _fields;
-  late final Map<String, Validator> _validators;
-  late final Map<String, bool> _touchedFields;
+  final FormFieldRegistry _registry;
+  final FormTouchedTracker _touchedTracker;
   final FormValidator _validator = FormValidator();
-
-  bool _fieldExists(String fieldName) =>
-      _fields.any((field) => field.name == fieldName);
-
-  Type? _getFieldType(String fieldName) {
-    for (final field in _fields) {
-      if (field.name == fieldName) return field.valueType;
-    }
-    return null;
-  }
-
-  void _checkFieldExists(String fieldName) {
-    if (!_fieldExists(fieldName)) {
-      throw FormFieldError.fieldNotFound(
-        fieldName: fieldName,
-        availableFields: _fields.map((f) => f.name).toList(),
-        fieldTypes: {for (final f in _fields) f.name: f.valueType},
-        currentValues: state.values,
-      );
-    }
-  }
 
   /// Type-safe getter for field values
   T? getValue<T>(String fieldName) => state.getValue<T>(fieldName);
@@ -80,15 +46,15 @@ class TypedFormController extends Cubit<TypedFormState> {
     T? value,
     required BuildContext context,
   }) {
-    _checkFieldExists(fieldName);
+    _registry.checkFieldExists(fieldName, currentValues: state.values);
     _validator.validateValueType(
       fieldName: fieldName,
       value: value,
-      expectedType: _getFieldType(fieldName),
+      expectedType: _registry.getFieldType(fieldName),
       operation: 'orchestrateFieldValidation',
     );
 
-    _touchedFields[fieldName] = true;
+    _touchedTracker.markTouched(fieldName);
 
     final newValues = Map<String, Object?>.from(state.values)..[fieldName] = value;
     final newErrors = Map<String, String>.from(state.errors);
@@ -102,13 +68,13 @@ class TypedFormController extends Cubit<TypedFormState> {
         newErrors.addAll(
           _validator.validateFields(
             values: newValues,
-            validators: _validators,
+            validators: _registry.validators,
             context: context,
           ),
         );
         break;
       case ValidationStrategy.realTimeOnly:
-        final validator = _validators[fieldName];
+        final validator = _registry.getValidator(fieldName);
         if (validator != null) {
           final error = validator.validate(value, context);
           if (error != null) {
@@ -127,8 +93,8 @@ class TypedFormController extends Cubit<TypedFormState> {
         ? true
         : _validator.computeOverallValidity(
             values: newValues,
-            validators: _validators,
-            touchedFields: _touchedFields,
+            validators: _registry.validators,
+            touchedFields: _touchedTracker.touchedFields,
             context: context,
           );
 
@@ -147,15 +113,15 @@ class TypedFormController extends Cubit<TypedFormState> {
     T? value,
     required BuildContext context,
   }) {
-    _checkFieldExists(fieldName);
+    _registry.checkFieldExists(fieldName, currentValues: state.values);
     _validator.validateValueType(
       fieldName: fieldName,
       value: value,
-      expectedType: _getFieldType(fieldName),
+      expectedType: _registry.getFieldType(fieldName),
       operation: 'orchestrateFieldValidation',
     );
 
-    _touchedFields[fieldName] = true;
+    _touchedTracker.markTouched(fieldName);
 
     final newValues = Map<String, Object?>.from(state.values)..[fieldName] = value;
 
@@ -168,13 +134,13 @@ class TypedFormController extends Cubit<TypedFormState> {
       case ValidationStrategy.allFieldsRealTime:
         _validator.validateAllFieldsWithDebounce(
           values: newValues,
-          validators: _validators,
+          validators: _registry.validators,
           context: context,
           onValidationComplete: (errors) {
             final overallValid = _validator.computeOverallValidity(
               values: newValues,
-              validators: _validators,
-              touchedFields: _touchedFields,
+              validators: _registry.validators,
+              touchedFields: _touchedTracker.touchedFields,
               context: context,
             );
             _emitIfChanged(
@@ -192,7 +158,7 @@ class TypedFormController extends Cubit<TypedFormState> {
         _validator.validateFieldWithDebounce(
           fieldName: fieldName,
           value: value,
-          validators: _validators,
+          validators: _registry.validators,
           context: context,
           onValidationComplete: (error) {
             final newErrors = Map<String, String>.from(state.errors);
@@ -204,8 +170,8 @@ class TypedFormController extends Cubit<TypedFormState> {
 
             final overallValid = _validator.computeOverallValidity(
               values: newValues,
-              validators: _validators,
-              touchedFields: _touchedFields,
+              validators: _registry.validators,
+              touchedFields: _touchedTracker.touchedFields,
               context: context,
             );
 
@@ -238,14 +204,14 @@ class TypedFormController extends Cubit<TypedFormState> {
     required BuildContext context,
   }) {
     for (final entry in fieldValues.entries) {
-      _checkFieldExists(entry.key);
+      _registry.checkFieldExists(entry.key, currentValues: state.values);
       _validator.validateValueType(
         fieldName: entry.key,
         value: entry.value,
-        expectedType: _getFieldType(entry.key),
+        expectedType: _registry.getFieldType(entry.key),
         operation: 'orchestrateFieldValidation',
       );
-      _touchedFields[entry.key] = true;
+      _touchedTracker.markTouched(entry.key);
     }
 
     final newValues = Map<String, Object?>.from(state.values);
@@ -264,14 +230,14 @@ class TypedFormController extends Cubit<TypedFormState> {
         newErrors.addAll(
           _validator.validateFields(
             values: newValues,
-            validators: _validators,
+            validators: _registry.validators,
             context: context,
           ),
         );
         break;
       case ValidationStrategy.realTimeOnly:
         for (final fieldName in fieldValues.keys) {
-          final validator = _validators[fieldName];
+          final validator = _registry.getValidator(fieldName);
           if (validator != null) {
             final value = newValues[fieldName];
             final error = validator.validate(value, context);
@@ -292,8 +258,8 @@ class TypedFormController extends Cubit<TypedFormState> {
         ? true
         : _validator.computeOverallValidity(
             values: newValues,
-            validators: _validators,
-            touchedFields: _touchedFields,
+            validators: _registry.validators,
+            touchedFields: _touchedTracker.touchedFields,
             context: context,
           );
 
@@ -313,30 +279,22 @@ class TypedFormController extends Cubit<TypedFormState> {
     required List<Validator<T>> validators,
     required BuildContext context,
   }) {
-    _checkFieldExists(name);
-
-    final fieldIndex = _fields.indexWhere((f) => f.name == name);
-    if (fieldIndex != -1) {
-      final field = _fields[fieldIndex];
-      final updatedField = FormFieldDefinition<T>(
-        name: name,
-        validators: validators,
-        initialValue: field.initialValue as T?,
-      );
-      _fields[fieldIndex] = updatedField;
-      _validators[name] = updatedField.createValidator();
-    }
+    _registry.updateFieldValidators<T>(
+      name: name,
+      validators: validators,
+      currentValues: state.values,
+    );
 
     final newErrors = _validator.validateFields(
       values: state.values,
-      validators: _validators,
+      validators: _registry.validators,
       context: context,
     );
 
     final newIsValid = _validator.computeOverallValidity(
       values: state.values,
-      validators: _validators,
-      touchedFields: _touchedFields,
+      validators: _registry.validators,
+      touchedFields: _touchedTracker.touchedFields,
       context: context,
     );
 
@@ -374,13 +332,13 @@ class TypedFormController extends Cubit<TypedFormState> {
 
       final newErrors = _validator.validateFields(
         values: state.values,
-        validators: _validators,
+        validators: _registry.validators,
         context: context,
       );
       final isValid = _validator.computeOverallValidity(
         values: state.values,
-        validators: _validators,
-        touchedFields: _touchedFields,
+        validators: _registry.validators,
+        touchedFields: _touchedTracker.touchedFields,
         context: context,
       );
 
@@ -410,15 +368,15 @@ class TypedFormController extends Cubit<TypedFormState> {
     required String fieldName,
     required BuildContext context,
   }) {
-    _checkFieldExists(fieldName);
+    _registry.checkFieldExists(fieldName, currentValues: state.values);
     _validator.validateValueType(
       fieldName: fieldName,
       value: state.values[fieldName],
-      expectedType: _getFieldType(fieldName),
+      expectedType: _registry.getFieldType(fieldName),
       operation: 'orchestrateFieldValidation',
     );
 
-    final validator = _validators[fieldName];
+    final validator = _registry.getValidator(fieldName);
     final newErrors = Map<String, String>.from(state.errors);
     if (validator != null) {
       final value = state.values[fieldName];
@@ -432,8 +390,8 @@ class TypedFormController extends Cubit<TypedFormState> {
 
     final isValid = _validator.computeOverallValidity(
       values: state.values,
-      validators: _validators,
-      touchedFields: _touchedFields,
+      validators: _registry.validators,
+      touchedFields: _touchedTracker.touchedFields,
       context: context,
     );
 
@@ -447,13 +405,9 @@ class TypedFormController extends Cubit<TypedFormState> {
 
   /// Resets the form to its initial state
   void resetForm() {
-    for (final key in _touchedFields.keys) {
-      _touchedFields[key] = false;
-    }
+    _touchedTracker.reset();
 
-    final resetValues = <String, Object?>{
-      for (final field in _fields) field.name: field.initialValue
-    };
+    final resetValues = _registry.initialValues;
 
     _emitIfChanged(
       state.copyWith(values: resetValues, errors: const {}, isValid: false),
@@ -462,20 +416,18 @@ class TypedFormController extends Cubit<TypedFormState> {
 
   /// Marks all fields as touched and validates them
   void touchAllFields(BuildContext context) {
-    for (final key in _touchedFields.keys) {
-      _touchedFields[key] = true;
-    }
+    _touchedTracker.markAllTouched();
 
     final newErrors = _validator.validateFields(
       values: state.values,
-      validators: _validators,
+      validators: _registry.validators,
       context: context,
     );
 
     final isValid = _validator.computeOverallValidity(
       values: state.values,
-      validators: _validators,
-      touchedFields: _touchedFields,
+      validators: _registry.validators,
+      touchedFields: _touchedTracker.touchedFields,
       context: context,
     );
 
@@ -500,8 +452,8 @@ class TypedFormController extends Cubit<TypedFormState> {
     String? errorMessage,
     required BuildContext context,
   }) {
-    _checkFieldExists(fieldName);
-    _touchedFields[fieldName] = true;
+    _registry.checkFieldExists(fieldName, currentValues: state.values);
+    _touchedTracker.markTouched(fieldName);
 
     final newErrors = Map<String, String>.from(state.errors);
     if (errorMessage != null) {
@@ -513,8 +465,8 @@ class TypedFormController extends Cubit<TypedFormState> {
     final overallValid = _validator.computeOverallValidityWithErrors(
       values: state.values,
       errors: newErrors,
-      touchedFields: _touchedFields,
-      validators: _validators,
+      touchedFields: _touchedTracker.touchedFields,
+      validators: _registry.validators,
       context: context,
     );
 
@@ -538,8 +490,8 @@ class TypedFormController extends Cubit<TypedFormState> {
     required BuildContext context,
   }) {
     for (final fieldName in errors.keys) {
-      _checkFieldExists(fieldName);
-      _touchedFields[fieldName] = true;
+      _registry.checkFieldExists(fieldName, currentValues: state.values);
+      _touchedTracker.markTouched(fieldName);
     }
 
     final newErrors = Map<String, String>.from(state.errors);
@@ -554,8 +506,8 @@ class TypedFormController extends Cubit<TypedFormState> {
     final overallValid = _validator.computeOverallValidityWithErrors(
       values: state.values,
       errors: newErrors,
-      touchedFields: _touchedFields,
-      validators: _validators,
+      touchedFields: _touchedTracker.touchedFields,
+      validators: _registry.validators,
       context: context,
     );
 
@@ -572,13 +524,8 @@ class TypedFormController extends Cubit<TypedFormState> {
     required FormFieldDefinition<T> field,
     required BuildContext context,
   }) {
-    if (_fieldExists(field.name)) {
-      throw FormFieldError.fieldAlreadyExists(fieldName: field.name);
-    }
-
-    _fields.add(field);
-    _validators[field.name] = field.createValidator();
-    _touchedFields[field.name] = false;
+    _registry.addField<T>(field);
+    _touchedTracker.markTouched(field.name, false);
 
     final newValues = Map<String, Object?>.from(state.values);
     newValues[field.name] = field.initialValue;
@@ -588,14 +535,14 @@ class TypedFormController extends Cubit<TypedFormState> {
 
     final newErrors = _validator.validateFields(
       values: newValues,
-      validators: _validators,
+      validators: _registry.validators,
       context: context,
     );
 
     final newIsValid = _validator.computeOverallValidity(
       values: newValues,
-      validators: _validators,
-      touchedFields: _touchedFields,
+      validators: _registry.validators,
+      touchedFields: _touchedTracker.touchedFields,
       context: context,
     );
 
@@ -614,16 +561,9 @@ class TypedFormController extends Cubit<TypedFormState> {
     required List<FormFieldDefinition> fields,
     required BuildContext context,
   }) {
+    _registry.addFields(fields);
     for (final field in fields) {
-      if (_fieldExists(field.name)) {
-        throw FormFieldError.fieldAlreadyExists(fieldName: field.name);
-      }
-    }
-
-    for (final field in fields) {
-      _fields.add(field);
-      _validators[field.name] = field.createValidator();
-      _touchedFields[field.name] = false;
+      _touchedTracker.markTouched(field.name, false);
     }
 
     final newValues = Map<String, Object?>.from(state.values);
@@ -636,14 +576,14 @@ class TypedFormController extends Cubit<TypedFormState> {
 
     final newErrors = _validator.validateFields(
       values: newValues,
-      validators: _validators,
+      validators: _registry.validators,
       context: context,
     );
 
     final newIsValid = _validator.computeOverallValidity(
       values: newValues,
-      validators: _validators,
-      touchedFields: _touchedFields,
+      validators: _registry.validators,
+      touchedFields: _touchedTracker.touchedFields,
       context: context,
     );
 
@@ -659,25 +599,22 @@ class TypedFormController extends Cubit<TypedFormState> {
 
   /// Remove a field from the form dynamically
   void removeField(String fieldName, {required BuildContext context}) {
-    _checkFieldExists(fieldName);
-
-    _fields.removeWhere((field) => field.name == fieldName);
-    _validators.remove(fieldName);
-    _touchedFields.remove(fieldName);
+    _registry.removeField(fieldName, currentValues: state.values);
+    _touchedTracker.remove(fieldName);
 
     final newValues = Map<String, Object?>.from(state.values)..remove(fieldName);
     final newFieldTypes = Map<String, Type>.from(state.fieldTypes)..remove(fieldName);
 
     final validatedErrors = _validator.validateFields(
       values: newValues,
-      validators: _validators,
+      validators: _registry.validators,
       context: context,
     );
 
     final newIsValid = _validator.computeOverallValidity(
       values: newValues,
-      validators: _validators,
-      touchedFields: _touchedFields,
+      validators: _registry.validators,
+      touchedFields: _touchedTracker.touchedFields,
       context: context,
     );
 
@@ -693,15 +630,8 @@ class TypedFormController extends Cubit<TypedFormState> {
 
   /// Remove multiple fields from the form dynamically
   void removeFields(List<String> fieldNames, {required BuildContext context}) {
-    for (final fieldName in fieldNames) {
-      _checkFieldExists(fieldName);
-    }
-
-    for (final fieldName in fieldNames) {
-      _fields.removeWhere((field) => field.name == fieldName);
-      _validators.remove(fieldName);
-      _touchedFields.remove(fieldName);
-    }
+    _registry.removeFields(fieldNames, currentValues: state.values);
+    _touchedTracker.removeFields(fieldNames);
 
     final newValues = Map<String, Object?>.from(state.values);
     final newFieldTypes = Map<String, Type>.from(state.fieldTypes);
@@ -713,14 +643,14 @@ class TypedFormController extends Cubit<TypedFormState> {
 
     final validatedErrors = _validator.validateFields(
       values: newValues,
-      validators: _validators,
+      validators: _registry.validators,
       context: context,
     );
 
     final newIsValid = _validator.computeOverallValidity(
       values: newValues,
-      validators: _validators,
-      touchedFields: _touchedFields,
+      validators: _registry.validators,
+      touchedFields: _touchedTracker.touchedFields,
       context: context,
     );
 
