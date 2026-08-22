@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:typed_form_fields/src/core/form_errors.dart';
 import 'package:typed_form_fields/src/core/typed_form_controller.dart';
+import 'package:typed_form_fields/src/core/validation_strategy.dart';
+import 'package:typed_form_fields/src/models/models.dart';
 
 void main() {
   group('CoreFormState', () {
@@ -200,6 +202,25 @@ void main() {
         );
 
         expect(state, equals(identicalState));
+        expect(state.hashCode, equals(identicalState.hashCode));
+      });
+
+      test('should compare map collections deeply', () {
+        final state1 = TypedFormState(
+          values: Map<String, Object?>.from({'a': 1, 'b': 'two'}),
+          errors: Map<String, String>.from({'a': 'err1'}),
+          isValid: true,
+          fieldTypes: Map<String, Type>.from({'a': int, 'b': String}),
+        );
+        final state2 = TypedFormState(
+          values: {'a': 1, 'b': 'two'},
+          errors: {'a': 'err1'},
+          isValid: true,
+          fieldTypes: {'a': int, 'b': String},
+        );
+
+        expect(state1, equals(state2));
+        expect(state1.hashCode, equals(state2.hashCode));
       });
 
       test('should not be equal to different state', () {
@@ -246,6 +267,64 @@ void main() {
           'ValidationStrategy.disabled');
       expect(ValidationStrategy.onSubmitOnly.toString(),
           'ValidationStrategy.onSubmitOnly');
+    });
+  });
+
+  group('FormFieldDefinition', () {
+    test('should create field definition with correct properties', () {
+      final field = FormFieldDefinition<String>(
+        name: 'email',
+        validators: [],
+        initialValue: 'test@example.com',
+      );
+
+      expect(field.name, 'email');
+      expect(field.validators, isEmpty);
+      expect(field.initialValue, 'test@example.com');
+      expect(field.valueType, String);
+    });
+
+    test('copyWith should update specified properties', () {
+      final field = FormFieldDefinition<String>(
+        name: 'email',
+        validators: [],
+        initialValue: 'test@example.com',
+      );
+
+      final updated = field.copyWith(name: 'newEmail', initialValue: 'new@example.com');
+
+      expect(updated.name, 'newEmail');
+      expect(updated.initialValue, 'new@example.com');
+      expect(updated.validators, isEmpty);
+    });
+
+    test('equality and hashCode should work deeply', () {
+      final field1 = FormFieldDefinition<String>(
+        name: 'email',
+        validators: [],
+        initialValue: 'test@example.com',
+      );
+      final field2 = FormFieldDefinition<String>(
+        name: 'email',
+        validators: [],
+        initialValue: 'test@example.com',
+      );
+      final field3 = field1.copyWith(name: 'username');
+
+      expect(field1, equals(field2));
+      expect(field1.hashCode, equals(field2.hashCode));
+      expect(field1, isNot(equals(field3)));
+    });
+
+    test('toString should include property values', () {
+      final field = FormFieldDefinition<String>(
+        name: 'email',
+        validators: [],
+        initialValue: 'test@example.com',
+      );
+
+      expect(field.toString(), contains('email'));
+      expect(field.toString(), contains('test@example.com'));
     });
   });
 }

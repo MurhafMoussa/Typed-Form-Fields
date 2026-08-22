@@ -8,6 +8,7 @@ library;
 export 'src/core/form_errors.dart';
 // Core exports
 export 'src/core/typed_form_controller.dart';
+export 'src/core/validation_strategy.dart';
 // Models exports
 export 'src/models/form_field_definition.dart';
 export 'src/services/field_registry.dart';

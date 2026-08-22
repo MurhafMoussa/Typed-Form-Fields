@@ -1,6 +1,7 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:meta/meta.dart';
 import 'package:typed_form_fields/src/models/models.dart';
 import 'package:typed_form_fields/src/services/error_management.dart';
 import 'package:typed_form_fields/src/services/field_lifecycle.dart';
@@ -13,8 +14,8 @@ import 'package:typed_form_fields/src/services/validation_execution.dart';
 import 'package:typed_form_fields/src/validators/validator.dart';
 
 import 'form_errors.dart';
+import 'validation_strategy.dart';
 
-part 'typed_form_controller.freezed.dart';
 part 'typed_form_state.dart';
 
 /// Form cubit with type-safe state access

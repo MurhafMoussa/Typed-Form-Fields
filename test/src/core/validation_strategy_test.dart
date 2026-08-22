@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:typed_form_fields/src/core/typed_form_controller.dart';
+import 'package:typed_form_fields/src/core/validation_strategy.dart';
 import 'package:typed_form_fields/src/models/form_field_definition.dart';
 import 'package:typed_form_fields/src/validators/typed_common_validators.dart';
 

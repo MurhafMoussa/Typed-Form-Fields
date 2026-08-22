@@ -1,22 +1,27 @@
 part of 'typed_form_controller.dart';
 
-@freezed
-abstract class TypedFormState with _$TypedFormState {
-  const factory TypedFormState({
-    required Map<String, Object?> values,
-    required Map<String, String> errors,
-    required bool isValid,
-    @Default(ValidationStrategy.realTimeOnly)
-    ValidationStrategy validationStrategy,
-    required Map<String, Type> fieldTypes,
-  }) = _TypedFormState;
-  const TypedFormState._();
+@immutable
+class TypedFormState {
+  const TypedFormState({
+    required this.values,
+    required this.errors,
+    required this.isValid,
+    this.validationStrategy = ValidationStrategy.realTimeOnly,
+    required this.fieldTypes,
+  });
+
   factory TypedFormState.initial() => const TypedFormState(
         values: {},
         errors: {},
         isValid: false,
         fieldTypes: {},
       );
+
+  final Map<String, Object?> values;
+  final Map<String, String> errors;
+  final bool isValid;
+  final ValidationStrategy validationStrategy;
+  final Map<String, Type> fieldTypes;
 
   /// Type-safe getter for field values
   @useResult
@@ -58,88 +63,47 @@ abstract class TypedFormState with _$TypedFormState {
   /// Check if a field has an error
   @useResult
   bool hasError(String fieldName) => errors.containsKey(fieldName);
-}
 
-/// Enum representing the available form validation strategies
-enum ValidationStrategy {
-  /// Validation occurs only upon form submission
-  onSubmitThenRealTime,
-
-  /// All fields are validated whenever any field is updated
-  allFieldsRealTime,
-
-  /// Only the field currently being edited is validated
-  realTimeOnly,
-
-  /// Validation is disabled
-  disabled,
-
-  /// Validation is only done on form submission
-  onSubmitOnly;
-
-  bool get isSubmissionSpecific =>
-      this == onSubmitOnly || this == onSubmitThenRealTime;
-
-  /// Get initial validation state based on strategy
-  bool get initialValidationState {
-    switch (this) {
-      case ValidationStrategy.onSubmitOnly:
-      case ValidationStrategy.onSubmitThenRealTime:
-      case ValidationStrategy.disabled:
-        return true;
-
-      case ValidationStrategy.realTimeOnly:
-      case ValidationStrategy.allFieldsRealTime:
-        return false;
-    }
+  TypedFormState copyWith({
+    Map<String, Object?>? values,
+    Map<String, String>? errors,
+    bool? isValid,
+    ValidationStrategy? validationStrategy,
+    Map<String, Type>? fieldTypes,
+  }) {
+    return TypedFormState(
+      values: values ?? this.values,
+      errors: errors ?? this.errors,
+      isValid: isValid ?? this.isValid,
+      validationStrategy: validationStrategy ?? this.validationStrategy,
+      fieldTypes: fieldTypes ?? this.fieldTypes,
+    );
   }
 
-  /// Determine if validation should occur for field updates
-  bool shouldValidateOnFieldUpdate() {
-    switch (this) {
-      case ValidationStrategy.disabled:
-        return false;
-      case ValidationStrategy.onSubmitOnly:
-      case ValidationStrategy.onSubmitThenRealTime:
-      case ValidationStrategy.realTimeOnly:
-      case ValidationStrategy.allFieldsRealTime:
-        return true; // All strategies except disabled should validate on field update
-    }
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! TypedFormState) return false;
+    return isValid == other.isValid &&
+        validationStrategy == other.validationStrategy &&
+        const MapEquality<String, Object?>().equals(values, other.values) &&
+        const MapEquality<String, String>().equals(errors, other.errors) &&
+        const MapEquality<String, Type>().equals(fieldTypes, other.fieldTypes);
   }
 
-  /// Determine if validation should occur for form submission
-  bool shouldValidateOnSubmission() {
-    switch (this) {
-      case ValidationStrategy.disabled:
-        return false;
-      case ValidationStrategy.onSubmitOnly:
-      case ValidationStrategy.onSubmitThenRealTime:
-      case ValidationStrategy.realTimeOnly:
-      case ValidationStrategy.allFieldsRealTime:
-        return true;
-    }
+  @override
+  int get hashCode {
+    return Object.hash(
+      isValid,
+      validationStrategy,
+      const MapEquality<String, Object?>().hash(values),
+      const MapEquality<String, String>().hash(errors),
+      const MapEquality<String, Type>().hash(fieldTypes),
+    );
   }
 
-  /// Check if strategy should switch after validation failure
-  bool shouldSwitchAfterValidationFailure() {
-    return this == ValidationStrategy.onSubmitThenRealTime;
-  }
-
-  /// Get the strategy to switch to after validation failure
-  ValidationStrategy? getStrategyAfterValidationFailure() {
-    if (shouldSwitchAfterValidationFailure()) {
-      return ValidationStrategy.realTimeOnly;
-    }
-    return null;
-  }
-
-  /// Check if empty values indicate validation errors for this strategy
-  bool hasValidationErrorsFromEmptyValues(Map<String, Object?> currentValues) {
-    if (this != ValidationStrategy.onSubmitThenRealTime) {
-      return false;
-    }
-
-    return currentValues.values
-        .any((value) => value == null || value.toString().isEmpty);
+  @override
+  String toString() {
+    return 'TypedFormState(values: $values, errors: $errors, isValid: $isValid, validationStrategy: $validationStrategy, fieldTypes: $fieldTypes)';
   }
 }
