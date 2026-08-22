@@ -153,17 +153,71 @@ void main() {
       });
 
       test('should delegate debounced field updates to service', () async {
-        // Test that controller properly delegates to field update service
         formCubit.updateFieldWithDebounce<String>(
           fieldName: 'email',
           value: 'test@example.com',
           context: mockContext,
         );
 
-        // Wait for debounce to complete
         await Future<void>.delayed(const Duration(milliseconds: 350));
 
         expect(formCubit.getValue<String>('email'), 'test@example.com');
+      });
+
+      test('should handle debounced field updates with realTimeOnly strategy', () async {
+        final emailValidator = MockValidator<String>();
+        emailValidator.mockValidate = (val, ctx) => val == 'invalid' ? 'Invalid email' : null;
+
+        formCubit = TestFormFactory.createFormWithValidators(
+          emailValidator: emailValidator,
+          validationStrategy: ValidationStrategy.realTimeOnly,
+        );
+
+        formCubit.updateFieldWithDebounce<String>(
+          fieldName: 'email',
+          value: 'invalid',
+          context: mockContext,
+        );
+
+        await Future<void>.delayed(const Duration(milliseconds: 350));
+
+        expect(formCubit.state.errors['email'], 'Invalid email');
+      });
+
+      test('should handle debounced field updates with onSubmitOnly strategy', () {
+        formCubit.setValidationStrategy(ValidationStrategy.onSubmitOnly);
+
+        formCubit.updateFieldWithDebounce<String>(
+          fieldName: 'email',
+          value: 'test@example.com',
+          context: mockContext,
+        );
+
+        expect(formCubit.getValue<String>('email'), 'test@example.com');
+      });
+
+      test('should handle debounced field updates with disabled strategy', () {
+        formCubit.setValidationStrategy(ValidationStrategy.disabled);
+
+        formCubit.updateFieldWithDebounce<String>(
+          fieldName: 'email',
+          value: 'test@example.com',
+          context: mockContext,
+        );
+
+        expect(formCubit.getValue<String>('email'), 'test@example.com');
+        expect(formCubit.state.isValid, isTrue);
+      });
+
+      test('should throw error on updateFieldWithDebounce for missing field', () {
+        expect(
+          () => formCubit.updateFieldWithDebounce<String>(
+            fieldName: 'nonExistent',
+            value: 'val',
+            context: mockContext,
+          ),
+          throwsA(isA<FormFieldError>()),
+        );
       });
     });
 
@@ -414,6 +468,48 @@ void main() {
 
         // Test that the error is cleared
         expect(formCubit.state.errors.containsKey('email'), isFalse);
+      });
+
+      test('should throw error when adding existing field with addField', () {
+        final existingField = FormFieldDefinition<String>(
+          name: 'email',
+          validators: [],
+        );
+
+        expect(
+          () => formCubit.addField(
+            field: existingField,
+            context: mockContext,
+          ),
+          throwsA(isA<FormFieldError>()),
+        );
+      });
+
+      test('should throw error when adding existing field with addFields', () {
+        final newFields = [
+          FormFieldDefinition<String>(
+            name: 'email',
+            validators: [],
+          ),
+        ];
+
+        expect(
+          () => formCubit.addFields(
+            fields: newFields,
+            context: mockContext,
+          ),
+          throwsA(isA<FormFieldError>()),
+        );
+      });
+
+      test('should throw error when removing non-existent field', () {
+        expect(
+          () => formCubit.removeField(
+            'nonExistent',
+            context: mockContext,
+          ),
+          throwsA(isA<FormFieldError>()),
+        );
       });
 
       test('should handle addField delegation', () {

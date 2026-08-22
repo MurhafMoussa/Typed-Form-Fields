@@ -15,11 +15,11 @@ Delete the obsolete internal micro-service unit tests (`test/src/services/*`). A
 - `test/benchmarks/form_performance_benchmark.dart`
 
 ## Acceptance criteria
-- [ ] Obsolete internal micro-service test directory `test/src/services/` is removed.
-- [ ] `test/src/core/typed_form_controller_test.dart` and `test/src/core/form_validator_test.dart` thoroughly test controller state updates, debouncing, validation strategies, and disposal.
-- [ ] `test/integration/form_integration_test.dart` and `test/benchmarks/form_performance_benchmark.dart` execute cleanly without reference errors to deleted micro-services.
-- [ ] `flutter analyze` passes with zero static analysis errors or warnings.
-- [ ] `flutter test` completes with 100% passing tests.
+- [x] Obsolete internal micro-service test directory `test/src/services/` is removed.
+- [x] `test/src/core/typed_form_controller_test.dart` and `test/src/core/form_validator_test.dart` thoroughly test controller state updates, debouncing, validation strategies, and disposal.
+- [x] `test/integration/form_integration_test.dart` and `test/benchmarks/form_performance_benchmark.dart` execute cleanly without reference errors to deleted micro-services.
+- [x] `flutter analyze` passes with zero static analysis errors or warnings.
+- [x] `flutter test` completes with 100% passing tests.
 
 ## Covers
 - User Stories: 2
