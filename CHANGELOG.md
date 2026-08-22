@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.3.3 - Dynamic Validator Localization & Comprehensive Test Suite
+
+### 🌍 **Localization & Validator Enhancements**
+
+- **Dynamic Localized Resolution**: Refactored `min`, `max`, `url`, `creditCard`, `dateString`, `ipAddress`, `uuid`, `json`, and `alphanumeric` validators to evaluate `ValidatorLocalizations.of(context)` dynamically at runtime (`validate(value, context)`), supporting instant app locale changes without re-instantiating validators.
+- **Type Compatibility Fix**: Updated `isValueCompatibleWithExpectedType` in `FormValidator` to correctly support `dynamic` and custom object runtime types.
+
+### 🧪 **Testing & Quality**
+
+- **Expanded Test Suite**: Added 30+ new unit and edge case tests covering `ValidationStrategy` helpers, `TypedFormController` edge cases (`realTimeOnly` error clearing, `updateFields`, `updateErrors`), `FormFieldDefinition.copyWith()`, and private helper constructors.
+- **99.62% Line Coverage**: Achieved near 100% line coverage on all core library files (excluding localizations delegate).
+
 ## 1.3.2 - Localization Fix & Improvements
 
 ### 🌍 **Localization Fixes**

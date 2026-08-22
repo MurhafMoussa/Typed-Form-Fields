@@ -105,7 +105,7 @@ if (state.isValid) {
 - **Zero dependencies** - no flutter_bloc required for users
 - **TypedFormProvider** for clean, simple API
 - **High performance** - uses BLoC internally with buildWhen/listenWhen optimizations
-- **4 validation strategies** (onSubmit, fieldsBeingEdited, allFields, disabled)
+- **5 validation strategies** (onSubmitOnly, onSubmitThenRealTime, realTimeOnly, allFieldsRealTime, disabled)
 - **Debouncing, performance optimizations**
 - **Cross-field, conditional, and composite validation**
 - **Pre-built widgets** for all common form controls
@@ -349,41 +349,34 @@ class CompanyEmailValidator extends Validator<String> {
 ## 🔗 **Cross-Field Validation**
 
 ```dart
-// Password confirmation
-CrossFieldValidators.matches('password', 'confirmPassword')
+// Password confirmation using built-in validator
+TypedCrossFieldValidators.matches<String>('password')
 
 // Custom cross-field validator
-class TotalBudgetValidator extends CrossFieldValidator {
-  @override
-  String get targetField => 'totalBudget';
-
-  @override
-  String? validateWithDependencies(
-    dynamic value,
-    Map<String, dynamic> allValues,
-    BuildContext context,
-  ) {
+final customCrossValidator = TypedCrossFieldValidator<double>(
+  dependentFields: ['marketingBudget', 'developmentBudget'],
+  validator: (value, allValues, context) {
     final marketing = allValues['marketingBudget'] as double? ?? 0;
     final development = allValues['developmentBudget'] as double? ?? 0;
-    final total = value as double? ?? 0;
+    final total = value ?? 0;
 
     if (total < marketing + development) {
-      return 'Total budget must be at least  {marketing + development}';
+      return 'Total budget must be at least ${marketing + development}';
     }
 
     return null;
-  }
-}
+  },
+);
 ```
 
 ## 🧩 **Conditional Validation**
 
-`ConditionalValidator` lets you apply validation rules only when certain conditions are met (e.g., only validate if a checkbox is checked, or if a value is not empty).
+`TypedConditionalValidator` lets you apply validation rules only when certain conditions are met (e.g., only validate if a checkbox is checked, or if a value is not empty).
 
 ```dart
 // Only require a field if the user checked a box
-final validator = ConditionalValidator<String>(
-  condition: (value, context) => TypedFormProvider.of(context).state.getValue<bool>('isChecked') == true,
+final validator = TypedConditionalValidator<String>(
+  condition: (value, context) => TypedFormProvider.of(context).getValue<bool>('isChecked') == true,
   validator: TypedCommonValidators.required<String>(),
 );
 
@@ -395,11 +388,11 @@ FormFieldDefinition<String>(
 )
 ```
 
-You can also use the built-in helpers in `ConditionalValidators`:
+You can also use the built-in helpers in `TypedConditionalValidators`:
 
 ```dart
 // Only validate if not empty
-final validator = ConditionalValidators.whenNotEmpty(
+final validator = TypedConditionalValidators.whenNotEmpty(
   TypedCommonValidators.email(),
 );
 ```
