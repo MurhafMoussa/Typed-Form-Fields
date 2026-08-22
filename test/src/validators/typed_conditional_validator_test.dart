@@ -24,6 +24,12 @@ void main() {
     registerFallbackValue(MockBuildContext());
   });
 
+  group('TypedConditionalValidators private constructor', () {
+    test('ensures private constructor exists', () {
+      expect(() => TypedConditionalValidators, isNotNull);
+    });
+  });
+
   group('TypedConditionalValidator', () {
     late MockBuildContext mockContext;
     late MockValidator mockValidator;

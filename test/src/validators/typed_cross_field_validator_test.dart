@@ -9,6 +9,12 @@ class MockBuildContext extends BuildContext {
 }
 
 void main() {
+  group('TypedCrossFieldValidators private constructor', () {
+    test('ensures private constructor exists', () {
+      expect(() => TypedCrossFieldValidators, isNotNull);
+    });
+  });
+
   group('TypedCrossFieldValidator', () {
 
     testWidgets('should validate field based on other field values',

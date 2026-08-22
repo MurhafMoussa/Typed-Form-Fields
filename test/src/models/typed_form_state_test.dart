@@ -6,6 +6,43 @@ import 'package:typed_form_fields/src/core/validation_strategy.dart';
 import 'package:typed_form_fields/src/models/models.dart';
 
 void main() {
+  group('FormFieldDefinition', () {
+    test('copyWith updates properties correctly', () {
+      const def = FormFieldDefinition<String>(
+        name: 'email',
+        validators: [],
+        initialValue: 'a@b.com',
+      );
+
+      final copy1 = def.copyWith(name: 'newEmail');
+      expect(copy1.name, 'newEmail');
+      expect(copy1.initialValue, 'a@b.com');
+
+      final copy2 = def.copyWith(validators: [], initialValue: 'c@d.com');
+      expect(copy2.name, 'email');
+      expect(copy2.initialValue, 'c@d.com');
+    });
+
+    test('valueType, createValidator, equality, hashCode and toString', () {
+      const def1 = FormFieldDefinition<String>(
+        name: 'email',
+        validators: [],
+        initialValue: 'a@b.com',
+      );
+      const def2 = FormFieldDefinition<String>(
+        name: 'email',
+        validators: [],
+        initialValue: 'a@b.com',
+      );
+
+      expect(def1.valueType, String);
+      expect(def1.createValidator(), isNotNull);
+      expect(def1, equals(def2));
+      expect(def1.hashCode, equals(def2.hashCode));
+      expect(def1.toString(), contains('FormFieldDefinition'));
+    });
+  });
+
   group('CoreFormState', () {
     late TypedFormState state;
 
