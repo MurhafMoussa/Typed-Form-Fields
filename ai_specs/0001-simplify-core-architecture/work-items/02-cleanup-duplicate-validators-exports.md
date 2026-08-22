@@ -15,10 +15,10 @@ Delete legacy duplicate validator files (`lib/src/validators/common_validators.d
 - `lib/src/core/cubit.dart`
 
 ## Acceptance criteria
-- [ ] Duplicate validator files (`common_validators.dart`, `conditional_validator.dart`, `cross_field_validator.dart`) are deleted from `lib/src/validators/`.
-- [ ] Canonical validator files (`typed_common_validators.dart`, `typed_conditional_validator.dart`, `typed_cross_field_validator.dart`) are exported by `lib/src/validators/validators.dart`.
-- [ ] Unused auxiliary file `lib/src/core/cubit.dart` is deleted.
-- [ ] Existing validator tests in `test/src/validators/*` pass.
+- [x] Duplicate validator files (`common_validators.dart`, `conditional_validator.dart`, `cross_field_validator.dart`) are deleted from `lib/src/validators/`.
+- [x] Canonical validator files (`typed_common_validators.dart`, `typed_conditional_validator.dart`, `typed_cross_field_validator.dart`) are exported by `lib/src/validators/validators.dart`.
+- [x] Unused auxiliary file `lib/src/core/cubit.dart` is deleted.
+- [x] Existing validator tests in `test/src/validators/*` pass.
 
 ## Covers
 - User Stories: 1

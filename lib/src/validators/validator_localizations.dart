@@ -17,10 +17,12 @@ abstract class ValidatorLocalizations {
   /// Returns the localized validator messages for the current locale.
   /// If no localizations are found, returns [EnglishValidatorLocalizations].
   static ValidatorLocalizations of(BuildContext context) {
-    final localizations = Localizations.of(context, ValidatorLocalizations);
-    if (localizations != null) {
-      return localizations;
-    }
+    try {
+      final localizations = Localizations.of(context, ValidatorLocalizations);
+      if (localizations != null) {
+        return localizations;
+      }
+    } catch (_) {}
     // Fallback to English if no localizations found
     return const EnglishValidatorLocalizations();
   }
