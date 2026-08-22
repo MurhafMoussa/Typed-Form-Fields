@@ -19,6 +19,8 @@ class FormValidator {
 
   /// Checks if a value is compatible with an expected type
   bool isValueCompatibleWithExpectedType(dynamic value, Type expectedType) {
+    if (expectedType == dynamic) return true;
+
     // Handle basic non-nullable types
     if (expectedType == String) return _isA<String>(value);
     if (expectedType == int) return _isA<int>(value);
@@ -38,7 +40,7 @@ class FormValidator {
     if (typeString == 'List<String>') return _isA<List<String>>(value);
 
     if (value == null) {
-      return typeString.endsWith('?');
+      return typeString.endsWith('?') || typeString == 'dynamic';
     }
     return value.runtimeType == expectedType;
   }

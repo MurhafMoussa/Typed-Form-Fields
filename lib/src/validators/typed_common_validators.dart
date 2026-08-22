@@ -145,10 +145,10 @@ class TypedCommonValidators {
   }) {
     return _MinValueValidator(
       minValue: minValue,
-      errorText: errorText ??
-          (context != null
-              ? ValidatorLocalizations.of(context).minValueError(minValue)
-              : 'Must be at least $minValue.'),
+      errorText: errorText,
+      fallbackErrorText: context != null
+          ? ValidatorLocalizations.of(context).minValueError(minValue)
+          : 'Must be at least $minValue.',
     );
   }
 
@@ -164,10 +164,10 @@ class TypedCommonValidators {
   }) {
     return _MaxValueValidator(
       maxValue: maxValue,
-      errorText: errorText ??
-          (context != null
-              ? ValidatorLocalizations.of(context).maxValueError(maxValue)
-              : 'Must be at most $maxValue.'),
+      errorText: errorText,
+      fallbackErrorText: context != null
+          ? ValidatorLocalizations.of(context).maxValueError(maxValue)
+          : 'Must be at most $maxValue.',
     );
   }
 
@@ -180,10 +180,10 @@ class TypedCommonValidators {
     String? errorText,
   }) {
     return _UrlValidator(
-      errorText: errorText ??
-          (context != null
-              ? ValidatorLocalizations.of(context).invalidUrlError
-              : 'Please enter a valid URL.'),
+      errorText: errorText,
+      fallbackErrorText: context != null
+          ? ValidatorLocalizations.of(context).invalidUrlError
+          : 'Please enter a valid URL.',
     );
   }
 
@@ -212,10 +212,10 @@ class TypedCommonValidators {
     String? errorText,
   }) {
     return _CreditCardValidator(
-      errorText: errorText ??
-          (context != null
-              ? ValidatorLocalizations.of(context).invalidCreditCardError
-              : 'Please enter a valid credit card number.'),
+      errorText: errorText,
+      fallbackErrorText: context != null
+          ? ValidatorLocalizations.of(context).invalidCreditCardError
+          : 'Please enter a valid credit card number.',
     );
   }
 
@@ -228,10 +228,10 @@ class TypedCommonValidators {
     String? errorText,
   }) {
     return _DateStringValidator(
-      errorText: errorText ??
-          (context != null
-              ? ValidatorLocalizations.of(context).invalidDateError
-              : 'Please enter a valid date.'),
+      errorText: errorText,
+      fallbackErrorText: context != null
+          ? ValidatorLocalizations.of(context).invalidDateError
+          : 'Please enter a valid date.',
     );
   }
 
@@ -244,10 +244,10 @@ class TypedCommonValidators {
     String? errorText,
   }) {
     return _IpAddressValidator(
-      errorText: errorText ??
-          (context != null
-              ? ValidatorLocalizations.of(context).invalidIpError
-              : 'Please enter a valid IP address.'),
+      errorText: errorText,
+      fallbackErrorText: context != null
+          ? ValidatorLocalizations.of(context).invalidIpError
+          : 'Please enter a valid IP address.',
     );
   }
 
@@ -260,10 +260,10 @@ class TypedCommonValidators {
     String? errorText,
   }) {
     return _UuidValidator(
-      errorText: errorText ??
-          (context != null
-              ? ValidatorLocalizations.of(context).invalidUuidError
-              : 'Please enter a valid UUID.'),
+      errorText: errorText,
+      fallbackErrorText: context != null
+          ? ValidatorLocalizations.of(context).invalidUuidError
+          : 'Please enter a valid UUID.',
     );
   }
 
@@ -276,10 +276,10 @@ class TypedCommonValidators {
     String? errorText,
   }) {
     return _JsonValidator(
-      errorText: errorText ??
-          (context != null
-              ? ValidatorLocalizations.of(context).invalidJsonError
-              : 'Please enter valid JSON.'),
+      errorText: errorText,
+      fallbackErrorText: context != null
+          ? ValidatorLocalizations.of(context).invalidJsonError
+          : 'Please enter valid JSON.',
     );
   }
 
@@ -292,10 +292,10 @@ class TypedCommonValidators {
     String? errorText,
   }) {
     return _AlphanumericValidator(
-      errorText: errorText ??
-          (context != null
-              ? ValidatorLocalizations.of(context).invalidAlphanumericError
-              : 'Only letters and numbers are allowed.'),
+      errorText: errorText,
+      fallbackErrorText: context != null
+          ? ValidatorLocalizations.of(context).invalidAlphanumericError
+          : 'Only letters and numbers are allowed.',
     );
   }
 
@@ -477,37 +477,57 @@ class _NumericValidator extends Validator<String> {
 }
 
 class _MinValueValidator extends Validator<num> {
-  const _MinValueValidator({required this.minValue, required this.errorText});
+  const _MinValueValidator({
+    required this.minValue,
+    this.errorText,
+    required this.fallbackErrorText,
+  });
 
   final num minValue;
-  final String errorText;
+  final String? errorText;
+  final String fallbackErrorText;
 
   @override
   String? validate(num? value, BuildContext context) {
     if (value == null) return null;
-    if (value < minValue) return errorText;
+    if (value < minValue) {
+      return errorText ??
+          ValidatorLocalizations.of(context).minValueError(minValue);
+    }
     return null;
   }
 }
 
 class _MaxValueValidator extends Validator<num> {
-  const _MaxValueValidator({required this.maxValue, required this.errorText});
+  const _MaxValueValidator({
+    required this.maxValue,
+    this.errorText,
+    required this.fallbackErrorText,
+  });
 
   final num maxValue;
-  final String errorText;
+  final String? errorText;
+  final String fallbackErrorText;
 
   @override
   String? validate(num? value, BuildContext context) {
     if (value == null) return null;
-    if (value > maxValue) return errorText;
+    if (value > maxValue) {
+      return errorText ??
+          ValidatorLocalizations.of(context).maxValueError(maxValue);
+    }
     return null;
   }
 }
 
 class _UrlValidator extends Validator<String> {
-  const _UrlValidator({required this.errorText});
+  const _UrlValidator({
+    this.errorText,
+    required this.fallbackErrorText,
+  });
 
-  final String errorText;
+  final String? errorText;
+  final String fallbackErrorText;
   static final RegExp _urlRegex = RegExp(
     r'^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$',
   );
@@ -515,7 +535,9 @@ class _UrlValidator extends Validator<String> {
   @override
   String? validate(String? value, BuildContext context) {
     if (value == null || value.isEmpty) return null;
-    if (!_urlRegex.hasMatch(value)) return errorText;
+    if (!_urlRegex.hasMatch(value)) {
+      return errorText ?? ValidatorLocalizations.of(context).invalidUrlError;
+    }
     return null;
   }
 }
@@ -543,22 +565,28 @@ class _PhoneValidator extends Validator<String> {
 }
 
 class _CreditCardValidator extends Validator<String> {
-  const _CreditCardValidator({required this.errorText});
+  const _CreditCardValidator({
+    this.errorText,
+    required this.fallbackErrorText,
+  });
 
-  final String errorText;
+  final String? errorText;
+  final String fallbackErrorText;
 
   @override
   String? validate(String? value, BuildContext context) {
     if (value == null || value.isEmpty) return null;
 
+    final err = errorText ?? ValidatorLocalizations.of(context).invalidCreditCardError;
+
     // Remove spaces and dashes
     final cleanValue = value.replaceAll(RegExp(r'[\s\-]'), '');
 
     // Check if it's all digits and has valid length
-    if (!RegExp(r'^\d{13,19}$').hasMatch(cleanValue)) return errorText;
+    if (!RegExp(r'^\d{13,19}$').hasMatch(cleanValue)) return err;
 
     // Luhn algorithm check
-    if (!_isValidLuhn(cleanValue)) return errorText;
+    if (!_isValidLuhn(cleanValue)) return err;
 
     return null;
   }
@@ -584,9 +612,13 @@ class _CreditCardValidator extends Validator<String> {
 }
 
 class _DateStringValidator extends Validator<String> {
-  const _DateStringValidator({required this.errorText});
+  const _DateStringValidator({
+    this.errorText,
+    required this.fallbackErrorText,
+  });
 
-  final String errorText;
+  final String? errorText;
+  final String fallbackErrorText;
 
   @override
   String? validate(String? value, BuildContext context) {
@@ -596,15 +628,19 @@ class _DateStringValidator extends Validator<String> {
       DateTime.parse(value);
       return null;
     } catch (e) {
-      return errorText;
+      return errorText ?? ValidatorLocalizations.of(context).invalidDateError;
     }
   }
 }
 
 class _IpAddressValidator extends Validator<String> {
-  const _IpAddressValidator({required this.errorText});
+  const _IpAddressValidator({
+    this.errorText,
+    required this.fallbackErrorText,
+  });
 
-  final String errorText;
+  final String? errorText;
+  final String fallbackErrorText;
   static final RegExp _ipv4Regex = RegExp(
     r'^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$',
   );
@@ -616,16 +652,20 @@ class _IpAddressValidator extends Validator<String> {
   String? validate(String? value, BuildContext context) {
     if (value == null || value.isEmpty) return null;
     if (!_ipv4Regex.hasMatch(value) && !_ipv6Regex.hasMatch(value)) {
-      return errorText;
+      return errorText ?? ValidatorLocalizations.of(context).invalidIpError;
     }
     return null;
   }
 }
 
 class _UuidValidator extends Validator<String> {
-  const _UuidValidator({required this.errorText});
+  const _UuidValidator({
+    this.errorText,
+    required this.fallbackErrorText,
+  });
 
-  final String errorText;
+  final String? errorText;
+  final String fallbackErrorText;
   static final RegExp _uuidRegex = RegExp(
     r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
   );
@@ -633,15 +673,21 @@ class _UuidValidator extends Validator<String> {
   @override
   String? validate(String? value, BuildContext context) {
     if (value == null || value.isEmpty) return null;
-    if (!_uuidRegex.hasMatch(value)) return errorText;
+    if (!_uuidRegex.hasMatch(value)) {
+      return errorText ?? ValidatorLocalizations.of(context).invalidUuidError;
+    }
     return null;
   }
 }
 
 class _JsonValidator extends Validator<String> {
-  const _JsonValidator({required this.errorText});
+  const _JsonValidator({
+    this.errorText,
+    required this.fallbackErrorText,
+  });
 
-  final String errorText;
+  final String? errorText;
+  final String fallbackErrorText;
 
   @override
   String? validate(String? value, BuildContext context) {
@@ -651,21 +697,28 @@ class _JsonValidator extends Validator<String> {
       jsonDecode(value);
       return null;
     } catch (e) {
-      return errorText;
+      return errorText ?? ValidatorLocalizations.of(context).invalidJsonError;
     }
   }
 }
 
 class _AlphanumericValidator extends Validator<String> {
-  const _AlphanumericValidator({required this.errorText});
+  const _AlphanumericValidator({
+    this.errorText,
+    required this.fallbackErrorText,
+  });
 
-  final String errorText;
+  final String? errorText;
+  final String fallbackErrorText;
   static final RegExp _alphanumericRegex = RegExp(r'^[a-zA-Z0-9]+$');
 
   @override
   String? validate(String? value, BuildContext context) {
     if (value == null || value.isEmpty) return null;
-    if (!_alphanumericRegex.hasMatch(value)) return errorText;
+    if (!_alphanumericRegex.hasMatch(value)) {
+      return errorText ??
+          ValidatorLocalizations.of(context).invalidAlphanumericError;
+    }
     return null;
   }
 }
