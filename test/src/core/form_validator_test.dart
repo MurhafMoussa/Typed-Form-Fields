@@ -81,10 +81,22 @@ void main() {
         );
       });
 
+      test('should validate custom runtime types', () {
+        final date = DateTime.now();
+        expect(
+          formValidator.isValueCompatibleWithExpectedType(date, DateTime),
+          isTrue,
+        );
+      });
+
       test('should handle null values correctly', () {
         expect(
           formValidator.isValueCompatibleWithExpectedType(null, String),
           isFalse,
+        );
+        expect(
+          formValidator.isValueCompatibleWithExpectedType(null, dynamic),
+          isTrue,
         );
       });
     });

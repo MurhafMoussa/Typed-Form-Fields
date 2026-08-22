@@ -618,6 +618,111 @@ void main() {
         expect(find.text('Submit'), findsOneWidget);
       });
     });
+    group('Additional Controller Tests for Edge Cases', () {
+      testWidgets('realTimeOnly strategy updateField clears error when field becomes valid', (tester) async {
+        final emailValidator = MockValidator<String>();
+        emailValidator.mockValidate = (val, ctx) => 'error';
+
+        formCubit = TypedFormController(
+          fields: [
+            FormFieldDefinition<String>(name: 'email', validators: [emailValidator]),
+          ],
+          validationStrategy: ValidationStrategy.realTimeOnly,
+        );
+
+        // First update field to produce error
+        formCubit.updateField(fieldName: 'email', value: 'bad', context: mockContext);
+        await tester.pump(const Duration(milliseconds: 350));
+        expect(formCubit.state.errors['email'], equals('error'));
+
+        // Now set validator to pass
+        emailValidator.mockValidate = (val, ctx) => null;
+        formCubit.updateField(fieldName: 'email', value: 'good', context: mockContext);
+        await tester.pump(const Duration(milliseconds: 350));
+        expect(formCubit.state.errors['email'], isNull);
+      });
+
+      test('updateFields under realTimeOnly strategy handles errors correctly', () {
+        final emailValidator = MockValidator<String>();
+        emailValidator.mockValidate = (val, ctx) => 'email error';
+
+        formCubit = TypedFormController(
+          fields: [
+            FormFieldDefinition<String>(name: 'email', validators: [emailValidator]),
+            const FormFieldDefinition<int>(name: 'age', validators: []),
+          ],
+          validationStrategy: ValidationStrategy.realTimeOnly,
+        );
+
+        formCubit.updateFields(
+          fieldValues: {'email': 'invalid', 'age': 20},
+          context: mockContext,
+        );
+        expect(formCubit.state.errors['email'], equals('email error'));
+
+        emailValidator.mockValidate = (val, ctx) => null;
+        formCubit.updateFields(
+          fieldValues: {'email': 'valid'},
+          context: mockContext,
+        );
+        expect(formCubit.state.errors['email'], isNull);
+      });
+
+      test('updateFields under disabled strategy clears errors and stays valid', () {
+        formCubit = TypedFormController(
+          fields: [
+            const FormFieldDefinition<String>(name: 'email', validators: []),
+          ],
+          validationStrategy: ValidationStrategy.disabled,
+        );
+
+        formCubit.updateFields(
+          fieldValues: {'email': 'anything'},
+          context: mockContext,
+        );
+        expect(formCubit.state.errors, isEmpty);
+        expect(formCubit.state.isValid, isTrue);
+      });
+
+      test('validateFieldImmediately clears error when field becomes valid', () {
+        final emailValidator = MockValidator<String>();
+        emailValidator.mockValidate = (val, ctx) => 'initial error';
+
+        formCubit = TypedFormController(
+          fields: [
+            FormFieldDefinition<String>(name: 'email', validators: [emailValidator]),
+          ],
+        );
+
+        formCubit.validateFieldImmediately(fieldName: 'email', context: mockContext);
+        expect(formCubit.state.errors['email'], equals('initial error'));
+
+        emailValidator.mockValidate = (val, ctx) => null;
+        formCubit.validateFieldImmediately(fieldName: 'email', context: mockContext);
+        expect(formCubit.state.errors['email'], isNull);
+      });
+
+      test('updateErrors clears error when null value is provided for key', () {
+        formCubit = TypedFormController(
+          fields: [
+            const FormFieldDefinition<String>(name: 'email', validators: []),
+          ],
+        );
+
+        formCubit.updateError(
+          fieldName: 'email',
+          errorMessage: 'custom error',
+          context: mockContext,
+        );
+        expect(formCubit.state.errors['email'], equals('custom error'));
+
+        formCubit.updateErrors(
+          errors: {'email': null},
+          context: mockContext,
+        );
+        expect(formCubit.state.errors['email'], isNull);
+      });
+    });
   });
 }
 
