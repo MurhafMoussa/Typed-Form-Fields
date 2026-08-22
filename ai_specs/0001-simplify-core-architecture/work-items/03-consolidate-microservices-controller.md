@@ -14,13 +14,13 @@ Consolidate the 10 internal micro-services (`field_lifecycle.dart`, `validation_
 - `lib/typed_form_fields.dart`
 
 ## Acceptance criteria
-- [ ] `FormValidator` is created at `lib/src/core/form_validator.dart` encapsulating validation rules, strategy coordination, and debouncing timers.
-- [ ] `TypedFormController` handles form lifecycle, values, touched fields, and state emission directly using `FormValidator`.
-- [ ] Debouncing timers are cleanly disposed when `TypedFormController.close()` is called.
-- [ ] All 10 internal micro-service files in `lib/src/services/` are deleted.
-- [ ] Obsolete internal micro-service constructor injection parameters are removed from `TypedFormController`.
-- [ ] `lib/typed_form_fields.dart` exports are updated to remove deleted micro-services and export `FormValidator`.
-- [ ] All public-facing APIs (`getValue`, `updateField`, `validateForm`, etc.) remain 100% backward compatible.
+- [x] `FormValidator` is created at `lib/src/core/form_validator.dart` encapsulating validation rules, strategy coordination, and debouncing timers.
+- [x] `TypedFormController` handles form lifecycle, values, touched fields, and state emission directly using `FormValidator`.
+- [x] Debouncing timers are cleanly disposed when `TypedFormController.close()` is called.
+- [x] All 10 internal micro-service files in `lib/src/services/` are deleted.
+- [x] Obsolete internal micro-service constructor injection parameters are removed from `TypedFormController`.
+- [x] `lib/typed_form_fields.dart` exports are updated to remove deleted micro-services and export `FormValidator`.
+- [x] All public-facing APIs (`getValue`, `updateField`, `validateForm`, etc.) remain 100% backward compatible.
 
 ## Covers
 - User Stories: 1
