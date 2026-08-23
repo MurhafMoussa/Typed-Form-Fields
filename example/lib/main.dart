@@ -5,6 +5,7 @@ import 'package:typed_form_fields/typed_form_fields.dart';
 import 'screens/dynamic_form_screen.dart';
 import 'screens/field_wrapper_screen.dart';
 import 'screens/login_form_screen.dart';
+import 'screens/multi_step_form_screen.dart';
 import 'screens/registration_form_screen.dart';
 import 'screens/validation_strategies_screen.dart';
 import 'screens/widget_showcase_screen.dart';
@@ -86,6 +87,7 @@ class _TypedFormFieldsExampleAppState extends State<TypedFormFieldsExampleApp> {
         '/validation-strategies': (context) =>
             const ValidationStrategiesScreen(),
         '/dynamic-form': (context) => const DynamicFormScreen(),
+        '/multi-step-form': (context) => const MultiStepFormScreen(),
         '/widget-showcase': (context) => const WidgetShowcaseScreen(),
       },
     );
@@ -243,6 +245,21 @@ class ExampleHomeScreen extends StatelessWidget {
                       'All 7 widgets',
                       'Comprehensive examples',
                       'Interactive demos',
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  _buildExampleCard(
+                    context,
+                    title: 'Multi-Step Form Wizard',
+                    description:
+                        'Field grouping and step validation across wizard steps',
+                    icon: Icons.linear_scale,
+                    route: '/multi-step-form',
+                    features: [
+                      'Field grouping',
+                      'Step validation',
+                      'Passive validity check',
+                      'Multi-step wizard',
                     ],
                   ),
                 ],

@@ -122,6 +122,7 @@ if (state.isValid) {
 - **TypedFormProvider** for clean, simple API
 - **High performance** - uses BLoC internally with buildWhen/listenWhen optimizations
 - **5 validation strategies** (onSubmitOnly, onSubmitThenRealTime, realTimeOnly, allFieldsRealTime, disabled)
+- **Field grouping & multi-step validation** (validateGroup, isGroupValid, touchGroup)
 - **Debouncing, performance optimizations**
 - **Cross-field, conditional, and composite validation**
 - **Localization** in 5 languages
@@ -478,6 +479,92 @@ When using `ValidationStrategy.onSubmitThenRealTime`, the form automatically swi
 **No Auto-Switch for onSubmitOnly:**
 When using `ValidationStrategy.onSubmitOnly`, the form maintains the submit-only behavior even after validation failures, providing a consistent experience.
 
+## 🧱 **Field Grouping & Multi-Step Forms**
+
+Tag form fields with an optional `group` metadata tag to validate and control multi-step forms, wizards, or tabbed form views with a single method call:
+
+### **1. Tag Fields with a Group Name**
+
+```dart
+TypedFormProvider(
+  fields: [
+    // Step 1: Personal Info
+    FormFieldDefinition<String>(
+      name: 'fullName',
+      group: 'personal_info',
+      validators: [TypedCommonValidators.required<String>()],
+      initialValue: '',
+    ),
+    FormFieldDefinition<String>(
+      name: 'email',
+      group: 'personal_info',
+      validators: [TypedCommonValidators.required<String>(), TypedCommonValidators.email()],
+      initialValue: '',
+    ),
+    // Step 2: Address Info
+    FormFieldDefinition<String>(
+      name: 'street',
+      group: 'address_info',
+      validators: [TypedCommonValidators.required<String>()],
+      initialValue: '',
+    ),
+  ],
+  child: (context) => MultiStepWizardView(),
+);
+```
+
+### **2. Validate Step / Group on Navigation**
+
+Use `context.validateGroup('group_name')` to validate all fields matching the group tag and mark them as touched. Triggers `onValidationPass` or `onValidationFail` callbacks automatically:
+
+```dart
+ElevatedButton(
+  onPressed: () {
+    context.validateGroup(
+      'personal_info',
+      onValidationPass: () {
+        // Step 1 is valid, advance to Step 2
+        setState(() => currentStep = 1);
+      },
+      onValidationFail: () {
+        // Show step error notification
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please fix errors before proceeding.')),
+        );
+      },
+    );
+  },
+  child: const Text('Next Step'),
+);
+```
+
+### **3. Passive Group & Subset Validity Checks**
+
+Passively check if a step or subset of fields is valid without triggering debouncing, without altering `touched` state, and without showing error messages prematurely (ideal for enabling/disabling "Next" buttons):
+
+```dart
+TypedFormBuilder(
+  builder: (context, state) {
+    // Passive check returns bool
+    final isStep1Valid = context.isGroupValid('personal_info');
+    final areFieldsValid = context.areFieldsValid(['fullName', 'email']);
+
+    return ElevatedButton(
+      onPressed: isStep1Valid ? () => advanceToNextStep() : null,
+      child: const Text('Next Step'),
+    );
+  },
+);
+```
+
+### **4. Group & Subset Control APIs**
+
+- **`context.validateGroup('group_name')`** - Validates group fields, marks touched = true, and triggers pass/fail callbacks.
+- **`context.validateFields(['field1', 'field2'])`** - Validates explicit list of field names.
+- **`context.isGroupValid('group_name')`** - Passively returns `true` if all group fields pass validation.
+- **`context.areFieldsValid(['field1', 'field2'])`** - Passively returns `true` if all specified fields pass validation.
+- **`context.touchGroup('group_name')`** - Marks all fields matching the group as touched without callbacks.
+
 ## 🔄 **Dynamic Form Updates**
 
 The `TypedFormController` provides comprehensive APIs for **real-time form updates**:
@@ -593,6 +680,24 @@ TypedFormProvider.of(context).validateForm(
   onValidationFail: () => print('Form has errors'),
 );
 
+// Validate a specific field group (step validation)
+TypedFormProvider.of(context).validateGroup(
+  'step1',
+  context: context,
+  onValidationPass: () => print('Step 1 valid!'),
+  onValidationFail: () => print('Step 1 invalid'),
+);
+
+// Validate specific subset of fields
+TypedFormProvider.of(context).validateFields(
+  ['firstName', 'lastName'],
+  context: context,
+);
+
+// Passive validity checks (returns bool without altering touched state)
+final step1Valid = TypedFormProvider.of(context).isGroupValid('step1', context: context);
+final subsetValid = TypedFormProvider.of(context).areFieldsValid(['firstName', 'lastName'], context: context);
+
 // Validate specific field immediately (no debouncing)
 TypedFormProvider.of(context).validateFieldImmediately(
   fieldName: 'email',
@@ -601,6 +706,9 @@ TypedFormProvider.of(context).validateFieldImmediately(
 
 // Mark all fields as touched and validate them
 TypedFormProvider.of(context).touchAllFields(context);
+
+// Touch fields in a group
+TypedFormProvider.of(context).touchGroup('step1', context: context);
 
 // Reset form to initial state
 TypedFormProvider.of(context).resetForm();

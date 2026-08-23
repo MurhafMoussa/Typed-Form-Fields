@@ -1,5 +1,25 @@
 # Changelog
 
+## 2.1.0 - Field Grouping & Multi-Step Validation API
+
+### ✨ **New Features**
+
+- **Field Grouping Metadata**: Added optional `group` (`String?`) parameter to `FormFieldDefinition<T>` and `copyWith()` method for categorizing fields by step or section.
+- **Group Validation API (`validateGroup`)**: Added `validateGroup` on `TypedFormController` and `context.validateGroup()` on `BuildContext` to validate and mark all fields in a specific step/group as touched, with `onValidationPass` and `onValidationFail` callbacks. Automatically switches `onSubmitThenRealTime` strategy to `realTimeOnly` if step validation fails.
+- **Field Subset Validation API (`validateFields`)**: Added `validateFields` on `TypedFormController` and `context.validateFields()` on `BuildContext` for validating explicit subsets of fields by name. Throws `FormFieldError.fieldNotFound` if a specified field is missing.
+- **Passive Group & Subset Validity Checks**: Added `isGroupValid` / `context.isGroupValid()` and `areFieldsValid` / `context.areFieldsValid()` for real-time passive validity checks without modifying `touched` state or triggering error displays prematurely.
+- **Group Touching API (`touchGroup`)**: Added `touchGroup` and `context.touchGroup()` to mark entire field groups as touched.
+- **Interactive Multi-Step Wizard Example**: Added `MultiStepFormScreen` in the example app showcasing group tagging, step validation callbacks, and passive step progress indicators.
+
+### 🛠 **Architectural & Core Improvements**
+
+- **Registry Group Indexing**: Updated `FormFieldRegistry` with `getFieldsByGroup()` returning unmodifiable lists of group fields for fast O(N) lookup.
+- **Controller Refactoring**: Internal delegation of field registry and touched state tracking to dedicated `FormFieldRegistry` and `FormTouchedTracker` helpers.
+
+### 🧪 **Testing & Quality**
+
+- **Multi-step Integration Tests**: Added integration tests in `test/integration/multi_step_form_integration_test.dart` covering 3-step wizard navigation, error highlighting, passive status checks, step correction, and form submission.
+
 ## 2.0.0 - Decoupled Built-in Widgets for Zero UI-Coupling
 
 ### 🚀 **Breaking Changes**
