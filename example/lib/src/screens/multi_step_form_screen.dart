@@ -10,10 +10,7 @@ import '../widgets/showcase_card.dart';
 class MultiStepFormScreen extends StatefulWidget {
   final bool embedded;
 
-  const MultiStepFormScreen({
-    super.key,
-    this.embedded = false,
-  });
+  const MultiStepFormScreen({super.key, this.embedded = false});
 
   @override
   State<MultiStepFormScreen> createState() => _MultiStepFormScreenState();
@@ -410,21 +407,29 @@ class _MultiStepFormScreenState extends State<MultiStepFormScreen> {
                                   }
                                 },
                                 child: Container(
-                                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: 4,
+                                  ),
                                   padding: const EdgeInsets.symmetric(
                                     vertical: 10,
                                     horizontal: 6,
                                   ),
                                   decoration: BoxDecoration(
                                     color: isCurrent
-                                        ? Theme.of(context).colorScheme.primaryContainer
+                                        ? Theme.of(
+                                            context,
+                                          ).colorScheme.primaryContainer
                                         : Theme.of(context).colorScheme.surface,
                                     border: Border.all(
                                       color: isCurrent
-                                          ? Theme.of(context).colorScheme.primary
+                                          ? Theme.of(
+                                              context,
+                                            ).colorScheme.primary
                                           : (isGroupValid
-                                              ? Colors.green
-                                              : Theme.of(context).colorScheme.outline),
+                                                ? Colors.green
+                                                : Theme.of(
+                                                    context,
+                                                  ).colorScheme.outline),
                                       width: isCurrent ? 1.5 : 1,
                                     ),
                                     borderRadius: BorderRadius.circular(8),
@@ -434,14 +439,20 @@ class _MultiStepFormScreenState extends State<MultiStepFormScreen> {
                                       CircleAvatar(
                                         radius: 10,
                                         backgroundColor: isCurrent
-                                            ? Theme.of(context).colorScheme.primary
-                                            : (isGroupValid ? Colors.green : Colors.grey),
+                                            ? Theme.of(
+                                                context,
+                                              ).colorScheme.primary
+                                            : (isGroupValid
+                                                  ? Colors.green
+                                                  : Colors.grey),
                                         child: Text(
                                           '${index + 1}',
                                           style: TextStyle(
                                             fontSize: 11,
                                             color: isCurrent
-                                                ? Theme.of(context).colorScheme.onPrimary
+                                                ? Theme.of(
+                                                    context,
+                                                  ).colorScheme.onPrimary
                                                 : Colors.white,
                                             fontWeight: FontWeight.bold,
                                           ),
@@ -452,11 +463,16 @@ class _MultiStepFormScreenState extends State<MultiStepFormScreen> {
                                         _stepTitles[index],
                                         style: TextStyle(
                                           fontSize: 11,
-                                          fontWeight:
-                                              isCurrent ? FontWeight.w600 : FontWeight.normal,
+                                          fontWeight: isCurrent
+                                              ? FontWeight.w600
+                                              : FontWeight.normal,
                                           color: isCurrent
-                                              ? Theme.of(context).colorScheme.onPrimaryContainer
-                                              : Theme.of(context).colorScheme.onSurface,
+                                              ? Theme.of(
+                                                  context,
+                                                ).colorScheme.onPrimaryContainer
+                                              : Theme.of(
+                                                  context,
+                                                ).colorScheme.onSurface,
                                         ),
                                         overflow: TextOverflow.ellipsis,
                                       ),
@@ -530,8 +546,6 @@ class _MultiStepFormScreenState extends State<MultiStepFormScreen> {
       return body;
     }
 
-    return Scaffold(
-      body: body,
-    );
+    return Scaffold(body: body);
   }
 }

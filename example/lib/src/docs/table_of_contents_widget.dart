@@ -68,10 +68,7 @@ class TableOfContentsWidget extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: theme.colorScheme.outline,
-          width: 1,
-        ),
+        border: Border.all(color: theme.colorScheme.outline, width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -79,11 +76,7 @@ class TableOfContentsWidget extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(
-                Icons.list_alt,
-                size: 16,
-                color: theme.colorScheme.primary,
-              ),
+              Icon(Icons.list_alt, size: 16, color: theme.colorScheme.primary),
               const SizedBox(width: 6),
               Text(
                 'On This Page',
@@ -140,8 +133,9 @@ class TableOfContentsWidget extends StatelessWidget {
                                     : FontWeight.normal,
                                 color: isActive
                                     ? theme.colorScheme.primary
-                                    : theme.colorScheme.onSurface
-                                        .withValues(alpha: 0.8),
+                                    : theme.colorScheme.onSurface.withValues(
+                                        alpha: 0.8,
+                                      ),
                               ),
                             ),
                           ),

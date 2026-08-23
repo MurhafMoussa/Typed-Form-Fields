@@ -21,13 +21,16 @@ class FormValidator {
   final Set<String> _activeValidatingFields = {};
 
   /// Set of field names currently undergoing async validation.
-  Set<String> get activeValidatingFields => Set.unmodifiable(_activeValidatingFields);
+  Set<String> get activeValidatingFields =>
+      Set.unmodifiable(_activeValidatingFields);
 
   /// Checks if a field is currently undergoing async validation.
-  bool isFieldValidating(String fieldName) => _activeValidatingFields.contains(fieldName);
+  bool isFieldValidating(String fieldName) =>
+      _activeValidatingFields.contains(fieldName);
 
   /// Checks if a field has a pending debounced async validation task.
-  bool isFieldDebouncing(String fieldName) => _asyncDebounceTimers.containsKey(fieldName);
+  bool isFieldDebouncing(String fieldName) =>
+      _asyncDebounceTimers.containsKey(fieldName);
 
   /// Checks if there are any active or pending async validation tasks.
   bool get hasActiveOrPendingAsyncValidations =>
@@ -252,8 +255,11 @@ class FormValidator {
     required BuildContext context,
     required Duration debounceDelay,
     required void Function(String fieldName) onValidationStart,
-    required void Function(String fieldName, String? error) onValidationComplete,
-    required void Function(Object error, StackTrace stackTrace, String fieldName) onError,
+    required void Function(String fieldName, String? error)
+        onValidationComplete,
+    required void Function(
+            Object error, StackTrace stackTrace, String fieldName)
+        onError,
   }) {
     cancelAsyncValidation(fieldName);
 

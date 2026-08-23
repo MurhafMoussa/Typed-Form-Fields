@@ -71,7 +71,10 @@ class ValidationStrategySelector extends StatelessWidget {
               value: strategy,
               child: Text(
                 _strategyLabels[strategy] ?? strategy.name,
-                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             );
           }).toList(),

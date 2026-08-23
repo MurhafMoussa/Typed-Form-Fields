@@ -100,8 +100,10 @@ class TypedFormState {
         validationStrategy == other.validationStrategy &&
         const MapEquality<String, Object?>().equals(values, other.values) &&
         const MapEquality<String, String>().equals(errors, other.errors) &&
-        const MapEquality<String, Type>().equals(fieldTypes, other.fieldTypes) &&
-        const SetEquality<String>().equals(validatingFields, other.validatingFields);
+        const MapEquality<String, Type>()
+            .equals(fieldTypes, other.fieldTypes) &&
+        const SetEquality<String>()
+            .equals(validatingFields, other.validatingFields);
   }
 
   @override

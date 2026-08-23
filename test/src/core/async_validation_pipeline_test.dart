@@ -46,7 +46,9 @@ void main() {
       mockContext = MockBuildContext();
     });
 
-    test('TypedFormController supports asyncDebounceDelay and onAsyncValidationError', () {
+    test(
+        'TypedFormController supports asyncDebounceDelay and onAsyncValidationError',
+        () {
       Object? caughtError;
       StackTrace? caughtStack;
       String? caughtField;
@@ -73,7 +75,9 @@ void main() {
       controller.close();
     });
 
-    test('Synchronous validation runs first; if sync validation fails, async validation is skipped', () async {
+    test(
+        'Synchronous validation runs first; if sync validation fails, async validation is skipped',
+        () async {
       final syncValidator = TestSyncValidator<String>((value, context) {
         if (value == null || value.isEmpty) return 'Value is required';
         return null;
@@ -115,7 +119,8 @@ void main() {
       controller.close();
     });
 
-    test('Debouncing delays async validator execution by asyncDebounceDelay', () async {
+    test('Debouncing delays async validator execution by asyncDebounceDelay',
+        () async {
       final asyncValidator = TestAsyncValidator<String>((value, context) async {
         return value == 'taken' ? 'Already taken' : null;
       });
@@ -156,7 +161,9 @@ void main() {
       controller.close();
     });
 
-    test('Fast value updates cancel previous pending async tasks without emitting stale errors', () async {
+    test(
+        'Fast value updates cancel previous pending async tasks without emitting stale errors',
+        () async {
       final asyncValidator = TestAsyncValidator<String>((value, context) async {
         await Future<void>.delayed(const Duration(milliseconds: 50));
         return 'Error for $value';
@@ -206,7 +213,9 @@ void main() {
       controller.close();
     });
 
-    test('In-flight async task is canceled when new value is typed before completion', () async {
+    test(
+        'In-flight async task is canceled when new value is typed before completion',
+        () async {
       final asyncValidator = TestAsyncValidator<String>((value, context) async {
         // Slow async check
         await Future<void>.delayed(const Duration(milliseconds: 150));
@@ -247,13 +256,16 @@ void main() {
       await Future<void>.delayed(const Duration(milliseconds: 250));
 
       // Second check should have finished and set error for 'second@example.com'
-      expect(controller.state.getError('email'), 'Error for second@example.com');
+      expect(
+          controller.state.getError('email'), 'Error for second@example.com');
       expect(controller.state.validatingFields, isEmpty);
 
       controller.close();
     });
 
-    test('Field names enter validatingFields during active async validation and leave when completed', () async {
+    test(
+        'Field names enter validatingFields during active async validation and leave when completed',
+        () async {
       final asyncCompleter = Completer<String?>();
       final asyncValidator = TestAsyncValidator<String>((value, context) {
         return asyncCompleter.future;
@@ -298,7 +310,9 @@ void main() {
       controller.close();
     });
 
-    test('Exceptions in async validators set localized fallback error, clear validatingFields, and trigger onAsyncValidationError', () async {
+    test(
+        'Exceptions in async validators set localized fallback error, clear validatingFields, and trigger onAsyncValidationError',
+        () async {
       Object? caughtError;
       StackTrace? caughtStack;
       String? caughtField;
@@ -347,7 +361,8 @@ void main() {
       controller.close();
     });
 
-    test('Multiple async validators on a single field run sequentially', () async {
+    test('Multiple async validators on a single field run sequentially',
+        () async {
       final logs = <String>[];
 
       final val1 = TestAsyncValidator<String>((value, context) async {
@@ -402,7 +417,9 @@ void main() {
       controller.close();
     });
 
-    test('validateFieldImmediately runs async validation immediately with Duration.zero debounce', () async {
+    test(
+        'validateFieldImmediately runs async validation immediately with Duration.zero debounce',
+        () async {
       final asyncValidator = TestAsyncValidator<String>((value, context) async {
         return value == 'invalid' ? 'Immediate error' : null;
       });
@@ -432,7 +449,8 @@ void main() {
       controller.close();
     });
 
-    test('updateFieldValidators updates async validators dynamically', () async {
+    test('updateFieldValidators updates async validators dynamically',
+        () async {
       final controller = TypedFormController(
         fields: [
           FormFieldDefinition<String>(
@@ -472,7 +490,9 @@ void main() {
       controller.close();
     });
 
-    test('updateField under realTimeOnly validation strategy with async validators', () async {
+    test(
+        'updateField under realTimeOnly validation strategy with async validators',
+        () async {
       final asyncValidator = TestAsyncValidator<String>((value, context) async {
         return value == 'bad' ? 'Bad value' : null;
       });
@@ -504,9 +524,13 @@ void main() {
       controller.close();
     });
 
-    test('updateFieldWithDebounce triggers async validation when sync check passes or cancels when sync fails', () async {
-      final syncValidator = TestSyncValidator<String>((v, c) => v == 'invalid' ? 'Invalid sync' : null);
-      final asyncValidator = TestAsyncValidator<String>((v, c) async => 'Async error');
+    test(
+        'updateFieldWithDebounce triggers async validation when sync check passes or cancels when sync fails',
+        () async {
+      final syncValidator = TestSyncValidator<String>(
+          (v, c) => v == 'invalid' ? 'Invalid sync' : null);
+      final asyncValidator =
+          TestAsyncValidator<String>((v, c) async => 'Async error');
 
       final controller = TypedFormController(
         fields: [
@@ -560,9 +584,12 @@ void main() {
       controller.close();
     });
 
-    test('updateFields under विभिन्न validation strategies and sync pass/fail', () async {
-      final syncValidator = TestSyncValidator<String>((v, c) => v == 'bad_sync' ? 'Sync error' : null);
-      final asyncValidator = TestAsyncValidator<String>((v, c) async => v == 'bad_async' ? 'Async error' : null);
+    test('updateFields under विभिन्न validation strategies and sync pass/fail',
+        () async {
+      final syncValidator = TestSyncValidator<String>(
+          (v, c) => v == 'bad_sync' ? 'Sync error' : null);
+      final asyncValidator = TestAsyncValidator<String>(
+          (v, c) async => v == 'bad_async' ? 'Async error' : null);
 
       final controller = TypedFormController(
         fields: [
@@ -628,8 +655,10 @@ void main() {
       controller.close();
     });
 
-    test('validateFieldImmediately for field without sync validators', () async {
-      final asyncValidator = TestAsyncValidator<String>((v, c) async => 'Async err');
+    test('validateFieldImmediately for field without sync validators',
+        () async {
+      final asyncValidator =
+          TestAsyncValidator<String>((v, c) async => 'Async err');
 
       final controller = TypedFormController(
         fields: [
@@ -665,7 +694,9 @@ void main() {
       controller.close();
     });
 
-    test('Token invalidation mid-flight and in catch block removes active field and exits', () async {
+    test(
+        'Token invalidation mid-flight and in catch block removes active field and exits',
+        () async {
       final completer1 = Completer<String?>();
       final asyncVal1 = TestAsyncValidator<String>((v, c) => completer1.future);
 
@@ -755,7 +786,9 @@ void main() {
       controller.close();
     });
 
-    test('updateFieldWithDebounce under realTimeOnly strategy for field without asyncValidators', () async {
+    test(
+        'updateFieldWithDebounce under realTimeOnly strategy for field without asyncValidators',
+        () async {
       final controller = TypedFormController(
         fields: [
           FormFieldDefinition<String>(
@@ -781,11 +814,14 @@ void main() {
     });
 
     group('Submission and Reset Lifecycle', () {
-      test('Form submission flushes active debounce timers immediately and awaits async validation', () async {
+      test(
+          'Form submission flushes active debounce timers immediately and awaits async validation',
+          () async {
         bool passCalled = false;
         bool failCalled = false;
 
-        final asyncValidator = TestAsyncValidator<String>((value, context) async {
+        final asyncValidator =
+            TestAsyncValidator<String>((value, context) async {
           await Future<void>.delayed(const Duration(milliseconds: 50));
           return value == 'valid@test.com' ? null : 'Invalid email';
         });
@@ -832,11 +868,14 @@ void main() {
         controller.close();
       });
 
-      test('Form submission awaits in-flight async validation and calls onValidationFail when invalid', () async {
+      test(
+          'Form submission awaits in-flight async validation and calls onValidationFail when invalid',
+          () async {
         bool passCalled = false;
         bool failCalled = false;
 
-        final asyncValidator = TestAsyncValidator<String>((value, context) async {
+        final asyncValidator =
+            TestAsyncValidator<String>((value, context) async {
           await Future<void>.delayed(const Duration(milliseconds: 100));
           return value == 'taken' ? 'Username already taken' : null;
         });
@@ -878,7 +917,9 @@ void main() {
         controller.close();
       });
 
-      test('Form reset cancels active debounced and in-flight async tasks and clears validatingFields immediately', () async {
+      test(
+          'Form reset cancels active debounced and in-flight async tasks and clears validatingFields immediately',
+          () async {
         final completer = Completer<String?>();
         final asyncValidator = TestAsyncValidator<String>((value, context) {
           return completer.future;
@@ -925,8 +966,10 @@ void main() {
         controller.close();
       });
 
-      test('Form reset cancels pending debounce timers before execution', () async {
-        final asyncValidator = TestAsyncValidator<String>((value, context) async {
+      test('Form reset cancels pending debounce timers before execution',
+          () async {
+        final asyncValidator =
+            TestAsyncValidator<String>((value, context) async {
           return 'Should never run';
         });
 
@@ -959,15 +1002,19 @@ void main() {
         controller.close();
       });
 
-      test('Form submission with multiple async fields flushes and awaits all fields concurrently', () async {
+      test(
+          'Form submission with multiple async fields flushes and awaits all fields concurrently',
+          () async {
         bool passCalled = false;
 
-        final userValidator = TestAsyncValidator<String>((value, context) async {
+        final userValidator =
+            TestAsyncValidator<String>((value, context) async {
           await Future<void>.delayed(const Duration(milliseconds: 60));
           return null;
         });
 
-        final emailValidator = TestAsyncValidator<String>((value, context) async {
+        final emailValidator =
+            TestAsyncValidator<String>((value, context) async {
           await Future<void>.delayed(const Duration(milliseconds: 60));
           return null;
         });
@@ -1015,10 +1062,13 @@ void main() {
         controller.close();
       });
 
-      test('Form submission under ValidationStrategy.onSubmitOnly schedules and awaits async validation for fields passing sync check', () async {
+      test(
+          'Form submission under ValidationStrategy.onSubmitOnly schedules and awaits async validation for fields passing sync check',
+          () async {
         bool passCalled = false;
 
-        final asyncValidator = TestAsyncValidator<String>((value, context) async {
+        final asyncValidator =
+            TestAsyncValidator<String>((value, context) async {
           await Future<void>.delayed(const Duration(milliseconds: 30));
           return value == 'valid' ? null : 'Invalid value';
         });

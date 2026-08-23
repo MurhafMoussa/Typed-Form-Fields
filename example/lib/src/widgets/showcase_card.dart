@@ -25,7 +25,8 @@ class ShowcaseCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final hasHeader = title != null ||
+    final hasHeader =
+        title != null ||
         description != null ||
         headerLeading != null ||
         headerTrailing != null;
@@ -38,7 +39,10 @@ class ShowcaseCard extends StatelessWidget {
         children: [
           if (hasHeader) ...[
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 12.0,
+              ),
               child: Row(
                 children: [
                   if (headerLeading != null) ...[
@@ -62,7 +66,9 @@ class ShowcaseCard extends StatelessWidget {
                           Text(
                             description!,
                             style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                              color: theme.colorScheme.onSurface.withValues(
+                                alpha: 0.6,
+                              ),
                               fontSize: 13,
                             ),
                           ),
@@ -77,17 +83,10 @@ class ShowcaseCard extends StatelessWidget {
                 ],
               ),
             ),
-            Divider(
-              height: 1,
-              thickness: 1,
-              color: theme.colorScheme.outline,
-            ),
+            Divider(height: 1, thickness: 1, color: theme.colorScheme.outline),
           ],
           if (contentPadding != null)
-            Padding(
-              padding: contentPadding!,
-              child: child,
-            )
+            Padding(padding: contentPadding!, child: child)
           else
             child,
         ],

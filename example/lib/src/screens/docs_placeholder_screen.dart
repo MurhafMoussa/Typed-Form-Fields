@@ -5,10 +5,7 @@ import '../shell/app_routes.dart';
 class DocsPlaceholderScreen extends StatelessWidget {
   final String docRoute;
 
-  const DocsPlaceholderScreen({
-    super.key,
-    required this.docRoute,
-  });
+  const DocsPlaceholderScreen({super.key, required this.docRoute});
 
   @override
   Widget build(BuildContext context) {
@@ -30,15 +27,15 @@ class DocsPlaceholderScreen extends StatelessWidget {
               Text(
                 title,
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 8),
               Text(
                 'Route: $docRoute',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.outline,
-                    ),
+                  color: Theme.of(context).colorScheme.outline,
+                ),
               ),
               const SizedBox(height: 16),
               const Text(

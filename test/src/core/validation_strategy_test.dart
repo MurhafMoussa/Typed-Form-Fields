@@ -9,47 +9,74 @@ void main() {
   group('ValidationStrategy Enum methods and properties', () {
     test('isSubmissionSpecific', () {
       expect(ValidationStrategy.onSubmitOnly.isSubmissionSpecific, isTrue);
-      expect(ValidationStrategy.onSubmitThenRealTime.isSubmissionSpecific, isTrue);
-      expect(ValidationStrategy.allFieldsRealTime.isSubmissionSpecific, isFalse);
+      expect(
+          ValidationStrategy.onSubmitThenRealTime.isSubmissionSpecific, isTrue);
+      expect(
+          ValidationStrategy.allFieldsRealTime.isSubmissionSpecific, isFalse);
       expect(ValidationStrategy.realTimeOnly.isSubmissionSpecific, isFalse);
       expect(ValidationStrategy.disabled.isSubmissionSpecific, isFalse);
     });
 
     test('initialValidationState', () {
       expect(ValidationStrategy.onSubmitOnly.initialValidationState, isTrue);
-      expect(ValidationStrategy.onSubmitThenRealTime.initialValidationState, isTrue);
+      expect(ValidationStrategy.onSubmitThenRealTime.initialValidationState,
+          isTrue);
       expect(ValidationStrategy.disabled.initialValidationState, isTrue);
       expect(ValidationStrategy.realTimeOnly.initialValidationState, isFalse);
-      expect(ValidationStrategy.allFieldsRealTime.initialValidationState, isFalse);
+      expect(
+          ValidationStrategy.allFieldsRealTime.initialValidationState, isFalse);
     });
 
     test('shouldValidateOnFieldUpdate', () {
-      expect(ValidationStrategy.disabled.shouldValidateOnFieldUpdate(), isFalse);
-      expect(ValidationStrategy.onSubmitOnly.shouldValidateOnFieldUpdate(), isTrue);
-      expect(ValidationStrategy.onSubmitThenRealTime.shouldValidateOnFieldUpdate(), isTrue);
-      expect(ValidationStrategy.realTimeOnly.shouldValidateOnFieldUpdate(), isTrue);
-      expect(ValidationStrategy.allFieldsRealTime.shouldValidateOnFieldUpdate(), isTrue);
+      expect(
+          ValidationStrategy.disabled.shouldValidateOnFieldUpdate(), isFalse);
+      expect(ValidationStrategy.onSubmitOnly.shouldValidateOnFieldUpdate(),
+          isTrue);
+      expect(
+          ValidationStrategy.onSubmitThenRealTime.shouldValidateOnFieldUpdate(),
+          isTrue);
+      expect(ValidationStrategy.realTimeOnly.shouldValidateOnFieldUpdate(),
+          isTrue);
+      expect(ValidationStrategy.allFieldsRealTime.shouldValidateOnFieldUpdate(),
+          isTrue);
     });
 
     test('shouldValidateOnSubmission', () {
       expect(ValidationStrategy.disabled.shouldValidateOnSubmission(), isFalse);
-      expect(ValidationStrategy.onSubmitOnly.shouldValidateOnSubmission(), isTrue);
-      expect(ValidationStrategy.onSubmitThenRealTime.shouldValidateOnSubmission(), isTrue);
-      expect(ValidationStrategy.realTimeOnly.shouldValidateOnSubmission(), isTrue);
-      expect(ValidationStrategy.allFieldsRealTime.shouldValidateOnSubmission(), isTrue);
+      expect(
+          ValidationStrategy.onSubmitOnly.shouldValidateOnSubmission(), isTrue);
+      expect(
+          ValidationStrategy.onSubmitThenRealTime.shouldValidateOnSubmission(),
+          isTrue);
+      expect(
+          ValidationStrategy.realTimeOnly.shouldValidateOnSubmission(), isTrue);
+      expect(ValidationStrategy.allFieldsRealTime.shouldValidateOnSubmission(),
+          isTrue);
     });
 
     test('shouldSwitchAfterValidationFailure', () {
-      expect(ValidationStrategy.onSubmitThenRealTime.shouldSwitchAfterValidationFailure(), isTrue);
-      expect(ValidationStrategy.onSubmitOnly.shouldSwitchAfterValidationFailure(), isFalse);
-      expect(ValidationStrategy.realTimeOnly.shouldSwitchAfterValidationFailure(), isFalse);
-      expect(ValidationStrategy.allFieldsRealTime.shouldSwitchAfterValidationFailure(), isFalse);
-      expect(ValidationStrategy.disabled.shouldSwitchAfterValidationFailure(), isFalse);
+      expect(
+          ValidationStrategy.onSubmitThenRealTime
+              .shouldSwitchAfterValidationFailure(),
+          isTrue);
+      expect(
+          ValidationStrategy.onSubmitOnly.shouldSwitchAfterValidationFailure(),
+          isFalse);
+      expect(
+          ValidationStrategy.realTimeOnly.shouldSwitchAfterValidationFailure(),
+          isFalse);
+      expect(
+          ValidationStrategy.allFieldsRealTime
+              .shouldSwitchAfterValidationFailure(),
+          isFalse);
+      expect(ValidationStrategy.disabled.shouldSwitchAfterValidationFailure(),
+          isFalse);
     });
 
     test('getStrategyAfterValidationFailure', () {
       expect(
-        ValidationStrategy.onSubmitThenRealTime.getStrategyAfterValidationFailure(),
+        ValidationStrategy.onSubmitThenRealTime
+            .getStrategyAfterValidationFailure(),
         equals(ValidationStrategy.realTimeOnly),
       );
       expect(
@@ -60,19 +87,23 @@ void main() {
 
     test('hasValidationErrorsFromEmptyValues', () {
       expect(
-        ValidationStrategy.onSubmitOnly.hasValidationErrorsFromEmptyValues({'field': ''}),
+        ValidationStrategy.onSubmitOnly
+            .hasValidationErrorsFromEmptyValues({'field': ''}),
         isFalse,
       );
       expect(
-        ValidationStrategy.onSubmitThenRealTime.hasValidationErrorsFromEmptyValues({'field': 'valid'}),
+        ValidationStrategy.onSubmitThenRealTime
+            .hasValidationErrorsFromEmptyValues({'field': 'valid'}),
         isFalse,
       );
       expect(
-        ValidationStrategy.onSubmitThenRealTime.hasValidationErrorsFromEmptyValues({'field': ''}),
+        ValidationStrategy.onSubmitThenRealTime
+            .hasValidationErrorsFromEmptyValues({'field': ''}),
         isTrue,
       );
       expect(
-        ValidationStrategy.onSubmitThenRealTime.hasValidationErrorsFromEmptyValues({'field': null}),
+        ValidationStrategy.onSubmitThenRealTime
+            .hasValidationErrorsFromEmptyValues({'field': null}),
         isTrue,
       );
     });

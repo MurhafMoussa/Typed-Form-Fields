@@ -19,4 +19,3 @@ abstract class AsyncValidator<T> {
   /// or null if validation passes.
   FutureOr<String?> validate(T? value, BuildContext context);
 }
-

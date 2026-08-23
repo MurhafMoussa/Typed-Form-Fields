@@ -128,7 +128,9 @@ class _EventLogWidgetState extends State<EventLogWidget> {
                     child: Text(
                       'No events recorded yet.',
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.5,
+                        ),
                         fontStyle: FontStyle.italic,
                       ),
                     ),
@@ -172,7 +174,9 @@ class _EventLogWidgetState extends State<EventLogWidget> {
         categoryName = 'VALID';
         break;
       case FormEventCategory.asyncValidation:
-        categoryColor = isDark ? Colors.purple.shade300 : Colors.purple.shade700;
+        categoryColor = isDark
+            ? Colors.purple.shade300
+            : Colors.purple.shade700;
         categoryName = 'ASYNC';
         break;
       case FormEventCategory.userAction:
@@ -204,7 +208,9 @@ class _EventLogWidgetState extends State<EventLogWidget> {
                 decoration: BoxDecoration(
                   color: categoryColor.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(3),
-                  border: Border.all(color: categoryColor.withValues(alpha: 0.4)),
+                  border: Border.all(
+                    color: categoryColor.withValues(alpha: 0.4),
+                  ),
                 ),
                 child: Text(
                   categoryName,

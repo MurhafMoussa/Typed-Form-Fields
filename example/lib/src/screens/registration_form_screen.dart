@@ -16,19 +16,16 @@ class SimulatedAvailabilityValidator extends AsyncValidator<String> {
     if (value == null || value.trim().isEmpty) {
       return Future.value(null);
     }
-    return Future.delayed(
-      const Duration(milliseconds: 500),
-      () {
-        final normalized = value.trim().toLowerCase();
-        if (normalized == 'admin' ||
-            normalized == 'taken' ||
-            normalized == 'admin@example.com' ||
-            normalized == 'taken@example.com') {
-          return '$fieldLabel "$value" is already taken';
-        }
-        return null;
-      },
-    );
+    return Future.delayed(const Duration(milliseconds: 500), () {
+      final normalized = value.trim().toLowerCase();
+      if (normalized == 'admin' ||
+          normalized == 'taken' ||
+          normalized == 'admin@example.com' ||
+          normalized == 'taken@example.com') {
+        return '$fieldLabel "$value" is already taken';
+      }
+      return null;
+    });
   }
 }
 
@@ -38,10 +35,7 @@ class SimulatedAvailabilityValidator extends AsyncValidator<String> {
 class RegistrationFormScreen extends StatefulWidget {
   final bool embedded;
 
-  const RegistrationFormScreen({
-    super.key,
-    this.embedded = false,
-  });
+  const RegistrationFormScreen({super.key, this.embedded = false});
 
   @override
   State<RegistrationFormScreen> createState() => _RegistrationFormScreenState();
@@ -77,9 +71,7 @@ class _RegistrationFormScreenState extends State<RegistrationFormScreen> {
         FormFieldDefinition<String>(
           name: 'username',
           validators: const [],
-          asyncValidators: const [
-            SimulatedAvailabilityValidator('Username'),
-          ],
+          asyncValidators: const [SimulatedAvailabilityValidator('Username')],
           initialValue: '',
         ),
         FormFieldDefinition<String>(
@@ -217,7 +209,10 @@ class _RegistrationFormScreenState extends State<RegistrationFormScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.secondary,
                     borderRadius: BorderRadius.circular(6),
@@ -316,10 +311,13 @@ class _RegistrationFormScreenState extends State<RegistrationFormScreen> {
                                 ),
                               )
                             : (field.value != null &&
-                                    field.value!.isNotEmpty &&
-                                    !field.hasError)
-                                ? const Icon(Icons.check_circle, color: Colors.green)
-                                : null,
+                                  field.value!.isNotEmpty &&
+                                  !field.hasError)
+                            ? const Icon(
+                                Icons.check_circle,
+                                color: Colors.green,
+                              )
+                            : null,
                       ),
                     );
                   },
@@ -350,7 +348,8 @@ class _RegistrationFormScreenState extends State<RegistrationFormScreen> {
                 // Phone
                 TypedFieldWrapper<String>(
                   fieldName: 'phone',
-                  transformValue: (val) => val.replaceAll(RegExp(r'[^\d+]'), ''),
+                  transformValue: (val) =>
+                      val.replaceAll(RegExp(r'[^\d+]'), ''),
                   builder: (context, field) {
                     return TextFormField(
                       key: const Key('input_phone'),
@@ -417,7 +416,9 @@ class _RegistrationFormScreenState extends State<RegistrationFormScreen> {
                       children: [
                         CheckboxListTile(
                           key: const Key('checkbox_terms'),
-                          title: const Text('I agree to the Terms and Conditions'),
+                          title: const Text(
+                            'I agree to the Terms and Conditions',
+                          ),
                           value: field.value ?? false,
                           onChanged: field.updateValue,
                           controlAffinity: ListTileControlAffinity.leading,
@@ -446,7 +447,9 @@ class _RegistrationFormScreenState extends State<RegistrationFormScreen> {
                   builder: (context, state) {
                     return ElevatedButton.icon(
                       key: const Key('submit_registration_button'),
-                      onPressed: state.isValidating ? null : () => _submitForm(context),
+                      onPressed: state.isValidating
+                          ? null
+                          : () => _submitForm(context),
                       icon: state.isValidating
                           ? const SizedBox(
                               width: 16,

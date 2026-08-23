@@ -403,7 +403,8 @@ void main() {
         initialValue: 'test@example.com',
       );
 
-      final updated = field.copyWith(name: 'newEmail', initialValue: 'new@example.com');
+      final updated =
+          field.copyWith(name: 'newEmail', initialValue: 'new@example.com');
 
       expect(updated.name, 'newEmail');
       expect(updated.initialValue, 'new@example.com');

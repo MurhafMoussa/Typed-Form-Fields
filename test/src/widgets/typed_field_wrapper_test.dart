@@ -674,7 +674,8 @@ void main() {
     });
 
     group('Validating State & Rebuilds', () {
-      testWidgets('should pass isValidating to builder and rebuild when validatingFields changes',
+      testWidgets(
+          'should pass isValidating to builder and rebuild when validatingFields changes',
           (tester) async {
         bool? receivedIsValidating;
         int buildCount = 0;
@@ -716,7 +717,8 @@ void main() {
         expect(buildCount, equals(initialBuildCount + 2));
       });
 
-      testWidgets('should not rebuild when another field enters validatingFields',
+      testWidgets(
+          'should not rebuild when another field enters validatingFields',
           (tester) async {
         int buildCount = 0;
 

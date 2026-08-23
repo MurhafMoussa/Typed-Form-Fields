@@ -7,10 +7,7 @@ import '../screens/registration_form_screen.dart';
 class EmbeddedLiveDemo extends StatelessWidget {
   final String demoId;
 
-  const EmbeddedLiveDemo({
-    super.key,
-    required this.demoId,
-  });
+  const EmbeddedLiveDemo({super.key, required this.demoId});
 
   @override
   Widget build(BuildContext context) {
@@ -72,12 +69,11 @@ class EmbeddedLiveDemo extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             decoration: BoxDecoration(
               color: theme.colorScheme.secondary.withValues(alpha: 0.4),
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(6),
+              ),
               border: Border(
-                bottom: BorderSide(
-                  color: theme.colorScheme.outline,
-                  width: 1,
-                ),
+                bottom: BorderSide(color: theme.colorScheme.outline, width: 1),
               ),
             ),
             child: Row(
@@ -107,7 +103,10 @@ class EmbeddedLiveDemo extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: theme.colorScheme.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
@@ -128,10 +127,10 @@ class EmbeddedLiveDemo extends StatelessWidget {
           SizedBox(
             height: 480,
             child: ClipRRect(
-              borderRadius: const BorderRadius.vertical(bottom: Radius.circular(6)),
-              child: SingleChildScrollView(
-                child: demoContent,
+              borderRadius: const BorderRadius.vertical(
+                bottom: Radius.circular(6),
               ),
+              child: SingleChildScrollView(child: demoContent),
             ),
           ),
         ],

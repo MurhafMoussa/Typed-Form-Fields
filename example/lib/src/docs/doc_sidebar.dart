@@ -69,10 +69,7 @@ class DocSidebar extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         border: Border(
-          right: BorderSide(
-            color: theme.colorScheme.outline,
-            width: 1,
-          ),
+          right: BorderSide(color: theme.colorScheme.outline, width: 1),
         ),
       ),
       child: Column(
@@ -117,11 +114,14 @@ class DocSidebar extends StatelessWidget {
                   borderRadius: BorderRadius.circular(6),
                   clipBehavior: Clip.antiAlias,
                   child: ListTile(
-                    key: Key('doc_sidebar_${section.route.replaceAll('/', '_')}'),
+                    key: Key(
+                      'doc_sidebar_${section.route.replaceAll('/', '_')}',
+                    ),
                     dense: true,
                     selected: isSelected,
-                    selectedTileColor:
-                        theme.colorScheme.primary.withValues(alpha: 0.1),
+                    selectedTileColor: theme.colorScheme.primary.withValues(
+                      alpha: 0.1,
+                    ),
                     leading: Icon(
                       section.icon,
                       size: 18,
@@ -133,8 +133,9 @@ class DocSidebar extends StatelessWidget {
                       section.title,
                       style: TextStyle(
                         fontSize: 13,
-                        fontWeight:
-                            isSelected ? FontWeight.bold : FontWeight.w500,
+                        fontWeight: isSelected
+                            ? FontWeight.bold
+                            : FontWeight.w500,
                         color: isSelected
                             ? theme.colorScheme.primary
                             : theme.colorScheme.onSurface,

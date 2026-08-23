@@ -31,10 +31,7 @@ abstract class AppTheme {
         elevation: 0,
         scrolledUnderElevation: 0,
         shape: Border(
-          bottom: BorderSide(
-            color: ShadcnColors.lightBorder,
-            width: 1,
-          ),
+          bottom: BorderSide(color: ShadcnColors.lightBorder, width: 1),
         ),
       ),
       cardTheme: CardThemeData(
@@ -42,10 +39,7 @@ abstract class AppTheme {
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
-          side: const BorderSide(
-            color: ShadcnColors.lightBorder,
-            width: 1,
-          ),
+          side: const BorderSide(color: ShadcnColors.lightBorder, width: 1),
         ),
         margin: EdgeInsets.zero,
       ),
@@ -95,10 +89,7 @@ abstract class AppTheme {
           color: ShadcnColors.lightMutedForeground,
           fontSize: 14,
         ),
-        hintStyle: const TextStyle(
-          color: ShadcnColors.slate400,
-          fontSize: 14,
-        ),
+        hintStyle: const TextStyle(color: ShadcnColors.slate400, fontSize: 14),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
@@ -106,35 +97,24 @@ abstract class AppTheme {
           foregroundColor: ShadcnColors.lightPrimaryForeground,
           elevation: 0,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(6),
-          ),
-          textStyle: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+          textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: ShadcnColors.lightForeground,
-          side: const BorderSide(
-            color: ShadcnColors.lightBorder,
-            width: 1,
-          ),
+          side: const BorderSide(color: ShadcnColors.lightBorder, width: 1),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(6),
-          ),
-          textStyle: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+          textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
         ),
       ),
       navigationRailTheme: NavigationRailThemeData(
         backgroundColor: ShadcnColors.lightCard,
-        selectedIconTheme: const IconThemeData(color: ShadcnColors.lightPrimary),
+        selectedIconTheme: const IconThemeData(
+          color: ShadcnColors.lightPrimary,
+        ),
         unselectedIconTheme: const IconThemeData(
           color: ShadcnColors.lightMutedForeground,
         ),
@@ -177,10 +157,7 @@ abstract class AppTheme {
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
-          side: const BorderSide(
-            color: ShadcnColors.lightBorder,
-            width: 1,
-          ),
+          side: const BorderSide(color: ShadcnColors.lightBorder, width: 1),
         ),
       ),
     );
@@ -214,10 +191,7 @@ abstract class AppTheme {
         elevation: 0,
         scrolledUnderElevation: 0,
         shape: Border(
-          bottom: BorderSide(
-            color: ShadcnColors.darkBorder,
-            width: 1,
-          ),
+          bottom: BorderSide(color: ShadcnColors.darkBorder, width: 1),
         ),
       ),
       cardTheme: CardThemeData(
@@ -225,10 +199,7 @@ abstract class AppTheme {
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
-          side: const BorderSide(
-            color: ShadcnColors.darkBorder,
-            width: 1,
-          ),
+          side: const BorderSide(color: ShadcnColors.darkBorder, width: 1),
         ),
         margin: EdgeInsets.zero,
       ),
@@ -241,17 +212,11 @@ abstract class AppTheme {
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(6),
-          borderSide: const BorderSide(
-            color: ShadcnColors.darkInput,
-            width: 1,
-          ),
+          borderSide: const BorderSide(color: ShadcnColors.darkInput, width: 1),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(6),
-          borderSide: const BorderSide(
-            color: ShadcnColors.darkInput,
-            width: 1,
-          ),
+          borderSide: const BorderSide(color: ShadcnColors.darkInput, width: 1),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(6),
@@ -278,10 +243,7 @@ abstract class AppTheme {
           color: ShadcnColors.darkMutedForeground,
           fontSize: 14,
         ),
-        hintStyle: const TextStyle(
-          color: ShadcnColors.slate500,
-          fontSize: 14,
-        ),
+        hintStyle: const TextStyle(color: ShadcnColors.slate500, fontSize: 14),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
@@ -289,30 +251,17 @@ abstract class AppTheme {
           foregroundColor: ShadcnColors.darkPrimaryForeground,
           elevation: 0,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(6),
-          ),
-          textStyle: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+          textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: ShadcnColors.darkForeground,
-          side: const BorderSide(
-            color: ShadcnColors.darkBorder,
-            width: 1,
-          ),
+          side: const BorderSide(color: ShadcnColors.darkBorder, width: 1),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(6),
-          ),
-          textStyle: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+          textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
         ),
       ),
       navigationRailTheme: NavigationRailThemeData(
@@ -360,10 +309,7 @@ abstract class AppTheme {
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
-          side: const BorderSide(
-            color: ShadcnColors.darkBorder,
-            width: 1,
-          ),
+          side: const BorderSide(color: ShadcnColors.darkBorder, width: 1),
         ),
       ),
     );

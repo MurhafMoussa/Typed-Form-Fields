@@ -61,7 +61,9 @@ void main() {
     });
 
     group('Lookups', () {
-      test('containsField returns true for existing field and false for non-existent', () {
+      test(
+          'containsField returns true for existing field and false for non-existent',
+          () {
         final registry = FormFieldRegistry([usernameField]);
         expect(registry.containsField('username'), isTrue);
         expect(registry.containsField('age'), isFalse);
@@ -86,7 +88,9 @@ void main() {
         expect(registry.getField('unknown'), isNull);
       });
 
-      test('getFieldsByGroup returns matching field definitions in unmodifiable list', () {
+      test(
+          'getFieldsByGroup returns matching field definitions in unmodifiable list',
+          () {
         const step1Field1 = FormFieldDefinition<String>(
           name: 'firstName',
           validators: [],
@@ -127,17 +131,21 @@ void main() {
       test('checkFieldExists does not throw when field exists', () {
         final registry = FormFieldRegistry([usernameField]);
         expect(
-          () => registry.checkFieldExists('username', currentValues: {'username': 'John'}),
+          () => registry.checkFieldExists('username',
+              currentValues: {'username': 'John'}),
           returnsNormally,
         );
       });
 
-      test('checkFieldExists throws FormFieldError.fieldNotFound when field missing', () {
+      test(
+          'checkFieldExists throws FormFieldError.fieldNotFound when field missing',
+          () {
         final registry = FormFieldRegistry([usernameField]);
         final currentValues = {'username': 'John'};
 
         expect(
-          () => registry.checkFieldExists('missingField', currentValues: currentValues),
+          () => registry.checkFieldExists('missingField',
+              currentValues: currentValues),
           throwsA(
             isA<FormFieldError>().having(
               (e) => e.fieldName,
@@ -148,7 +156,9 @@ void main() {
         );
       });
 
-      test('checkFieldDoesNotExist passes when field is absent and throws when present', () {
+      test(
+          'checkFieldDoesNotExist passes when field is absent and throws when present',
+          () {
         final registry = FormFieldRegistry([usernameField]);
         expect(() => registry.checkFieldDoesNotExist('age'), returnsNormally);
         expect(
@@ -170,7 +180,8 @@ void main() {
           ageField,
         ];
 
-        expect(() => registry.checkFieldsDoNotExist(newFields), returnsNormally);
+        expect(
+            () => registry.checkFieldsDoNotExist(newFields), returnsNormally);
 
         final duplicateFields = [
           const FormFieldDefinition<String>(name: 'email', validators: []),
@@ -214,7 +225,9 @@ void main() {
         expect(registry.availableFields, equals(['username', 'age']));
       });
 
-      test('addFields fails atomically without partial addition if any field exists', () {
+      test(
+          'addFields fails atomically without partial addition if any field exists',
+          () {
         final registry = FormFieldRegistry([usernameField]);
         final newFields = [
           const FormFieldDefinition<String>(name: 'email', validators: []),
@@ -257,7 +270,8 @@ void main() {
 
       test('removeField removes field and validator', () {
         final registry = FormFieldRegistry([usernameField, ageField]);
-        registry.removeField('username', currentValues: {'username': 'John', 'age': 20});
+        registry.removeField('username',
+            currentValues: {'username': 'John', 'age': 20});
 
         expect(registry.containsField('username'), isFalse);
         expect(registry.getValidator('username'), isNull);
@@ -274,15 +288,19 @@ void main() {
 
       test('removeFields removes multiple fields atomically', () {
         final registry = FormFieldRegistry([usernameField, ageField]);
-        registry.removeFields(['username', 'age'], currentValues: {'username': 'John', 'age': 20});
+        registry.removeFields(['username', 'age'],
+            currentValues: {'username': 'John', 'age': 20});
 
         expect(registry.availableFields, isEmpty);
       });
 
-      test('removeFields throws if any requested field is missing before removing any', () {
+      test(
+          'removeFields throws if any requested field is missing before removing any',
+          () {
         final registry = FormFieldRegistry([usernameField, ageField]);
         expect(
-          () => registry.removeFields(['username', 'missing'], currentValues: {}),
+          () =>
+              registry.removeFields(['username', 'missing'], currentValues: {}),
           throwsA(isA<FormFieldError>()),
         );
         expect(registry.containsField('username'), isTrue);

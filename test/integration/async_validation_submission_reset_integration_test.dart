@@ -7,7 +7,8 @@ import 'package:typed_form_fields/typed_form_fields.dart';
 class AsyncEmailValidator implements AsyncValidator<String> {
   AsyncEmailValidator(this.onValidate);
 
-  final Future<String?> Function(String? value, BuildContext context) onValidate;
+  final Future<String?> Function(String? value, BuildContext context)
+      onValidate;
 
   @override
   FutureOr<String?> validate(String? value, BuildContext context) {
@@ -17,7 +18,9 @@ class AsyncEmailValidator implements AsyncValidator<String> {
 
 void main() {
   group('Async Validation Submission and Reset Integration Test', () {
-    testWidgets('Submitting form flushes debounce timer, displays progress, and waits for validation before completion', (tester) async {
+    testWidgets(
+        'Submitting form flushes debounce timer, displays progress, and waits for validation before completion',
+        (tester) async {
       final emailCompleter = Completer<String?>();
       bool submitted = false;
 
@@ -81,7 +84,8 @@ void main() {
       );
 
       // Enter email value
-      await tester.enterText(find.byKey(const Key('email_input')), 'alice@example.com');
+      await tester.enterText(
+          find.byKey(const Key('email_input')), 'alice@example.com');
       await tester.pump();
 
       // Immediately tap submit before async debounce timer expires
@@ -102,7 +106,9 @@ void main() {
       expect(find.byKey(const Key('email_error')), findsNothing);
     });
 
-    testWidgets('Resetting form cancels active async validation and hides loading state immediately', (tester) async {
+    testWidgets(
+        'Resetting form cancels active async validation and hides loading state immediately',
+        (tester) async {
       final emailCompleter = Completer<String?>();
 
       final emailField = FormFieldDefinition<String>(
@@ -161,8 +167,10 @@ void main() {
       );
 
       // Type new email
-      await tester.enterText(find.byKey(const Key('email_input')), 'new@example.com');
-      await tester.pump(const Duration(milliseconds: 350)); // Wait for debounce to trigger validation
+      await tester.enterText(
+          find.byKey(const Key('email_input')), 'new@example.com');
+      await tester.pump(const Duration(
+          milliseconds: 350)); // Wait for debounce to trigger validation
 
       // Loading indicator is visible
       expect(find.byKey(const Key('loading_indicator')), findsOneWidget);

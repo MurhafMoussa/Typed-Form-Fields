@@ -299,7 +299,8 @@ void main() {
       });
 
       test('should provide German async validation error message', () {
-        expect(localizations.asyncValidationError, 'Validierung fehlgeschlagen.');
+        expect(
+            localizations.asyncValidationError, 'Validierung fehlgeschlagen.');
       });
     });
 

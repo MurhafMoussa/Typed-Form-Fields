@@ -40,30 +40,30 @@ void main() {
 
     group('isValueCompatibleWithExpectedType', () {
       test('should validate basic non-nullable types', () {
-        expect(
-            formValidator.isValueCompatibleWithExpectedType('hello', String),
+        expect(formValidator.isValueCompatibleWithExpectedType('hello', String),
             isTrue);
-        expect(
-            formValidator.isValueCompatibleWithExpectedType(123, String),
+        expect(formValidator.isValueCompatibleWithExpectedType(123, String),
             isFalse);
 
-        expect(formValidator.isValueCompatibleWithExpectedType(42, int), isTrue);
         expect(
-            formValidator.isValueCompatibleWithExpectedType('42', int), isFalse);
+            formValidator.isValueCompatibleWithExpectedType(42, int), isTrue);
+        expect(formValidator.isValueCompatibleWithExpectedType('42', int),
+            isFalse);
+
+        expect(formValidator.isValueCompatibleWithExpectedType(3.14, double),
+            isTrue);
+        expect(formValidator.isValueCompatibleWithExpectedType(3, double),
+            isFalse);
 
         expect(
-            formValidator.isValueCompatibleWithExpectedType(3.14, double), isTrue);
-        expect(
-            formValidator.isValueCompatibleWithExpectedType(3, double), isFalse);
-
-        expect(formValidator.isValueCompatibleWithExpectedType(10, num), isTrue);
+            formValidator.isValueCompatibleWithExpectedType(10, num), isTrue);
         expect(
             formValidator.isValueCompatibleWithExpectedType(3.14, num), isTrue);
 
-        expect(
-            formValidator.isValueCompatibleWithExpectedType(true, bool), isTrue);
-        expect(
-            formValidator.isValueCompatibleWithExpectedType('true', bool), isFalse);
+        expect(formValidator.isValueCompatibleWithExpectedType(true, bool),
+            isTrue);
+        expect(formValidator.isValueCompatibleWithExpectedType('true', bool),
+            isFalse);
       });
 
       test('should validate nullable type strings', () {
@@ -77,7 +77,8 @@ void main() {
       test('should validate complex generic types like List<String>', () {
         final list = <String>['a', 'b'];
         expect(
-          formValidator.isValueCompatibleWithExpectedType(list, list.runtimeType),
+          formValidator.isValueCompatibleWithExpectedType(
+              list, list.runtimeType),
           isTrue,
         );
       });
@@ -101,13 +102,16 @@ void main() {
         );
       });
 
-      test('should return true for null when type string ends with ? or is dynamic', () {
+      test(
+          'should return true for null when type string ends with ? or is dynamic',
+          () {
         const field = FormFieldDefinition<DateTime?>(
           name: 'optionalDate',
           validators: [],
         );
         expect(
-          formValidator.isValueCompatibleWithExpectedType(null, field.valueType),
+          formValidator.isValueCompatibleWithExpectedType(
+              null, field.valueType),
           isTrue,
         );
         expect(
@@ -166,7 +170,8 @@ void main() {
             isA<FormFieldError>().having(
               (e) => e.message,
               'message',
-              contains("Type mismatch for field \"age\": expected int but got String."),
+              contains(
+                  "Type mismatch for field \"age\": expected int but got String."),
             ),
           ),
         );
@@ -209,8 +214,8 @@ void main() {
 
       test('validateFieldByName should validate when validator exists', () {
         final validators = <String, Validator>{
-          'email': TestValidator<dynamic>((value, context) =>
-              value == 'bad' ? 'Bad email' : null),
+          'email': TestValidator<dynamic>(
+              (value, context) => value == 'bad' ? 'Bad email' : null),
         };
         final values = <String, Object?>{'email': 'bad'};
 
@@ -223,7 +228,8 @@ void main() {
         expect(error, 'Bad email');
       });
 
-      test('validateFieldByName should return null when field has no validator', () {
+      test('validateFieldByName should return null when field has no validator',
+          () {
         final error = formValidator.validateFieldByName(
           fieldName: 'email',
           values: {'email': 'test'},
@@ -237,8 +243,10 @@ void main() {
     group('validateFields', () {
       test('should collect errors from all failing validators', () {
         final validators = <String, Validator>{
-          'name': TestValidator<dynamic>((v, c) => v == '' ? 'Name required' : null),
-          'age': TestValidator<dynamic>((v, c) => (v as int) < 18 ? 'Underage' : null),
+          'name': TestValidator<dynamic>(
+              (v, c) => v == '' ? 'Name required' : null),
+          'age': TestValidator<dynamic>(
+              (v, c) => (v as int) < 18 ? 'Underage' : null),
         };
         final values = <String, Object?>{
           'name': '',
@@ -304,7 +312,8 @@ void main() {
         expect(isValid, isFalse);
       });
 
-      test('should return true when all validated fields are touched and valid', () {
+      test('should return true when all validated fields are touched and valid',
+          () {
         final validators = <String, Validator>{
           'email': TestValidator<dynamic>((v, c) => null),
         };
@@ -362,7 +371,8 @@ void main() {
         expect(isValid, isFalse);
       });
 
-      test('should return true when no errors, touched, and validators pass', () {
+      test('should return true when no errors, touched, and validators pass',
+          () {
         final validators = <String, Validator>{
           'email': TestValidator<dynamic>((v, c) => null),
         };
@@ -434,9 +444,12 @@ void main() {
     });
 
     group('Debounced Validation & Timer Lifecycle', () {
-      test('validateFieldWithDebounce should trigger completion callback after delay', () async {
+      test(
+          'validateFieldWithDebounce should trigger completion callback after delay',
+          () async {
         final validators = <String, Validator>{
-          'username': TestValidator<dynamic>((v, c) => v == 'taken' ? 'Username taken' : null),
+          'username': TestValidator<dynamic>(
+              (v, c) => v == 'taken' ? 'Username taken' : null),
         };
 
         String? resultError;
@@ -461,7 +474,9 @@ void main() {
         expect(resultError, 'Username taken');
       });
 
-      test('validateFieldWithDebounce should cancel previous timer when called rapidly', () async {
+      test(
+          'validateFieldWithDebounce should cancel previous timer when called rapidly',
+          () async {
         final validators = <String, Validator>{
           'search': TestValidator<dynamic>((v, c) => 'Error for $v'),
         };
@@ -498,7 +513,8 @@ void main() {
         expect(finalError, 'Error for second');
       });
 
-      test('validateFieldWithDebounce should return null if validator is null', () async {
+      test('validateFieldWithDebounce should return null if validator is null',
+          () async {
         String? resultError;
         bool completed = false;
 
@@ -519,7 +535,9 @@ void main() {
         expect(resultError, isNull);
       });
 
-      test('validateAllFieldsWithDebounce should trigger callback with all field errors', () async {
+      test(
+          'validateAllFieldsWithDebounce should trigger callback with all field errors',
+          () async {
         final validators = <String, Validator>{
           'f1': TestValidator<dynamic>((v, c) => 'Err 1'),
           'f2': TestValidator<dynamic>((v, c) => 'Err 2'),
@@ -544,7 +562,8 @@ void main() {
         });
       });
 
-      test('cancelFieldValidation should stop pending debounced validation', () async {
+      test('cancelFieldValidation should stop pending debounced validation',
+          () async {
         bool completed = false;
 
         formValidator.validateFieldWithDebounce(

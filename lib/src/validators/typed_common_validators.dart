@@ -577,7 +577,8 @@ class _CreditCardValidator extends Validator<String> {
   String? validate(String? value, BuildContext context) {
     if (value == null || value.isEmpty) return null;
 
-    final err = errorText ?? ValidatorLocalizations.of(context).invalidCreditCardError;
+    final err =
+        errorText ?? ValidatorLocalizations.of(context).invalidCreditCardError;
 
     // Remove spaces and dashes
     final cleanValue = value.replaceAll(RegExp(r'[\s\-]'), '');

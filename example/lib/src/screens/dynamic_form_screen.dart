@@ -10,10 +10,7 @@ import '../widgets/showcase_card.dart';
 class DynamicFormScreen extends StatefulWidget {
   final bool embedded;
 
-  const DynamicFormScreen({
-    super.key,
-    this.embedded = false,
-  });
+  const DynamicFormScreen({super.key, this.embedded = false});
 
   @override
   State<DynamicFormScreen> createState() => _DynamicFormScreenState();
@@ -299,51 +296,54 @@ class _DynamicFormScreenState extends State<DynamicFormScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-          Row(
-            children: [
-              Chip(
-                label: Text(
-                  '${index + 1}. ${fieldName.split('_').first.toUpperCase()}',
-                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+            Row(
+              children: [
+                Chip(
+                  label: Text(
+                    '${index + 1}. ${fieldName.split('_').first.toUpperCase()}',
+                    style: const TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  padding: EdgeInsets.zero,
+                  visualDensity: VisualDensity.compact,
                 ),
-                padding: EdgeInsets.zero,
-                visualDensity: VisualDensity.compact,
-              ),
-              const Spacer(),
+                const Spacer(),
 
-              // Move Up Button
-              IconButton(
-                key: Key('move_up_$fieldName'),
-                icon: const Icon(Icons.arrow_upward, size: 18),
-                onPressed: index > 0 ? () => _moveFieldUp(index) : null,
-                tooltip: 'Move Up',
-              ),
+                // Move Up Button
+                IconButton(
+                  key: Key('move_up_$fieldName'),
+                  icon: const Icon(Icons.arrow_upward, size: 18),
+                  onPressed: index > 0 ? () => _moveFieldUp(index) : null,
+                  tooltip: 'Move Up',
+                ),
 
-              // Move Down Button
-              IconButton(
-                key: Key('move_down_$fieldName'),
-                icon: const Icon(Icons.arrow_downward, size: 18),
-                onPressed: index < _orderedFields.length - 1
-                    ? () => _moveFieldDown(index)
-                    : null,
-                tooltip: 'Move Down',
-              ),
+                // Move Down Button
+                IconButton(
+                  key: Key('move_down_$fieldName'),
+                  icon: const Icon(Icons.arrow_downward, size: 18),
+                  onPressed: index < _orderedFields.length - 1
+                      ? () => _moveFieldDown(index)
+                      : null,
+                  tooltip: 'Move Down',
+                ),
 
-              // Remove Button
-              IconButton(
-                key: Key('delete_$fieldName'),
-                icon: const Icon(Icons.delete, color: Colors.red, size: 18),
-                onPressed: () => _removeField(fieldName, context),
-                tooltip: 'Remove Field',
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          inputWidget,
-        ],
+                // Remove Button
+                IconButton(
+                  key: Key('delete_$fieldName'),
+                  icon: const Icon(Icons.delete, color: Colors.red, size: 18),
+                  onPressed: () => _removeField(fieldName, context),
+                  tooltip: 'Remove Field',
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            inputWidget,
+          ],
+        ),
       ),
-    ),
-  );
+    );
   }
 
   @override
@@ -380,8 +380,13 @@ class _DynamicFormScreenState extends State<DynamicFormScreen> {
                             key: const Key('btn_clear_all_fields'),
                             onPressed: () => _clearAllFields(ctx),
                             icon: const Icon(Icons.delete_sweep, size: 16),
-                            label: const Text('Clear All', style: TextStyle(fontSize: 12)),
-                            style: TextButton.styleFrom(foregroundColor: Colors.red),
+                            label: const Text(
+                              'Clear All',
+                              style: TextStyle(fontSize: 12),
+                            ),
+                            style: TextButton.styleFrom(
+                              foregroundColor: Colors.red,
+                            ),
                           ),
                       ],
                     ),
@@ -428,7 +433,11 @@ class _DynamicFormScreenState extends State<DynamicFormScreen> {
                         alignment: Alignment.center,
                         child: Column(
                           children: [
-                            const Icon(Icons.dynamic_form, size: 48, color: Colors.grey),
+                            const Icon(
+                              Icons.dynamic_form,
+                              size: 48,
+                              color: Colors.grey,
+                            ),
                             const SizedBox(height: 8),
                             const Text(
                               'No active dynamic fields',
@@ -448,7 +457,11 @@ class _DynamicFormScreenState extends State<DynamicFormScreen> {
                       Column(
                         children: List.generate(
                           _orderedFields.length,
-                          (index) => _buildFieldItem(ctx, _orderedFields[index], index),
+                          (index) => _buildFieldItem(
+                            ctx,
+                            _orderedFields[index],
+                            index,
+                          ),
                         ),
                       ),
 
@@ -480,17 +493,12 @@ class _DynamicFormScreenState extends State<DynamicFormScreen> {
       ),
     );
 
-    final body = InspectorPanel(
-      controller: _controller,
-      child: formBody,
-    );
+    final body = InspectorPanel(controller: _controller, child: formBody);
 
     if (widget.embedded) {
       return body;
     }
 
-    return Scaffold(
-      body: body,
-    );
+    return Scaffold(body: body);
   }
 }

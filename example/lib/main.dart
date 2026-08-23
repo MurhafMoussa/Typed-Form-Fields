@@ -31,8 +31,7 @@ class TypedFormFieldsExampleApp extends StatefulWidget {
       _TypedFormFieldsExampleAppState();
 }
 
-class _TypedFormFieldsExampleAppState
-    extends State<TypedFormFieldsExampleApp> {
+class _TypedFormFieldsExampleAppState extends State<TypedFormFieldsExampleApp> {
   late final ThemeController _themeController;
   late final ValueNotifier<Locale> _localeNotifier;
   late final GoRouter _router;
@@ -84,7 +83,8 @@ class _TypedFormFieldsExampleAppState
             GoRoute(
               path: '/docs/:docId',
               builder: (context, state) {
-                final docId = state.pathParameters['docId'] ?? 'getting-started';
+                final docId =
+                    state.pathParameters['docId'] ?? 'getting-started';
                 final docRoute = '/docs/$docId';
                 return ValueListenableBuilder<Locale>(
                   valueListenable: _localeNotifier,

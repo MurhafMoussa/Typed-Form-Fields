@@ -8,7 +8,8 @@ import 'package:typed_form_fields/typed_form_fields.dart';
 import '../../example/lib/src/screens/registration_form_screen.dart';
 
 void main() {
-  Widget buildTestableWidget(Widget child, {Locale locale = const Locale('en')}) {
+  Widget buildTestableWidget(Widget child,
+      {Locale locale = const Locale('en')}) {
     return MaterialApp(
       locale: locale,
       localizationsDelegates: const [
@@ -26,7 +27,9 @@ void main() {
   }
 
   group('RegistrationFormScreen Integration Tests', () {
-    testWidgets('should render registration form and inspector panel with strategy selector', (tester) async {
+    testWidgets(
+        'should render registration form and inspector panel with strategy selector',
+        (tester) async {
       tester.view.physicalSize = const Size(1280, 900);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() {
@@ -34,7 +37,8 @@ void main() {
         tester.view.resetDevicePixelRatio();
       });
 
-      await tester.pumpWidget(buildTestableWidget(const RegistrationFormScreen()));
+      await tester
+          .pumpWidget(buildTestableWidget(const RegistrationFormScreen()));
       await tester.pumpAndSettle();
 
       expect(find.text('Registration Form'), findsWidgets);
@@ -48,7 +52,9 @@ void main() {
       expect(find.byKey(const Key('strategy_dropdown')), findsOneWidget);
     });
 
-    testWidgets('should render all registration fields and show errors on invalid input', (tester) async {
+    testWidgets(
+        'should render all registration fields and show errors on invalid input',
+        (tester) async {
       tester.view.physicalSize = const Size(1280, 1000);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() {
@@ -56,7 +62,8 @@ void main() {
         tester.view.resetDevicePixelRatio();
       });
 
-      await tester.pumpWidget(buildTestableWidget(const RegistrationFormScreen()));
+      await tester
+          .pumpWidget(buildTestableWidget(const RegistrationFormScreen()));
       await tester.pumpAndSettle();
 
       // Enter invalid email
@@ -78,7 +85,9 @@ void main() {
       expect(find.text('Fields do not match.'), findsOneWidget);
     });
 
-    testWidgets('should complete full registration flow when valid inputs entered', (tester) async {
+    testWidgets(
+        'should complete full registration flow when valid inputs entered',
+        (tester) async {
       tester.view.physicalSize = const Size(1280, 1200);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() {
@@ -86,7 +95,8 @@ void main() {
         tester.view.resetDevicePixelRatio();
       });
 
-      await tester.pumpWidget(buildTestableWidget(const RegistrationFormScreen()));
+      await tester
+          .pumpWidget(buildTestableWidget(const RegistrationFormScreen()));
       await tester.pumpAndSettle();
 
       // Enter First Name
@@ -98,19 +108,23 @@ void main() {
       await tester.pumpAndSettle();
 
       // Enter Email
-      await tester.enterText(find.byKey(const Key('input_email')), 'john.doe@example.com');
+      await tester.enterText(
+          find.byKey(const Key('input_email')), 'john.doe@example.com');
       await tester.pumpAndSettle();
 
       // Enter Phone
-      await tester.enterText(find.byKey(const Key('input_phone')), '+12345678901');
+      await tester.enterText(
+          find.byKey(const Key('input_phone')), '+12345678901');
       await tester.pumpAndSettle();
 
       // Enter Password
-      await tester.enterText(find.byKey(const Key('input_password')), 'Password123');
+      await tester.enterText(
+          find.byKey(const Key('input_password')), 'Password123');
       await tester.pumpAndSettle();
 
       // Enter Confirm Password
-      await tester.enterText(find.byKey(const Key('input_confirm_password')), 'Password123');
+      await tester.enterText(
+          find.byKey(const Key('input_confirm_password')), 'Password123');
       await tester.pumpAndSettle();
 
       // Toggle Terms Checkbox
@@ -135,18 +149,22 @@ void main() {
         tester.view.resetDevicePixelRatio();
       });
 
-      await tester.pumpWidget(buildTestableWidget(const RegistrationFormScreen()));
+      await tester
+          .pumpWidget(buildTestableWidget(const RegistrationFormScreen()));
       await tester.pumpAndSettle();
 
-      expect(find.text('Active: TypedFormProvider Zero-Dependency Mode'), findsOneWidget);
+      expect(find.text('Active: TypedFormProvider Zero-Dependency Mode'),
+          findsOneWidget);
 
       await tester.tap(find.byKey(const Key('bloc_integration_toggle')));
       await tester.pumpAndSettle();
 
-      expect(find.text('Active: BlocProvider / BlocBuilder Integration'), findsOneWidget);
+      expect(find.text('Active: BlocProvider / BlocBuilder Integration'),
+          findsOneWidget);
     });
 
-    testWidgets('should verify RTL layout rendering for Arabic locale', (tester) async {
+    testWidgets('should verify RTL layout rendering for Arabic locale',
+        (tester) async {
       tester.view.physicalSize = const Size(1280, 900);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() {
@@ -160,7 +178,8 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      final scaffoldElement = tester.element(find.byType(RegistrationFormScreen));
+      final scaffoldElement =
+          tester.element(find.byType(RegistrationFormScreen));
       final textDirection = Directionality.of(scaffoldElement);
       expect(textDirection, TextDirection.rtl);
     });

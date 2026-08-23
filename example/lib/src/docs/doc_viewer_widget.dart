@@ -28,7 +28,13 @@ class LiveDemoSegment extends DocGuideSegment {
 /// Helper parser to split raw markdown content on `<live-demo id="..." />` tags.
 class DocGuideParser {
   static final RegExp _demoTagRegex = RegExp(
-    r'<live-demo\s+id=["' "'" r']([^"' "'" r']+)["' "'" r']\s*/?>',
+    r'<live-demo\s+id=["'
+    "'"
+    r']([^"'
+    "'"
+    r']+)["'
+    "'"
+    r']\s*/?>',
     caseSensitive: false,
   );
 
@@ -105,11 +111,7 @@ class ShadcnCodeBlockBuilder extends MarkdownElementBuilder {
             ),
             child: Row(
               children: [
-                const Icon(
-                  Icons.code,
-                  size: 14,
-                  color: Color(0xFF94A3B8),
-                ),
+                const Icon(Icons.code, size: 14, color: Color(0xFF94A3B8)),
                 const SizedBox(width: 6),
                 const Text(
                   'CODE',
@@ -134,8 +136,10 @@ class ShadcnCodeBlockBuilder extends MarkdownElementBuilder {
                   },
                   borderRadius: BorderRadius.circular(4),
                   child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(4),
@@ -143,7 +147,11 @@ class ShadcnCodeBlockBuilder extends MarkdownElementBuilder {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: const [
-                        Icon(Icons.copy_rounded, size: 12, color: Color(0xDDFFFFFF)),
+                        Icon(
+                          Icons.copy_rounded,
+                          size: 12,
+                          color: Color(0xDDFFFFFF),
+                        ),
                         SizedBox(width: 4),
                         Text(
                           'Copy',
@@ -273,7 +281,9 @@ class _DocViewerWidgetState extends State<DocViewerWidget> {
       setState(() {
         _rawMarkdown = content;
         _tocItems = content != null ? TocItem.extractFromMarkdown(content) : [];
-        _activeAnchorId = _tocItems.isNotEmpty ? _tocItems.first.anchorId : null;
+        _activeAnchorId = _tocItems.isNotEmpty
+            ? _tocItems.first.anchorId
+            : null;
         _isLoading = false;
       });
     }
@@ -311,13 +321,13 @@ class _DocViewerWidgetState extends State<DocViewerWidget> {
           child: _isLoading
               ? const Center(child: CircularProgressIndicator())
               : _errorMessage != null
-                  ? Center(
-                      child: Text(
-                        _errorMessage!,
-                        style: TextStyle(color: theme.colorScheme.error),
-                      ),
-                    )
-                  : _buildMarkdownContent(context),
+              ? Center(
+                  child: Text(
+                    _errorMessage!,
+                    style: TextStyle(color: theme.colorScheme.error),
+                  ),
+                )
+              : _buildMarkdownContent(context),
         ),
 
         // Right Table of Contents (Desktop Viewports)
@@ -351,8 +361,10 @@ class _DocViewerWidgetState extends State<DocViewerWidget> {
               if (MediaQuery.of(context).size.width < desktopBreakpoint)
                 Container(
                   margin: const EdgeInsets.only(bottom: 16),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: theme.colorScheme.surface,
                     borderRadius: BorderRadius.circular(8),
@@ -392,9 +404,7 @@ class _DocViewerWidgetState extends State<DocViewerWidget> {
                   return MarkdownBody(
                     data: segment.content,
                     selectable: true,
-                    builders: {
-                      'code': ShadcnCodeBlockBuilder(context),
-                    },
+                    builders: {'code': ShadcnCodeBlockBuilder(context)},
                     styleSheet: MarkdownStyleSheet.fromTheme(theme).copyWith(
                       p: theme.textTheme.bodyLarge?.copyWith(
                         height: 1.6,

@@ -201,8 +201,7 @@ class _TypedFieldWrapperState<T> extends State<TypedFieldWrapper<T>> {
         final error = state.errors[widget.fieldName];
         final hasError = error != null && error.isNotEmpty;
         final formValue = state.values[widget.fieldName] as T?;
-        final isValidating =
-            state.validatingFields.contains(widget.fieldName);
+        final isValidating = state.validatingFields.contains(widget.fieldName);
 
         // Use form value if available, otherwise use current local value
         final effectiveValue = formValue ?? _currentValue;

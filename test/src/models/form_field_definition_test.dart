@@ -28,7 +28,8 @@ void main() {
       expect(def.asyncValidators, isNull);
     });
 
-    test('accepts optional group and asyncValidators parameters in constructor', () {
+    test('accepts optional group and asyncValidators parameters in constructor',
+        () {
       const asyncVal = _TestAsyncValidator<String>();
       const def = FormFieldDefinition<String>(
         name: 'email',

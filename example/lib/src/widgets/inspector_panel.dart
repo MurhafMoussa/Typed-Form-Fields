@@ -97,7 +97,8 @@ class _InspectorPanelState extends State<InspectorPanel> {
           _logEvent(
             FormEventLogEntry(
               title: 'Form State Updated',
-              detail: 'isValid: ${state.isValid}, errors: ${state.errors.length}',
+              detail:
+                  'isValid: ${state.isValid}, errors: ${state.errors.length}',
               category: FormEventCategory.stateChange,
             ),
           );
@@ -106,7 +107,8 @@ class _InspectorPanelState extends State<InspectorPanel> {
       child: BlocBuilder<TypedFormController, TypedFormState>(
         bloc: widget.controller,
         builder: (context, state) {
-          final isDesktop = MediaQuery.of(context).size.width >= widget.desktopBreakpoint;
+          final isDesktop =
+              MediaQuery.of(context).size.width >= widget.desktopBreakpoint;
 
           if (widget.child == null) {
             return Container(
@@ -121,10 +123,7 @@ class _InspectorPanelState extends State<InspectorPanel> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    flex: 5,
-                    child: widget.child!,
-                  ),
+                  Expanded(flex: 5, child: widget.child!),
                   const SizedBox(width: 16),
                   Expanded(
                     flex: 5,
@@ -182,7 +181,9 @@ class _InspectorPanelState extends State<InspectorPanel> {
                                   ValidationStrategySelector(
                                     currentStrategy: state.validationStrategy,
                                     onStrategyChanged: (newStrategy) {
-                                      widget.controller.setValidationStrategy(newStrategy);
+                                      widget.controller.setValidationStrategy(
+                                        newStrategy,
+                                      );
                                     },
                                   ),
                                   const SizedBox(height: 16),
@@ -229,13 +230,8 @@ class _InspectorPanelState extends State<InspectorPanel> {
               height: 420,
               child: TabBarView(
                 children: [
-                  JsonViewer(
-                    jsonMap: _buildFormStateJson(state),
-                  ),
-                  EventLogWidget(
-                    logs: _eventLogs,
-                    onClearLogs: _clearLogs,
-                  ),
+                  JsonViewer(jsonMap: _buildFormStateJson(state)),
+                  EventLogWidget(logs: _eventLogs, onClearLogs: _clearLogs),
                   SingleChildScrollView(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -243,7 +239,9 @@ class _InspectorPanelState extends State<InspectorPanel> {
                         ValidationStrategySelector(
                           currentStrategy: state.validationStrategy,
                           onStrategyChanged: (newStrategy) {
-                            widget.controller.setValidationStrategy(newStrategy);
+                            widget.controller.setValidationStrategy(
+                              newStrategy,
+                            );
                           },
                         ),
                         const SizedBox(height: 16),

@@ -88,10 +88,7 @@ class _JsonViewerState extends State<JsonViewer> {
             TextButton.icon(
               key: const Key('copy_json_button'),
               onPressed: _copyToClipboard,
-              icon: Icon(
-                _copied ? Icons.check : Icons.copy,
-                size: 14,
-              ),
+              icon: Icon(_copied ? Icons.check : Icons.copy, size: 14),
               label: Text(
                 _copied ? 'Copied' : 'Copy JSON',
                 style: const TextStyle(fontSize: 12),
@@ -134,12 +131,24 @@ class _JsonViewerState extends State<JsonViewer> {
     final spans = <TextSpan>[];
 
     // Colors matching dark/light mode JSON syntax highlighting
-    final keyColor = isDark ? const Color(0xFF38BDF8) : const Color(0xFF0284C7); // Cyan / Blue
-    final stringColor = isDark ? const Color(0xFF4ADE80) : const Color(0xFF16A34A); // Green
-    final numberColor = isDark ? const Color(0xFFFB923C) : const Color(0xFFEA580C); // Orange
-    final boolColor = isDark ? const Color(0xFFC084FC) : const Color(0xFF9333EA); // Purple
-    final nullColor = isDark ? const Color(0xFFF87171) : const Color(0xFFDC2626); // Red
-    final punctuationColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B); // Slate
+    final keyColor = isDark
+        ? const Color(0xFF38BDF8)
+        : const Color(0xFF0284C7); // Cyan / Blue
+    final stringColor = isDark
+        ? const Color(0xFF4ADE80)
+        : const Color(0xFF16A34A); // Green
+    final numberColor = isDark
+        ? const Color(0xFFFB923C)
+        : const Color(0xFFEA580C); // Orange
+    final boolColor = isDark
+        ? const Color(0xFFC084FC)
+        : const Color(0xFF9333EA); // Purple
+    final nullColor = isDark
+        ? const Color(0xFFF87171)
+        : const Color(0xFFDC2626); // Red
+    final punctuationColor = isDark
+        ? const Color(0xFF94A3B8)
+        : const Color(0xFF64748B); // Slate
 
     final regex = RegExp(
       r'("(?:\\.|[^"\\])*")(?=\s*:)|' // Key
@@ -154,60 +163,76 @@ class _JsonViewerState extends State<JsonViewer> {
 
     for (final match in regex.allMatches(code)) {
       if (match.start > lastMatchEnd) {
-        spans.add(TextSpan(
-          text: code.substring(lastMatchEnd, match.start),
-          style: TextStyle(color: punctuationColor),
-        ));
+        spans.add(
+          TextSpan(
+            text: code.substring(lastMatchEnd, match.start),
+            style: TextStyle(color: punctuationColor),
+          ),
+        );
       }
 
       final matchedText = match.group(0)!;
 
       if (match.group(1) != null) {
         // Key
-        spans.add(TextSpan(
-          text: matchedText,
-          style: TextStyle(color: keyColor, fontWeight: FontWeight.w600),
-        ));
+        spans.add(
+          TextSpan(
+            text: matchedText,
+            style: TextStyle(color: keyColor, fontWeight: FontWeight.w600),
+          ),
+        );
       } else if (match.group(2) != null) {
         // String
-        spans.add(TextSpan(
-          text: matchedText,
-          style: TextStyle(color: stringColor),
-        ));
+        spans.add(
+          TextSpan(
+            text: matchedText,
+            style: TextStyle(color: stringColor),
+          ),
+        );
       } else if (match.group(3) != null) {
         // Bool
-        spans.add(TextSpan(
-          text: matchedText,
-          style: TextStyle(color: boolColor, fontWeight: FontWeight.bold),
-        ));
+        spans.add(
+          TextSpan(
+            text: matchedText,
+            style: TextStyle(color: boolColor, fontWeight: FontWeight.bold),
+          ),
+        );
       } else if (match.group(4) != null) {
         // Null
-        spans.add(TextSpan(
-          text: matchedText,
-          style: TextStyle(color: nullColor, fontStyle: FontStyle.italic),
-        ));
+        spans.add(
+          TextSpan(
+            text: matchedText,
+            style: TextStyle(color: nullColor, fontStyle: FontStyle.italic),
+          ),
+        );
       } else if (match.group(5) != null) {
         // Number
-        spans.add(TextSpan(
-          text: matchedText,
-          style: TextStyle(color: numberColor),
-        ));
+        spans.add(
+          TextSpan(
+            text: matchedText,
+            style: TextStyle(color: numberColor),
+          ),
+        );
       } else {
         // Punctuation
-        spans.add(TextSpan(
-          text: matchedText,
-          style: TextStyle(color: punctuationColor),
-        ));
+        spans.add(
+          TextSpan(
+            text: matchedText,
+            style: TextStyle(color: punctuationColor),
+          ),
+        );
       }
 
       lastMatchEnd = match.end;
     }
 
     if (lastMatchEnd < code.length) {
-      spans.add(TextSpan(
-        text: code.substring(lastMatchEnd),
-        style: TextStyle(color: punctuationColor),
-      ));
+      spans.add(
+        TextSpan(
+          text: code.substring(lastMatchEnd),
+          style: TextStyle(color: punctuationColor),
+        ),
+      );
     }
 
     return TextSpan(children: spans);

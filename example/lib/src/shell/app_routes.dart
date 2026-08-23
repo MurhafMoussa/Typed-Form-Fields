@@ -12,7 +12,8 @@ abstract class AppRoutes {
   static const String docsValidationStrategies = '/docs/validation-strategies';
   static const String docsAsyncValidation = '/docs/async-validation';
   static const String docsFieldGrouping = '/docs/field-grouping';
-  static const String docsDynamicFormManagement = '/docs/dynamic-form-management';
+  static const String docsDynamicFormManagement =
+      '/docs/dynamic-form-management';
 
   /// Default route when launching the application.
   static const String initial = registration;

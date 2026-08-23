@@ -23,7 +23,8 @@ const List<SearchManifestEntry> searchManifestEntries = [
   // Showcase Screens
   SearchManifestEntry(
     title: 'Registration Showcase',
-    subtitle: 'Cross-field password match, async username check, terms agreement',
+    subtitle:
+        'Cross-field password match, async username check, terms agreement',
     route: AppRoutes.registration,
     category: 'Showcase',
     keywords: ['registration', 'password', 'async', 'email', 'form'],
@@ -81,7 +82,8 @@ const List<SearchManifestEntry> searchManifestEntries = [
   ),
   SearchManifestEntry(
     title: 'Dynamic Form Management',
-    subtitle: 'Runtime form modification APIs and dynamic field array manipulation',
+    subtitle:
+        'Runtime form modification APIs and dynamic field array manipulation',
     route: AppRoutes.docsDynamicFormManagement,
     category: 'Documentation',
     keywords: ['dynamic', 'management', 'addField', 'removeField', 'runtime'],
@@ -92,10 +94,7 @@ const List<SearchManifestEntry> searchManifestEntries = [
 class DocSearchOverlay extends StatefulWidget {
   final ValueChanged<String> onSelectRoute;
 
-  const DocSearchOverlay({
-    super.key,
-    required this.onSelectRoute,
-  });
+  const DocSearchOverlay({super.key, required this.onSelectRoute});
 
   /// Displays the search overlay dialog.
   static Future<void> show(
@@ -139,8 +138,9 @@ class _DocSearchOverlayState extends State<DocSearchOverlay> {
           final matchesTitle = entry.title.toLowerCase().contains(query);
           final matchesSubtitle = entry.subtitle.toLowerCase().contains(query);
           final matchesCategory = entry.category.toLowerCase().contains(query);
-          final matchesKeywords = entry.keywords
-              .any((kw) => kw.toLowerCase().contains(query));
+          final matchesKeywords = entry.keywords.any(
+            (kw) => kw.toLowerCase().contains(query),
+          );
 
           return matchesTitle ||
               matchesSubtitle ||
@@ -160,10 +160,7 @@ class _DocSearchOverlayState extends State<DocSearchOverlay> {
       insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 48),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
-        side: BorderSide(
-          color: theme.colorScheme.outline,
-          width: 1,
-        ),
+        side: BorderSide(color: theme.colorScheme.outline, width: 1),
       ),
       child: Container(
         constraints: const BoxConstraints(maxWidth: 600),
@@ -187,7 +184,9 @@ class _DocSearchOverlayState extends State<DocSearchOverlay> {
                     : Container(
                         margin: const EdgeInsets.all(8),
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 2),
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
                           color: theme.colorScheme.secondary,
                           borderRadius: BorderRadius.circular(4),
@@ -238,7 +237,9 @@ class _DocSearchOverlayState extends State<DocSearchOverlay> {
                         final isDoc = entry.category == 'Documentation';
 
                         return ListTile(
-                          key: Key('search_result_${entry.route.replaceAll('/', '_')}'),
+                          key: Key(
+                            'search_result_${entry.route.replaceAll('/', '_')}',
+                          ),
                           dense: true,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(6),
@@ -263,10 +264,13 @@ class _DocSearchOverlayState extends State<DocSearchOverlay> {
                               const SizedBox(width: 8),
                               Container(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 6, vertical: 2),
+                                  horizontal: 6,
+                                  vertical: 2,
+                                ),
                                 decoration: BoxDecoration(
-                                  color: theme.colorScheme.primary
-                                      .withValues(alpha: 0.1),
+                                  color: theme.colorScheme.primary.withValues(
+                                    alpha: 0.1,
+                                  ),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(
@@ -286,11 +290,15 @@ class _DocSearchOverlayState extends State<DocSearchOverlay> {
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontSize: 12,
-                              color: theme.colorScheme.onSurface
-                                  .withValues(alpha: 0.7),
+                              color: theme.colorScheme.onSurface.withValues(
+                                alpha: 0.7,
+                              ),
                             ),
                           ),
-                          trailing: const Icon(Icons.arrow_forward_ios, size: 12),
+                          trailing: const Icon(
+                            Icons.arrow_forward_ios,
+                            size: 12,
+                          ),
                           onTap: () {
                             Navigator.of(context).pop();
                             widget.onSelectRoute(entry.route);

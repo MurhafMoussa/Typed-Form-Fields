@@ -59,12 +59,14 @@ void main() {
             ValidationStrategy.onSubmitThenRealTime);
       });
 
-      test('should expose touchedFields, initialValues, isDirty, and isTouched', () {
+      test('should expose touchedFields, initialValues, isDirty, and isTouched',
+          () {
         final fields = TestFieldFactory.createEmailAndAgeFields();
         formCubit = TypedFormController(fields: fields);
 
         expect(formCubit.touchedFields, equals({'email': false, 'age': false}));
-        expect(formCubit.initialValues, equals({'email': 'test@example.com', 'age': 25}));
+        expect(formCubit.initialValues,
+            equals({'email': 'test@example.com', 'age': 25}));
         expect(formCubit.isDirty, isFalse);
         expect(formCubit.isTouched('email'), isFalse);
 
@@ -114,7 +116,8 @@ void main() {
         );
       });
 
-      test('should throw FormFieldError for non-existent field in getValue', () {
+      test('should throw FormFieldError for non-existent field in getValue',
+          () {
         expect(
           () => formCubit.getValue<String>('nonExistent'),
           throwsA(isA<FormFieldError>()),
@@ -128,7 +131,8 @@ void main() {
       });
 
       test('should update validation strategy', () {
-        formCubit.setValidationStrategy(ValidationStrategy.onSubmitThenRealTime);
+        formCubit
+            .setValidationStrategy(ValidationStrategy.onSubmitThenRealTime);
         expect(formCubit.state.validationStrategy,
             ValidationStrategy.onSubmitThenRealTime);
       });
@@ -243,7 +247,9 @@ void main() {
         expect(formCubit.state.errors['email'], 'Multi error');
       });
 
-      test('delegates dynamic field management (addField, addFields, removeField, removeFields)', () {
+      test(
+          'delegates dynamic field management (addField, addFields, removeField, removeFields)',
+          () {
         final newField = FormFieldDefinition<String>(
           name: 'phone',
           initialValue: '123456',
@@ -257,8 +263,10 @@ void main() {
         expect(formCubit.state.values.containsKey('phone'), isFalse);
 
         final fields = [
-          const FormFieldDefinition<String>(name: 'f1', initialValue: 'v1', validators: []),
-          const FormFieldDefinition<String>(name: 'f2', initialValue: 'v2', validators: []),
+          const FormFieldDefinition<String>(
+              name: 'f1', initialValue: 'v1', validators: []),
+          const FormFieldDefinition<String>(
+              name: 'f2', initialValue: 'v2', validators: []),
         ];
 
         formCubit.addFields(fields: fields, context: mockContext);
@@ -268,9 +276,12 @@ void main() {
         expect(formCubit.state.values.containsKey('f1'), isFalse);
       });
 
-      test('delegates group and subset queries (isGroupValid, areFieldsValid, touchGroup, validateGroup, validateFields)', () {
+      test(
+          'delegates group and subset queries (isGroupValid, areFieldsValid, touchGroup, validateGroup, validateFields)',
+          () {
         final requiredVal = MockValidator<String>();
-        requiredVal.mockValidate = (val, ctx) => (val == null || val.isEmpty) ? 'Req' : null;
+        requiredVal.mockValidate =
+            (val, ctx) => (val == null || val.isEmpty) ? 'Req' : null;
 
         formCubit = TypedFormController(
           fields: [
@@ -283,8 +294,10 @@ void main() {
           ],
         );
 
-        expect(formCubit.isGroupValid('nameGrp', context: mockContext), isFalse);
-        expect(formCubit.areFieldsValid(['fname'], context: mockContext), isFalse);
+        expect(
+            formCubit.isGroupValid('nameGrp', context: mockContext), isFalse);
+        expect(
+            formCubit.areFieldsValid(['fname'], context: mockContext), isFalse);
 
         formCubit.touchGroup('nameGrp', context: mockContext);
         expect(formCubit.state.errors['fname'], 'Req');

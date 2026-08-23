@@ -72,7 +72,8 @@ class ExampleTopAppBar extends StatelessWidget implements PreferredSizeWidget {
           key: const Key('search_button'),
           icon: const Icon(Icons.search, size: 20),
           tooltip: 'Search documentation & forms (Ctrl+K)',
-          onPressed: onSearchPressed ??
+          onPressed:
+              onSearchPressed ??
               () {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
@@ -124,8 +125,9 @@ class ExampleTopAppBar extends StatelessWidget implements PreferredSizeWidget {
                     Text(
                       entry.value,
                       style: TextStyle(
-                        fontWeight:
-                            isSelected ? FontWeight.bold : FontWeight.normal,
+                        fontWeight: isSelected
+                            ? FontWeight.bold
+                            : FontWeight.normal,
                       ),
                     ),
                   ],
@@ -139,8 +141,8 @@ class ExampleTopAppBar extends StatelessWidget implements PreferredSizeWidget {
         ValueListenableBuilder<ThemeMode>(
           valueListenable: themeController,
           builder: (context, mode, _) {
-            final icon = mode == ThemeMode.dark ||
-                    (mode == ThemeMode.system && isDark)
+            final icon =
+                mode == ThemeMode.dark || (mode == ThemeMode.system && isDark)
                 ? Icons.light_mode_outlined
                 : Icons.dark_mode_outlined;
             final tooltip = isDark
@@ -152,7 +154,9 @@ class ExampleTopAppBar extends StatelessWidget implements PreferredSizeWidget {
               icon: Icon(icon, size: 20),
               tooltip: tooltip,
               onPressed: () {
-                final platformBrightness = MediaQuery.platformBrightnessOf(context);
+                final platformBrightness = MediaQuery.platformBrightnessOf(
+                  context,
+                );
                 themeController.toggleTheme(platformBrightness);
               },
             );
@@ -164,11 +168,14 @@ class ExampleTopAppBar extends StatelessWidget implements PreferredSizeWidget {
           key: const Key('github_link'),
           icon: const Icon(Icons.code, size: 20),
           tooltip: 'GitHub Repository',
-          onPressed: onGitHubPressed ??
+          onPressed:
+              onGitHubPressed ??
               () {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('GitHub: https://github.com/Murhaf/Typed-Form-Fields'),
+                    content: Text(
+                      'GitHub: https://github.com/Murhaf/Typed-Form-Fields',
+                    ),
                     duration: Duration(seconds: 2),
                   ),
                 );

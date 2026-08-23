@@ -81,14 +81,16 @@ void main() {
       mockContext = MockBuildContext();
     });
 
-    test('should create async validator instance and validate asynchronously', () async {
+    test('should create async validator instance and validate asynchronously',
+        () async {
       const validator = ConcreteAsyncValidator();
       expect(validator, isA<AsyncValidator<String>>());
 
       final result = await validator.validate('taken@example.com', mockContext);
       expect(result, equals('Email is already taken'));
 
-      final validResult = await validator.validate('available@example.com', mockContext);
+      final validResult =
+          await validator.validate('available@example.com', mockContext);
       expect(validResult, isNull);
     });
 

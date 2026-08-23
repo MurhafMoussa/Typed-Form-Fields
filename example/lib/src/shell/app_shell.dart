@@ -36,7 +36,9 @@ class AppShell extends StatelessWidget {
         ? AppRoutes.docsGettingStarted
         : currentRoute;
 
-    final index = primaryNavItems.indexWhere((item) => item.route == normalized);
+    final index = primaryNavItems.indexWhere(
+      (item) => item.route == normalized,
+    );
     return index >= 0 ? index : 0;
   }
 
@@ -53,16 +55,15 @@ class AppShell extends StatelessWidget {
           themeController: themeController,
           currentLocale: currentLocale,
           onLocaleChanged: onLocaleChanged,
-          onSearchPressed: onSearchPressed ??
-              () => DocSearchOverlay.show(
-                    context,
-                    onSelectRoute: onNavigate,
-                  ),
+          onSearchPressed:
+              onSearchPressed ??
+              () => DocSearchOverlay.show(context, onSelectRoute: onNavigate),
           onGitHubPressed: onGitHubPressed,
         ),
         body: isDesktop ? _buildDesktopLayout(context) : child,
-        bottomNavigationBar:
-            isDesktop ? null : _buildMobileNavigationBar(context),
+        bottomNavigationBar: isDesktop
+            ? null
+            : _buildMobileNavigationBar(context),
       ),
     );
   }

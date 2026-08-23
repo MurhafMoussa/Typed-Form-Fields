@@ -840,19 +840,23 @@ void main() {
           MaterialApp(
             home: Builder(
               builder: (context) {
-                final req = TypedCommonValidators.required<String>(context: context);
+                final req =
+                    TypedCommonValidators.required<String>(context: context);
                 expect(req.validate(null, context), isNotNull);
 
                 final email = TypedCommonValidators.email(context: context);
                 expect(email.validate('bad', context), isNotNull);
 
-                final minLen = TypedCommonValidators.minLength(5, context: context);
+                final minLen =
+                    TypedCommonValidators.minLength(5, context: context);
                 expect(minLen.validate('a', context), isNotNull);
 
-                final maxLen = TypedCommonValidators.maxLength(3, context: context);
+                final maxLen =
+                    TypedCommonValidators.maxLength(3, context: context);
                 expect(maxLen.validate('aaaa', context), isNotNull);
 
-                final pattern = TypedCommonValidators.pattern(RegExp(r'^\d+$'), context: context);
+                final pattern = TypedCommonValidators.pattern(RegExp(r'^\d+$'),
+                    context: context);
                 expect(pattern.validate('abc', context), isNotNull);
 
                 final numVal = TypedCommonValidators.numeric(context: context);
@@ -867,13 +871,16 @@ void main() {
                 final urlVal = TypedCommonValidators.url(context: context);
                 expect(urlVal.validate('invalid', context), isNotNull);
 
-                final phoneVal = TypedCommonValidators.phoneNumber(context: context);
+                final phoneVal =
+                    TypedCommonValidators.phoneNumber(context: context);
                 expect(phoneVal.validate('bad', context), isNotNull);
 
-                final ccVal = TypedCommonValidators.creditCard(context: context);
+                final ccVal =
+                    TypedCommonValidators.creditCard(context: context);
                 expect(ccVal.validate('bad', context), isNotNull);
 
-                final dateVal = TypedCommonValidators.dateString(context: context);
+                final dateVal =
+                    TypedCommonValidators.dateString(context: context);
                 expect(dateVal.validate('bad', context), isNotNull);
 
                 final ipVal = TypedCommonValidators.ipAddress(context: context);
@@ -885,13 +892,16 @@ void main() {
                 final jsonVal = TypedCommonValidators.json(context: context);
                 expect(jsonVal.validate('bad', context), isNotNull);
 
-                final alphaNum = TypedCommonValidators.alphanumeric(context: context);
+                final alphaNum =
+                    TypedCommonValidators.alphanumeric(context: context);
                 expect(alphaNum.validate('bad@', context), isNotNull);
 
-                final alpha = TypedCommonValidators.alphabetic(context: context);
+                final alpha =
+                    TypedCommonValidators.alphabetic(context: context);
                 expect(alpha.validate('123', context), isNotNull);
 
-                final mustTrue = TypedCommonValidators.mustBeTrue(context: context);
+                final mustTrue =
+                    TypedCommonValidators.mustBeTrue(context: context);
                 expect(mustTrue.validate(false, context), isNotNull);
 
                 final cust = TypedCommonValidators.custom<String>(

@@ -99,7 +99,8 @@ void main() {
 
       registry = FormFieldRegistry(fields);
       touchedTracker = FormTouchedTracker(fields.map((f) => f.name));
-      validator = FormValidator(debounceDelay: const Duration(milliseconds: 10));
+      validator =
+          FormValidator(debounceDelay: const Duration(milliseconds: 10));
       mockContext = MockBuildContext();
 
       orchestrator = FormValidationOrchestrator(
@@ -132,7 +133,8 @@ void main() {
     }
 
     group('updateField', () {
-      test('throws FormFieldError.fieldNotFound if field is not registered', () {
+      test('throws FormFieldError.fieldNotFound if field is not registered',
+          () {
         final state = createInitialState();
         expect(
           () => orchestrator.updateField<String>(
@@ -163,7 +165,8 @@ void main() {
       });
 
       test('onSubmitOnly cancels async validation and updates values', () {
-        final state = createInitialState(strategy: ValidationStrategy.onSubmitOnly);
+        final state =
+            createInitialState(strategy: ValidationStrategy.onSubmitOnly);
         final newState = orchestrator.updateField<String>(
           fieldName: 'username',
           value: 'john',
@@ -177,7 +180,8 @@ void main() {
         expect(touchedTracker.isTouched('username'), isTrue);
       });
 
-      test('onSubmitThenRealTime cancels async validation and updates values', () {
+      test('onSubmitThenRealTime cancels async validation and updates values',
+          () {
         final state = createInitialState(
           strategy: ValidationStrategy.onSubmitThenRealTime,
         );
@@ -195,7 +199,8 @@ void main() {
       });
 
       test('allFieldsRealTime validates all fields and updates errors', () {
-        final state = createInitialState(strategy: ValidationStrategy.allFieldsRealTime);
+        final state =
+            createInitialState(strategy: ValidationStrategy.allFieldsRealTime);
         final newState = orchestrator.updateField<String>(
           fieldName: 'username',
           value: 'john',
@@ -211,8 +216,11 @@ void main() {
         expect(newState.isValid, isFalse);
       });
 
-      test('allFieldsRealTime cancels async validation if field fails sync validation', () {
-        final state = createInitialState(strategy: ValidationStrategy.allFieldsRealTime);
+      test(
+          'allFieldsRealTime cancels async validation if field fails sync validation',
+          () {
+        final state =
+            createInitialState(strategy: ValidationStrategy.allFieldsRealTime);
         final newState = orchestrator.updateField<String>(
           fieldName: 'username',
           value: '',
@@ -226,7 +234,8 @@ void main() {
       });
 
       test('realTimeOnly validates single field synchronously', () {
-        final state = createInitialState(strategy: ValidationStrategy.realTimeOnly);
+        final state =
+            createInitialState(strategy: ValidationStrategy.realTimeOnly);
         final newState = orchestrator.updateField<String>(
           fieldName: 'email',
           value: 'invalidemail',
@@ -265,7 +274,9 @@ void main() {
         expect(newState.isValid, isTrue);
       });
 
-      test('schedules async validation when field passes sync validation in allFieldsRealTime', () async {
+      test(
+          'schedules async validation when field passes sync validation in allFieldsRealTime',
+          () async {
         final asyncField = FormFieldDefinition<String>(
           name: 'asyncUsername',
           initialValue: '',
@@ -282,7 +293,8 @@ void main() {
 
         final testReg = FormFieldRegistry([asyncField]);
         final testTracker = FormTouchedTracker(['asyncUsername']);
-        final testVal = FormValidator(debounceDelay: const Duration(milliseconds: 10));
+        final testVal =
+            FormValidator(debounceDelay: const Duration(milliseconds: 10));
         final testOrch = FormValidationOrchestrator(
           registry: testReg,
           touchedTracker: testTracker,
@@ -320,7 +332,9 @@ void main() {
         testVal.dispose();
       });
 
-      test('schedules async validation when field passes sync validation in realTimeOnly', () async {
+      test(
+          'schedules async validation when field passes sync validation in realTimeOnly',
+          () async {
         final asyncField = FormFieldDefinition<String>(
           name: 'asyncField',
           initialValue: '',
@@ -370,8 +384,10 @@ void main() {
     });
 
     group('updateFieldWithDebounce', () {
-      test('onSubmitOnly and onSubmitThenRealTime emit state with new values', () {
-        final state = createInitialState(strategy: ValidationStrategy.onSubmitOnly);
+      test('onSubmitOnly and onSubmitThenRealTime emit state with new values',
+          () {
+        final state =
+            createInitialState(strategy: ValidationStrategy.onSubmitOnly);
         final emissions = <TypedFormState>[];
 
         orchestrator.updateFieldWithDebounce<String>(
@@ -387,8 +403,11 @@ void main() {
         expect(emissions.first.values['username'], 'john');
       });
 
-      test('allFieldsRealTime debounces validation and emits state on completion', () async {
-        var state = createInitialState(strategy: ValidationStrategy.allFieldsRealTime);
+      test(
+          'allFieldsRealTime debounces validation and emits state on completion',
+          () async {
+        var state =
+            createInitialState(strategy: ValidationStrategy.allFieldsRealTime);
         final emissions = <TypedFormState>[];
 
         orchestrator.updateFieldWithDebounce<String>(
@@ -409,8 +428,11 @@ void main() {
         expect(state.errors['username'], 'Username required');
       });
 
-      test('allFieldsRealTime debounces validation without async validators when sync validation passes', () async {
-        var state = createInitialState(strategy: ValidationStrategy.allFieldsRealTime);
+      test(
+          'allFieldsRealTime debounces validation without async validators when sync validation passes',
+          () async {
+        var state =
+            createInitialState(strategy: ValidationStrategy.allFieldsRealTime);
         final emissions = <TypedFormState>[];
 
         orchestrator.updateFieldWithDebounce<String>(
@@ -432,7 +454,9 @@ void main() {
         expect(state.errors.containsKey('username'), isFalse);
       });
 
-      test('allFieldsRealTime schedules async validation if sync validation passes', () async {
+      test(
+          'allFieldsRealTime schedules async validation if sync validation passes',
+          () async {
         final asyncField = FormFieldDefinition<String>(
           name: 'asyncUsername',
           initialValue: '',
@@ -444,7 +468,8 @@ void main() {
 
         final testReg = FormFieldRegistry([asyncField]);
         final testTracker = FormTouchedTracker(['asyncUsername']);
-        final testVal = FormValidator(debounceDelay: const Duration(milliseconds: 10));
+        final testVal =
+            FormValidator(debounceDelay: const Duration(milliseconds: 10));
         final testOrch = FormValidationOrchestrator(
           registry: testReg,
           touchedTracker: testTracker,
@@ -478,7 +503,8 @@ void main() {
       });
 
       test('realTimeOnly debounces single field validation', () async {
-        var state = createInitialState(strategy: ValidationStrategy.realTimeOnly);
+        var state =
+            createInitialState(strategy: ValidationStrategy.realTimeOnly);
         final emissions = <TypedFormState>[];
 
         orchestrator.updateFieldWithDebounce<String>(
@@ -499,8 +525,11 @@ void main() {
         expect(state.errors['email'], 'Invalid email');
       });
 
-      test('realTimeOnly debounces single field validation without async validators when sync passes', () async {
-        var state = createInitialState(strategy: ValidationStrategy.realTimeOnly);
+      test(
+          'realTimeOnly debounces single field validation without async validators when sync passes',
+          () async {
+        var state =
+            createInitialState(strategy: ValidationStrategy.realTimeOnly);
         final emissions = <TypedFormState>[];
 
         orchestrator.updateFieldWithDebounce<String>(
@@ -521,7 +550,9 @@ void main() {
         expect(state.errors.containsKey('email'), isFalse);
       });
 
-      test('realTimeOnly schedules async validation when sync validation passes', () async {
+      test(
+          'realTimeOnly schedules async validation when sync validation passes',
+          () async {
         final asyncField = FormFieldDefinition<String>(
           name: 'asyncField',
           initialValue: '',
@@ -533,7 +564,8 @@ void main() {
 
         final testReg = FormFieldRegistry([asyncField]);
         final testTracker = FormTouchedTracker(['asyncField']);
-        final testVal = FormValidator(debounceDelay: const Duration(milliseconds: 10));
+        final testVal =
+            FormValidator(debounceDelay: const Duration(milliseconds: 10));
         final testOrch = FormValidationOrchestrator(
           registry: testReg,
           touchedTracker: testTracker,
@@ -586,7 +618,8 @@ void main() {
 
     group('updateFields', () {
       test('updates multiple fields at once across all strategies', () {
-        final state = createInitialState(strategy: ValidationStrategy.allFieldsRealTime);
+        final state =
+            createInitialState(strategy: ValidationStrategy.allFieldsRealTime);
         final newState = orchestrator.updateFields(
           fieldValues: {'username': 'john', 'age': 25},
           context: mockContext,
@@ -602,7 +635,8 @@ void main() {
       });
 
       test('onSubmitOnly cancels async validation for updated fields', () {
-        final state = createInitialState(strategy: ValidationStrategy.onSubmitOnly);
+        final state =
+            createInitialState(strategy: ValidationStrategy.onSubmitOnly);
         final newState = orchestrator.updateFields(
           fieldValues: {'username': 'john'},
           context: mockContext,
@@ -615,7 +649,8 @@ void main() {
       });
 
       test('realTimeOnly validates updated fields individually', () {
-        final state = createInitialState(strategy: ValidationStrategy.realTimeOnly);
+        final state =
+            createInitialState(strategy: ValidationStrategy.realTimeOnly);
         final newState = orchestrator.updateFields(
           fieldValues: {'username': '', 'email': 'john@example.com'},
           context: mockContext,
@@ -628,8 +663,11 @@ void main() {
         expect(newState.errors.containsKey('email'), isFalse);
       });
 
-      test('allFieldsRealTime in updateFields cancels async validation when field fails sync validation', () {
-        final state = createInitialState(strategy: ValidationStrategy.allFieldsRealTime);
+      test(
+          'allFieldsRealTime in updateFields cancels async validation when field fails sync validation',
+          () {
+        final state =
+            createInitialState(strategy: ValidationStrategy.allFieldsRealTime);
         final newState = orchestrator.updateFields(
           fieldValues: {'username': ''},
           context: mockContext,
@@ -641,7 +679,9 @@ void main() {
         expect(newState.errors['username'], 'Username required');
       });
 
-      test('allFieldsRealTime in updateFields schedules async validation for fields with async validators', () async {
+      test(
+          'allFieldsRealTime in updateFields schedules async validation for fields with async validators',
+          () async {
         final asyncField = FormFieldDefinition<String>(
           name: 'asyncField',
           initialValue: '',
@@ -683,7 +723,9 @@ void main() {
         testVal.dispose();
       });
 
-      test('realTimeOnly in updateFields schedules async validation for fields with async validators', () async {
+      test(
+          'realTimeOnly in updateFields schedules async validation for fields with async validators',
+          () async {
         final asyncField = FormFieldDefinition<String>(
           name: 'asyncField',
           initialValue: '',
@@ -746,7 +788,8 @@ void main() {
         final newState = orchestrator.updateFieldValidators<String>(
           name: 'optionalNote',
           validators: [
-            TestValidator<String>((v, c) => (v == null || v.isEmpty) ? 'Note required' : null),
+            TestValidator<String>(
+                (v, c) => (v == null || v.isEmpty) ? 'Note required' : null),
           ],
           context: mockContext,
           state: state,
@@ -757,7 +800,9 @@ void main() {
         expect(newState.errors['optionalNote'], 'Note required');
       });
 
-      test('updates validators without async validators when field passes sync validation', () {
+      test(
+          'updates validators without async validators when field passes sync validation',
+          () {
         final state = createInitialState();
         final newState = orchestrator.updateFieldValidators<String>(
           name: 'optionalNote',
@@ -771,7 +816,8 @@ void main() {
         expect(newState.errors.containsKey('optionalNote'), isFalse);
       });
 
-      test('schedules async validation when new async validators provided', () async {
+      test('schedules async validation when new async validators provided',
+          () async {
         final state = createInitialState();
         var currentState = state;
 
@@ -797,7 +843,9 @@ void main() {
 
     group('Group and Subset Validation Routines', () {
       group('validateGroup', () {
-        test('returns state unchanged and calls onValidationPass if group is empty or unknown', () {
+        test(
+            'returns state unchanged and calls onValidationPass if group is empty or unknown',
+            () {
           final state = createInitialState();
           bool passed = false;
 
@@ -812,8 +860,11 @@ void main() {
           expect(passed, isTrue);
         });
 
-        test('marks group fields touched and updates errors when group validation fails', () {
-          final state = createInitialState(strategy: ValidationStrategy.onSubmitOnly);
+        test(
+            'marks group fields touched and updates errors when group validation fails',
+            () {
+          final state =
+              createInitialState(strategy: ValidationStrategy.onSubmitOnly);
           bool failed = false;
 
           final newState = orchestrator.validateGroup(
@@ -830,8 +881,11 @@ void main() {
           expect(failed, isTrue);
         });
 
-        test('switches strategy from onSubmitThenRealTime to realTimeOnly when group validation fails', () {
-          final state = createInitialState(strategy: ValidationStrategy.onSubmitThenRealTime);
+        test(
+            'switches strategy from onSubmitThenRealTime to realTimeOnly when group validation fails',
+            () {
+          final state = createInitialState(
+              strategy: ValidationStrategy.onSubmitThenRealTime);
 
           final newState = orchestrator.validateGroup(
             'account',
@@ -842,7 +896,8 @@ void main() {
           expect(newState.validationStrategy, ValidationStrategy.realTimeOnly);
         });
 
-        test('calls onValidationPass when all fields in group pass validation', () {
+        test('calls onValidationPass when all fields in group pass validation',
+            () {
           var state = createInitialState();
           state = state.copyWith(
             values: {
@@ -866,7 +921,9 @@ void main() {
       });
 
       group('validateFields', () {
-        test('returns state unchanged and calls onValidationPass if field list is empty', () {
+        test(
+            'returns state unchanged and calls onValidationPass if field list is empty',
+            () {
           final state = createInitialState();
           bool passed = false;
 
@@ -881,7 +938,9 @@ void main() {
           expect(passed, isTrue);
         });
 
-        test('throws FormFieldError.fieldNotFound if any specified field does not exist', () {
+        test(
+            'throws FormFieldError.fieldNotFound if any specified field does not exist',
+            () {
           final state = createInitialState();
 
           expect(
@@ -895,7 +954,8 @@ void main() {
         });
 
         test('marks specified fields touched and evaluates errors', () {
-          final state = createInitialState(strategy: ValidationStrategy.onSubmitOnly);
+          final state =
+              createInitialState(strategy: ValidationStrategy.onSubmitOnly);
           bool failed = false;
 
           final newState = orchestrator.validateFields(
@@ -910,8 +970,11 @@ void main() {
           expect(failed, isTrue);
         });
 
-        test('switches strategy from onSubmitThenRealTime to realTimeOnly on failure', () {
-          final state = createInitialState(strategy: ValidationStrategy.onSubmitThenRealTime);
+        test(
+            'switches strategy from onSubmitThenRealTime to realTimeOnly on failure',
+            () {
+          final state = createInitialState(
+              strategy: ValidationStrategy.onSubmitThenRealTime);
 
           final newState = orchestrator.validateFields(
             ['age'],
@@ -922,7 +985,8 @@ void main() {
           expect(newState.validationStrategy, ValidationStrategy.realTimeOnly);
         });
 
-        test('calls onValidationPass when all specified fields pass validation', () {
+        test('calls onValidationPass when all specified fields pass validation',
+            () {
           var state = createInitialState();
           state = state.copyWith(values: {...state.values, 'age': 20});
 
@@ -942,12 +1006,18 @@ void main() {
       group('isGroupValid', () {
         test('returns true for unknown or empty group', () {
           final state = createInitialState();
-          expect(orchestrator.isGroupValid('emptyGroup', context: mockContext, state: state), isTrue);
+          expect(
+              orchestrator.isGroupValid('emptyGroup',
+                  context: mockContext, state: state),
+              isTrue);
         });
 
         test('returns false if any field in group fails validation', () {
           final state = createInitialState();
-          expect(orchestrator.isGroupValid('account', context: mockContext, state: state), isFalse);
+          expect(
+              orchestrator.isGroupValid('account',
+                  context: mockContext, state: state),
+              isFalse);
         });
 
         test('returns true if all fields in group pass validation', () {
@@ -960,47 +1030,62 @@ void main() {
             },
           );
 
-          expect(orchestrator.isGroupValid('account', context: mockContext, state: state), isTrue);
+          expect(
+              orchestrator.isGroupValid('account',
+                  context: mockContext, state: state),
+              isTrue);
         });
       });
 
       group('areFieldsValid', () {
         test('returns true for empty fieldNames list', () {
           final state = createInitialState();
-          expect(orchestrator.areFieldsValid([], context: mockContext, state: state), isTrue);
+          expect(
+              orchestrator
+                  .areFieldsValid([], context: mockContext, state: state),
+              isTrue);
         });
 
         test('returns false if any field is missing from registry', () {
           final state = createInitialState();
           expect(
-            orchestrator.areFieldsValid(['username', 'missing'], context: mockContext, state: state),
+            orchestrator.areFieldsValid(['username', 'missing'],
+                context: mockContext, state: state),
             isFalse,
           );
         });
 
         test('returns false if any field fails validation', () {
           final state = createInitialState();
-          expect(orchestrator.areFieldsValid(['username'], context: mockContext, state: state), isFalse);
+          expect(
+              orchestrator.areFieldsValid(['username'],
+                  context: mockContext, state: state),
+              isFalse);
         });
 
         test('returns true if all specified fields pass validation', () {
           final state = createInitialState().copyWith(
             values: {'username': 'john'},
           );
-          expect(orchestrator.areFieldsValid(['username'], context: mockContext, state: state), isTrue);
+          expect(
+              orchestrator.areFieldsValid(['username'],
+                  context: mockContext, state: state),
+              isTrue);
         });
       });
 
       group('touchGroup', () {
         test('returns unchanged state if group is empty/unknown', () {
           final state = createInitialState();
-          final newState = orchestrator.touchGroup('unknownGroup', context: mockContext, state: state);
+          final newState = orchestrator.touchGroup('unknownGroup',
+              context: mockContext, state: state);
           expect(newState, state);
         });
 
         test('marks group fields touched and updates errors and validity', () {
           final state = createInitialState();
-          final newState = orchestrator.touchGroup('account', context: mockContext, state: state);
+          final newState = orchestrator.touchGroup('account',
+              context: mockContext, state: state);
 
           expect(touchedTracker.isTouched('username'), isTrue);
           expect(touchedTracker.isTouched('email'), isTrue);
@@ -1008,7 +1093,9 @@ void main() {
           expect(newState.errors['email'], 'Invalid email');
         });
 
-        test('removes errors when touchGroup encounters a valid field that previously had error', () {
+        test(
+            'removes errors when touchGroup encounters a valid field that previously had error',
+            () {
           final state = createInitialState().copyWith(
             values: {
               'username': 'john',
@@ -1019,7 +1106,8 @@ void main() {
             errors: {'username': 'Old error'},
           );
 
-          final newState = orchestrator.touchGroup('account', context: mockContext, state: state);
+          final newState = orchestrator.touchGroup('account',
+              context: mockContext, state: state);
 
           expect(newState.errors.containsKey('username'), isFalse);
         });
@@ -1027,7 +1115,9 @@ void main() {
     });
 
     group('scheduleFieldAsyncValidation & Error Handling', () {
-      test('captures async validation exception and calls onAsyncValidationError callback', () async {
+      test(
+          'captures async validation exception and calls onAsyncValidationError callback',
+          () async {
         final throwingField = FormFieldDefinition<String>(
           name: 'throwingField',
           initialValue: '',
@@ -1065,7 +1155,8 @@ void main() {
         testOrch.scheduleFieldAsyncValidation<String>(
           fieldName: 'throwingField',
           value: 'val',
-          asyncValidators: throwingField.asyncValidators!.cast<AsyncValidator<String>>(),
+          asyncValidators:
+              throwingField.asyncValidators!.cast<AsyncValidator<String>>(),
           context: mockContext,
           getState: () => currentState,
           emitState: (s) => currentState = s,
@@ -1079,7 +1170,8 @@ void main() {
         testVal.dispose();
       });
 
-      test('removes field error when async validator completes with null', () async {
+      test('removes field error when async validator completes with null',
+          () async {
         final asyncField = FormFieldDefinition<String>(
           name: 'asyncUsername',
           initialValue: '',
@@ -1110,7 +1202,8 @@ void main() {
         testOrch.scheduleFieldAsyncValidation<String>(
           fieldName: 'asyncUsername',
           value: 'validValue',
-          asyncValidators: asyncField.asyncValidators!.cast<AsyncValidator<String>>(),
+          asyncValidators:
+              asyncField.asyncValidators!.cast<AsyncValidator<String>>(),
           context: mockContext,
           getState: () => currentState,
           emitState: (s) => currentState = s,
@@ -1125,7 +1218,8 @@ void main() {
 
     group('validateForm', () {
       test('validates form and calls onValidationPass when valid', () {
-        var state = createInitialState(strategy: ValidationStrategy.onSubmitThenRealTime);
+        var state = createInitialState(
+            strategy: ValidationStrategy.onSubmitThenRealTime);
         state = state.copyWith(values: {
           ...state.values,
           'username': 'john',
@@ -1146,8 +1240,11 @@ void main() {
         expect(state.isValid, isTrue);
       });
 
-      test('validates form, calls onValidationFail, and switches strategy on error', () {
-        var state = createInitialState(strategy: ValidationStrategy.onSubmitThenRealTime);
+      test(
+          'validates form, calls onValidationFail, and switches strategy on error',
+          () {
+        var state = createInitialState(
+            strategy: ValidationStrategy.onSubmitThenRealTime);
 
         bool failCalled = false;
         orchestrator.validateForm(
@@ -1185,7 +1282,8 @@ void main() {
           initialValue: 'taken',
           validators: [],
           asyncValidators: [
-            TestAsyncValidator<String>((v, c) async => v == 'taken' ? 'Username taken' : null),
+            TestAsyncValidator<String>(
+                (v, c) async => v == 'taken' ? 'Username taken' : null),
           ],
         );
 
@@ -1239,7 +1337,12 @@ void main() {
 
       test('clears error when field becomes valid', () {
         final state = createInitialState().copyWith(
-          values: {'username': 'john', 'email': '', 'age': 0, 'optionalNote': ''},
+          values: {
+            'username': 'john',
+            'email': '',
+            'age': 0,
+            'optionalNote': ''
+          },
           errors: {'username': 'Username required'},
         );
 
@@ -1254,7 +1357,8 @@ void main() {
         expect(newState.errors.containsKey('username'), isFalse);
       });
 
-      test('schedules async validation when field passes sync validation', () async {
+      test('schedules async validation when field passes sync validation',
+          () async {
         final asyncField = FormFieldDefinition<String>(
           name: 'asyncField',
           initialValue: 'val',
@@ -1298,7 +1402,9 @@ void main() {
     });
 
     group('resetForm', () {
-      test('resets touched tracker, cancels async validations, and restores initial values', () {
+      test(
+          'resets touched tracker, cancels async validations, and restores initial values',
+          () {
         touchedTracker.markAllTouched();
         final state = createInitialState().copyWith(
           values: {'username': 'john', 'email': 'john@example.com'},
@@ -1349,7 +1455,8 @@ void main() {
         expect(clearedState.errors.containsKey('username'), isFalse);
       });
 
-      test('updateErrors sets multiple errors and clears error for null values', () {
+      test('updateErrors sets multiple errors and clears error for null values',
+          () {
         final state = createInitialState();
         final newState = orchestrator.updateErrors(
           errors: {'username': 'Err1', 'email': 'Err2'},
@@ -1393,8 +1500,10 @@ void main() {
       test('addFields adds multiple fields to registry and state', () {
         final state = createInitialState();
         final newFields = [
-          const FormFieldDefinition<String>(name: 'f1', initialValue: 'v1', validators: []),
-          const FormFieldDefinition<int>(name: 'f2', initialValue: 10, validators: []),
+          const FormFieldDefinition<String>(
+              name: 'f1', initialValue: 'v1', validators: []),
+          const FormFieldDefinition<int>(
+              name: 'f2', initialValue: 10, validators: []),
         ];
 
         final newState = orchestrator.addFields(

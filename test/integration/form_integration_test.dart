@@ -426,8 +426,8 @@ void main() {
                   ElevatedButton(
                     onPressed: () {
                       final controller = context.formCubit;
-                      controller
-                          .setValidationStrategy(ValidationStrategy.realTimeOnly);
+                      controller.setValidationStrategy(
+                          ValidationStrategy.realTimeOnly);
                     },
                     child: const Text('Enable Real-time Validation'),
                   ),

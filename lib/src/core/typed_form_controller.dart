@@ -37,7 +37,8 @@ class TypedFormController extends Cubit<TypedFormState> {
     required List<FormFieldDefinition> fields,
     required ValidationStrategy validationStrategy,
     required Duration asyncDebounceDelay,
-    required void Function(Object error, StackTrace stackTrace, String fieldName)?
+    required void Function(
+            Object error, StackTrace stackTrace, String fieldName)?
         onAsyncValidationError,
     required FormFieldRegistry registry,
     required FormTouchedTracker touchedTracker,

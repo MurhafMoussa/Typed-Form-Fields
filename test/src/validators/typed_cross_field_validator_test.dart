@@ -16,7 +16,6 @@ void main() {
   });
 
   group('TypedCrossFieldValidator', () {
-
     testWidgets('should validate field based on other field values',
         (tester) async {
       final testFields = [

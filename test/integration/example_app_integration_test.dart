@@ -11,7 +11,8 @@ import '../../example/lib/src/shell/app_shell.dart';
 
 void main() {
   group('Example App Integration Tests', () {
-    testWidgets('should render AppShell and top app bar controls', (tester) async {
+    testWidgets('should render AppShell and top app bar controls',
+        (tester) async {
       tester.view.physicalSize = const Size(1200, 900);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() {
@@ -30,7 +31,8 @@ void main() {
       expect(find.byKey(const Key('github_link')), findsOneWidget);
     });
 
-    testWidgets('should switch application locale via language picker dropdown', (tester) async {
+    testWidgets('should switch application locale via language picker dropdown',
+        (tester) async {
       tester.view.physicalSize = const Size(1200, 900);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() {
@@ -41,7 +43,8 @@ void main() {
       await tester.pumpWidget(const TypedFormFieldsExampleApp());
       await tester.pumpAndSettle();
 
-      final languageDropdown = find.byKey(const Key('locale_switcher_dropdown'));
+      final languageDropdown =
+          find.byKey(const Key('locale_switcher_dropdown'));
       expect(languageDropdown, findsOneWidget);
       await tester.tap(languageDropdown);
       await tester.pumpAndSettle();
@@ -52,7 +55,8 @@ void main() {
       expect(find.text('ES'), findsOneWidget);
     });
 
-    testWidgets('should render RTL layout when Arabic locale selected', (tester) async {
+    testWidgets('should render RTL layout when Arabic locale selected',
+        (tester) async {
       tester.view.physicalSize = const Size(1200, 900);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() {
@@ -63,7 +67,8 @@ void main() {
       await tester.pumpWidget(const TypedFormFieldsExampleApp());
       await tester.pumpAndSettle();
 
-      final languageDropdown = find.byKey(const Key('locale_switcher_dropdown'));
+      final languageDropdown =
+          find.byKey(const Key('locale_switcher_dropdown'));
       await tester.tap(languageDropdown);
       await tester.pumpAndSettle();
 
@@ -77,7 +82,9 @@ void main() {
       expect(textDirection, TextDirection.rtl);
     });
 
-    testWidgets('should navigate between showcase screens using shell navigation', (tester) async {
+    testWidgets(
+        'should navigate between showcase screens using shell navigation',
+        (tester) async {
       tester.view.physicalSize = const Size(1200, 900);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() {

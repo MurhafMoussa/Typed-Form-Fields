@@ -15,7 +15,11 @@ class DiagnosticActions extends StatelessWidget {
     this.onEventLogged,
   });
 
-  void _showFeedback(BuildContext context, String message, {bool isError = false}) {
+  void _showFeedback(
+    BuildContext context,
+    String message, {
+    bool isError = false,
+  }) {
     final theme = Theme.of(context);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -23,8 +27,8 @@ class DiagnosticActions extends StatelessWidget {
         backgroundColor: isError
             ? theme.colorScheme.error
             : (theme.brightness == Brightness.dark
-                ? Colors.green.shade800
-                : Colors.green.shade700),
+                  ? Colors.green.shade800
+                  : Colors.green.shade700),
         duration: const Duration(seconds: 2),
         behavior: SnackBarBehavior.floating,
       ),
@@ -87,7 +91,8 @@ class DiagnosticActions extends StatelessWidget {
                     onEventLogged?.call(
                       FormEventLogEntry(
                         title: 'Form Validation Failed',
-                        detail: 'Found $errorCount error(s): ${controller.state.errors}',
+                        detail:
+                            'Found $errorCount error(s): ${controller.state.errors}',
                         category: FormEventCategory.validation,
                         isError: true,
                       ),
@@ -125,7 +130,10 @@ class DiagnosticActions extends StatelessWidget {
                           category: FormEventCategory.validation,
                         ),
                       );
-                      _showFeedback(context, 'Group "$groupName" validation passed!');
+                      _showFeedback(
+                        context,
+                        'Group "$groupName" validation passed!',
+                      );
                     },
                     onValidationFail: () {
                       onEventLogged?.call(

@@ -503,7 +503,8 @@ void main() {
       expect(validationFailed, isFalse);
     });
 
-    testWidgets('should provide validateGroup and touchGroup methods', (tester) async {
+    testWidgets('should provide validateGroup and touchGroup methods',
+        (tester) async {
       final testFields = [
         FormFieldDefinition<String>(
           name: 'email',

@@ -8,7 +8,8 @@ import 'package:typed_form_fields/typed_form_fields.dart';
 import '../../example/lib/src/screens/multi_step_form_screen.dart';
 
 void main() {
-  Widget buildTestableWidget(Widget child, {Locale locale = const Locale('en')}) {
+  Widget buildTestableWidget(Widget child,
+      {Locale locale = const Locale('en')}) {
     return MaterialApp(
       locale: locale,
       localizationsDelegates: const [
@@ -26,7 +27,8 @@ void main() {
   }
 
   group('MultiStepFormScreen Integration Tests', () {
-    testWidgets('should render multi-step form wizard and inspector panel', (tester) async {
+    testWidgets('should render multi-step form wizard and inspector panel',
+        (tester) async {
       tester.view.physicalSize = const Size(1280, 1000);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() {
@@ -42,7 +44,9 @@ void main() {
       expect(find.text('Step 1: Personal Information'), findsOneWidget);
     });
 
-    testWidgets('should prevent advancement when Step 1 fields are empty/invalid', (tester) async {
+    testWidgets(
+        'should prevent advancement when Step 1 fields are empty/invalid',
+        (tester) async {
       tester.view.physicalSize = const Size(1280, 1000);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() {
@@ -62,11 +66,14 @@ void main() {
 
       // Should remain on Step 1 and show error messages on required fields
       expect(find.text('Step 1: Personal Information'), findsOneWidget);
-      expect(find.text('Please fix errors in Personal Info before proceeding.'), findsOneWidget);
+      expect(find.text('Please fix errors in Personal Info before proceeding.'),
+          findsOneWidget);
       expect(find.text('This field is required.'), findsNWidgets(2));
     });
 
-    testWidgets('should validate Step 1, advance to Step 2, and handle Step 2 validation', (tester) async {
+    testWidgets(
+        'should validate Step 1, advance to Step 2, and handle Step 2 validation',
+        (tester) async {
       tester.view.physicalSize = const Size(1280, 1000);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() {
@@ -78,10 +85,12 @@ void main() {
       await tester.pumpAndSettle();
 
       // Fill Step 1 with valid inputs
-      await tester.enterText(find.byKey(const Key('step_input_full_name')), 'Jane Doe');
+      await tester.enterText(
+          find.byKey(const Key('step_input_full_name')), 'Jane Doe');
       await tester.pumpAndSettle();
 
-      await tester.enterText(find.byKey(const Key('step_input_email')), 'jane.doe@example.com');
+      await tester.enterText(
+          find.byKey(const Key('step_input_email')), 'jane.doe@example.com');
       await tester.pumpAndSettle();
 
       // Click Next Step
@@ -98,10 +107,14 @@ void main() {
 
       // Should stay on Step 2 and display validation errors
       expect(find.text('Step 2: Address Details'), findsOneWidget);
-      expect(find.text('Please fix errors in Address Details before proceeding.'), findsOneWidget);
+      expect(
+          find.text('Please fix errors in Address Details before proceeding.'),
+          findsOneWidget);
     });
 
-    testWidgets('should complete full multi-step registration flow successfully', (tester) async {
+    testWidgets(
+        'should complete full multi-step registration flow successfully',
+        (tester) async {
       tester.view.physicalSize = const Size(1280, 1200);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() {
@@ -113,10 +126,12 @@ void main() {
       await tester.pumpAndSettle();
 
       // Step 1: Personal Info
-      await tester.enterText(find.byKey(const Key('step_input_full_name')), 'Alice Smith');
+      await tester.enterText(
+          find.byKey(const Key('step_input_full_name')), 'Alice Smith');
       await tester.pumpAndSettle();
 
-      await tester.enterText(find.byKey(const Key('step_input_email')), 'alice.smith@example.com');
+      await tester.enterText(
+          find.byKey(const Key('step_input_email')), 'alice.smith@example.com');
       await tester.pumpAndSettle();
 
       final nextButton = find.byKey(const Key('btn_step_next'));
@@ -126,10 +141,12 @@ void main() {
       // Step 2: Address Details
       expect(find.text('Step 2: Address Details'), findsOneWidget);
 
-      await tester.enterText(find.byKey(const Key('step_input_street')), '123 Tech Lane');
+      await tester.enterText(
+          find.byKey(const Key('step_input_street')), '123 Tech Lane');
       await tester.pumpAndSettle();
 
-      await tester.enterText(find.byKey(const Key('step_input_city')), 'San Francisco');
+      await tester.enterText(
+          find.byKey(const Key('step_input_city')), 'San Francisco');
       await tester.pumpAndSettle();
 
       await tester.enterText(find.byKey(const Key('step_input_zip')), '94105');
@@ -147,7 +164,8 @@ void main() {
       await tester.tap(submitButton);
       await tester.pumpAndSettle();
 
-      expect(find.text('Please accept terms and conditions to submit.'), findsOneWidget);
+      expect(find.text('Please accept terms and conditions to submit.'),
+          findsOneWidget);
 
       // Check accept terms checkbox
       await tester.tap(find.byKey(const Key('step_input_accept_terms')));
@@ -166,7 +184,9 @@ void main() {
       expect(find.text('ZIP Code: 94105'), findsOneWidget);
     });
 
-    testWidgets('should support navigating back to previous steps and retain values', (tester) async {
+    testWidgets(
+        'should support navigating back to previous steps and retain values',
+        (tester) async {
       tester.view.physicalSize = const Size(1280, 1000);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() {
@@ -178,8 +198,10 @@ void main() {
       await tester.pumpAndSettle();
 
       // Step 1
-      await tester.enterText(find.byKey(const Key('step_input_full_name')), 'Bob Vance');
-      await tester.enterText(find.byKey(const Key('step_input_email')), 'bob@vancerefrigeration.com');
+      await tester.enterText(
+          find.byKey(const Key('step_input_full_name')), 'Bob Vance');
+      await tester.enterText(find.byKey(const Key('step_input_email')),
+          'bob@vancerefrigeration.com');
       await tester.pumpAndSettle();
 
       await tester.tap(find.byKey(const Key('btn_step_next')));
@@ -196,10 +218,12 @@ void main() {
       // Back on Step 1
       expect(find.text('Step 1: Personal Information'), findsOneWidget);
       expect(find.widgetWithText(TextFormField, 'Bob Vance'), findsOneWidget);
-      expect(find.widgetWithText(TextFormField, 'bob@vancerefrigeration.com'), findsOneWidget);
+      expect(find.widgetWithText(TextFormField, 'bob@vancerefrigeration.com'),
+          findsOneWidget);
     });
 
-    testWidgets('should verify RTL layout rendering for Arabic locale', (tester) async {
+    testWidgets('should verify RTL layout rendering for Arabic locale',
+        (tester) async {
       tester.view.physicalSize = const Size(1280, 1000);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() {

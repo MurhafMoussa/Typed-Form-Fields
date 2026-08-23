@@ -38,7 +38,10 @@ void main() {
 
   setUp(() {
     final binding = TestWidgetsFlutterBinding.ensureInitialized();
-    binding.platformDispatcher.views.first.physicalSize = const Size(1280, 1024);
+    binding.platformDispatcher.views.first.physicalSize = const Size(
+      1280,
+      1024,
+    );
     binding.platformDispatcher.views.first.devicePixelRatio = 1.0;
   });
 
@@ -60,11 +63,17 @@ Some text after.
       final segments = DocGuideParser.parse(input);
       expect(segments.length, equals(3));
       expect(segments[0], isA<MarkdownTextSegment>());
-      expect((segments[0] as MarkdownTextSegment).content, contains('# Heading'));
+      expect(
+        (segments[0] as MarkdownTextSegment).content,
+        contains('# Heading'),
+      );
       expect(segments[1], isA<LiveDemoSegment>());
       expect((segments[1] as LiveDemoSegment).demoId, equals('registration'));
       expect(segments[2], isA<MarkdownTextSegment>());
-      expect((segments[2] as MarkdownTextSegment).content, contains('Some text after.'));
+      expect(
+        (segments[2] as MarkdownTextSegment).content,
+        contains('Some text after.'),
+      );
     });
   });
 
@@ -97,9 +106,9 @@ More text.
 
   group('EmbeddedLiveDemo Widget Tests', () {
     testWidgets('renders Registration demo correctly', (tester) async {
-      await tester.pumpWidget(_wrapWithApp(
-        const EmbeddedLiveDemo(demoId: 'registration'),
-      ));
+      await tester.pumpWidget(
+        _wrapWithApp(const EmbeddedLiveDemo(demoId: 'registration')),
+      );
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 300));
 
@@ -108,20 +117,23 @@ More text.
     });
 
     testWidgets('renders Multi-Step demo correctly', (tester) async {
-      await tester.pumpWidget(_wrapWithApp(
-        const EmbeddedLiveDemo(demoId: 'multi-step'),
-      ));
+      await tester.pumpWidget(
+        _wrapWithApp(const EmbeddedLiveDemo(demoId: 'multi-step')),
+      );
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 300));
 
       expect(find.byKey(const Key('live_demo_multi-step')), findsOneWidget);
-      expect(find.text('Interactive Demo: Multi-Step Field Grouping'), findsOneWidget);
+      expect(
+        find.text('Interactive Demo: Multi-Step Field Grouping'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('renders Dynamic Form demo correctly', (tester) async {
-      await tester.pumpWidget(_wrapWithApp(
-        const EmbeddedLiveDemo(demoId: 'dynamic-form'),
-      ));
+      await tester.pumpWidget(
+        _wrapWithApp(const EmbeddedLiveDemo(demoId: 'dynamic-form')),
+      );
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 300));
 
@@ -138,13 +150,15 @@ More text.
         const TocItem(title: 'Details', anchorId: 'details', level: 3),
       ];
 
-      await tester.pumpWidget(_wrapWithApp(
-        TableOfContentsWidget(
-          items: items,
-          activeAnchorId: 'overview',
-          onItemTap: (item) => selectedItem = item,
+      await tester.pumpWidget(
+        _wrapWithApp(
+          TableOfContentsWidget(
+            items: items,
+            activeAnchorId: 'overview',
+            onItemTap: (item) => selectedItem = item,
+          ),
         ),
-      ));
+      );
 
       expect(find.text('On This Page'), findsOneWidget);
       expect(find.text('Overview'), findsOneWidget);
@@ -156,15 +170,19 @@ More text.
   });
 
   group('DocSidebar Widget Tests', () {
-    testWidgets('renders documentation sections and triggers navigation', (tester) async {
+    testWidgets('renders documentation sections and triggers navigation', (
+      tester,
+    ) async {
       String? selectedRoute;
 
-      await tester.pumpWidget(_wrapWithApp(
-        DocSidebar(
-          currentRoute: AppRoutes.docsGettingStarted,
-          onSelectRoute: (route) => selectedRoute = route,
+      await tester.pumpWidget(
+        _wrapWithApp(
+          DocSidebar(
+            currentRoute: AppRoutes.docsGettingStarted,
+            onSelectRoute: (route) => selectedRoute = route,
+          ),
         ),
-      ));
+      );
 
       expect(find.text('Getting Started'), findsOneWidget);
       expect(find.text('Core Concepts'), findsOneWidget);
@@ -176,21 +194,25 @@ More text.
   });
 
   group('DocSearchOverlay Widget Tests', () {
-    testWidgets('filters search manifest and handles selection', (tester) async {
+    testWidgets('filters search manifest and handles selection', (
+      tester,
+    ) async {
       String? selectedRoute;
 
-      await tester.pumpWidget(_wrapWithApp(
-        DocSearchOverlay(
-          onSelectRoute: (route) => selectedRoute = route,
+      await tester.pumpWidget(
+        _wrapWithApp(
+          DocSearchOverlay(onSelectRoute: (route) => selectedRoute = route),
         ),
-      ));
+      );
 
       expect(find.byKey(const Key('doc_search_overlay')), findsOneWidget);
       expect(find.text('Getting Started'), findsOneWidget);
 
       // Enter search text
       await tester.enterText(
-          find.byKey(const Key('doc_search_input')), 'wizard');
+        find.byKey(const Key('doc_search_input')),
+        'wizard',
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('Multi-Step Form Showcase'), findsOneWidget);
@@ -203,24 +225,35 @@ More text.
   });
 
   group('DocViewerWidget Asset Integration Tests', () {
-    test('loads all 6 English documentation markdown files from rootBundle', () async {
-      final guideFiles = [
-        'getting_started.md',
-        'core_concepts.md',
-        'validation_strategies.md',
-        'async_validation.md',
-        'field_grouping.md',
-        'dynamic_form_management.md',
-      ];
+    test(
+      'loads all 6 English documentation markdown files from rootBundle',
+      () async {
+        final guideFiles = [
+          'getting_started.md',
+          'core_concepts.md',
+          'validation_strategies.md',
+          'async_validation.md',
+          'field_grouping.md',
+          'dynamic_form_management.md',
+        ];
 
-      for (final fileName in guideFiles) {
-        final content = await rootBundle.loadString('assets/docs/en/$fileName');
-        expect(content, isNotEmpty, reason: '$fileName should not be empty');
-        expect(content, contains('<live-demo'), reason: '$fileName should contain live-demo tag');
-      }
-    });
+        for (final fileName in guideFiles) {
+          final content = await rootBundle.loadString(
+            'assets/docs/en/$fileName',
+          );
+          expect(content, isNotEmpty, reason: '$fileName should not be empty');
+          expect(
+            content,
+            contains('<live-demo'),
+            reason: '$fileName should contain live-demo tag',
+          );
+        }
+      },
+    );
 
-    testWidgets('loads and renders all 6 documentation guide routes', (tester) async {
+    testWidgets('loads and renders all 6 documentation guide routes', (
+      tester,
+    ) async {
       final routes = [
         AppRoutes.docsGettingStarted,
         AppRoutes.docsCoreConcepts,
@@ -231,13 +264,15 @@ More text.
       ];
 
       for (final route in routes) {
-        await tester.pumpWidget(_wrapWithApp(
-          DocViewerWidget(
-            docRoute: route,
-            locale: const Locale('en'),
-            onNavigate: (_) {},
+        await tester.pumpWidget(
+          _wrapWithApp(
+            DocViewerWidget(
+              docRoute: route,
+              locale: const Locale('en'),
+              onNavigate: (_) {},
+            ),
           ),
-        ));
+        );
 
         await tester.pump();
         await tester.pump(const Duration(milliseconds: 300));
@@ -247,25 +282,32 @@ More text.
       }
     });
 
-    testWidgets('handles locale fallback to English when localized asset missing', (tester) async {
-      await tester.pumpWidget(_wrapWithApp(
-        DocViewerWidget(
-          docRoute: AppRoutes.docsGettingStarted,
-          locale: const Locale('de'),
-          onNavigate: (_) {},
-        ),
-      ));
+    testWidgets(
+      'handles locale fallback to English when localized asset missing',
+      (tester) async {
+        await tester.pumpWidget(
+          _wrapWithApp(
+            DocViewerWidget(
+              docRoute: AppRoutes.docsGettingStarted,
+              locale: const Locale('de'),
+              onNavigate: (_) {},
+            ),
+          ),
+        );
 
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 300));
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 300));
 
-      expect(find.byType(DocViewerWidget), findsOneWidget);
-    });
+        expect(find.byType(DocViewerWidget), findsOneWidget);
+      },
+    );
   });
 
   group('ShadcnCodeBlockBuilder Tests', () {
-    testWidgets('renders copy code button and copies code to clipboard on tap', (tester) async {
-      const markdownData = '''
+    testWidgets(
+      'renders copy code button and copies code to clipboard on tap',
+      (tester) async {
+        const markdownData = '''
 ```dart
 void main() {
   print("Hello World");
@@ -273,27 +315,28 @@ void main() {
 ```
 ''';
 
-      await tester.pumpWidget(_wrapWithApp(
-        Builder(
-          builder: (context) {
-            return MarkdownBody(
-              data: markdownData,
-              builders: {
-                'code': ShadcnCodeBlockBuilder(context),
+        await tester.pumpWidget(
+          _wrapWithApp(
+            Builder(
+              builder: (context) {
+                return MarkdownBody(
+                  data: markdownData,
+                  builders: {'code': ShadcnCodeBlockBuilder(context)},
+                );
               },
-            );
-          },
-        ),
-      ));
-      await tester.pumpAndSettle();
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
 
-      final copyButton = find.byKey(const Key('copy_code_button')).first;
-      expect(copyButton, findsOneWidget);
+        final copyButton = find.byKey(const Key('copy_code_button')).first;
+        expect(copyButton, findsOneWidget);
 
-      await tester.tap(copyButton);
-      await tester.pump();
+        await tester.tap(copyButton);
+        await tester.pump();
 
-      expect(find.text('Code copied to clipboard!'), findsOneWidget);
-    });
+        expect(find.text('Code copied to clipboard!'), findsOneWidget);
+      },
+    );
   });
 }

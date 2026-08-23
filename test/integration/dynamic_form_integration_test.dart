@@ -8,7 +8,8 @@ import 'package:typed_form_fields/typed_form_fields.dart';
 import '../../example/lib/src/screens/dynamic_form_screen.dart';
 
 void main() {
-  Widget buildTestableWidget(Widget child, {Locale locale = const Locale('en')}) {
+  Widget buildTestableWidget(Widget child,
+      {Locale locale = const Locale('en')}) {
     return MaterialApp(
       locale: locale,
       localizationsDelegates: const [
@@ -26,7 +27,8 @@ void main() {
   }
 
   group('DynamicFormScreen Integration Tests', () {
-    testWidgets('should render dynamic form and inspector panel', (tester) async {
+    testWidgets('should render dynamic form and inspector panel',
+        (tester) async {
       tester.view.physicalSize = const Size(1280, 1000);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() {
@@ -43,7 +45,8 @@ void main() {
       expect(find.byKey(const Key('btn_add_email_field')), findsOneWidget);
     });
 
-    testWidgets('should support adding, reordering, and removing fields', (tester) async {
+    testWidgets('should support adding, reordering, and removing fields',
+        (tester) async {
       tester.view.physicalSize = const Size(1280, 1200);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() {
@@ -88,7 +91,9 @@ void main() {
       expect(find.byType(TextFormField), findsAtLeastNWidgets(1));
     });
 
-    testWidgets('should not display validation errors for untouched or newly added fields until interaction or submit', (tester) async {
+    testWidgets(
+        'should not display validation errors for untouched or newly added fields until interaction or submit',
+        (tester) async {
       tester.view.physicalSize = const Size(1280, 1200);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() {
@@ -133,7 +138,8 @@ void main() {
       expect(find.text('This field is required.'), findsAtLeastNWidgets(1));
     });
 
-    testWidgets('should verify RTL layout rendering for Arabic locale', (tester) async {
+    testWidgets('should verify RTL layout rendering for Arabic locale',
+        (tester) async {
       tester.view.physicalSize = const Size(1280, 1000);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() {

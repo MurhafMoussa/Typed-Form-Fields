@@ -56,7 +56,8 @@ void main() {
         expect(tracker.isTouched('username'), isFalse);
       });
 
-      test('markTouched tracks and marks a new field if not previously tracked', () {
+      test('markTouched tracks and marks a new field if not previously tracked',
+          () {
         final tracker = FormTouchedTracker();
         tracker.markTouched('newField');
         expect(tracker.isTouched('newField'), isTrue);
