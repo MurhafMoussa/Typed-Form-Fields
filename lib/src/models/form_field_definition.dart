@@ -9,11 +9,13 @@ class FormFieldDefinition<T> {
     required this.name,
     required this.validators,
     this.initialValue,
+    this.group,
   });
 
   final String name;
   final List<Validator<T>> validators;
   final T? initialValue;
+  final String? group;
 
   /// Get the runtime type of the field value
   Type get valueType => T;
@@ -25,11 +27,13 @@ class FormFieldDefinition<T> {
     String? name,
     List<Validator<T>>? validators,
     T? initialValue,
+    String? group,
   }) {
     return FormFieldDefinition<T>(
       name: name ?? this.name,
       validators: validators ?? this.validators,
       initialValue: initialValue ?? this.initialValue,
+      group: group ?? this.group,
     );
   }
 
@@ -39,6 +43,7 @@ class FormFieldDefinition<T> {
     if (other is! FormFieldDefinition<T>) return false;
     return name == other.name &&
         initialValue == other.initialValue &&
+        group == other.group &&
         const ListEquality<dynamic>().equals(validators, other.validators);
   }
 
@@ -47,12 +52,13 @@ class FormFieldDefinition<T> {
     return Object.hash(
       name,
       initialValue,
+      group,
       const ListEquality<dynamic>().hash(validators),
     );
   }
 
   @override
   String toString() {
-    return 'FormFieldDefinition<$T>(name: $name, validators: $validators, initialValue: $initialValue)';
+    return 'FormFieldDefinition<$T>(name: $name, validators: $validators, initialValue: $initialValue, group: $group)';
   }
 }

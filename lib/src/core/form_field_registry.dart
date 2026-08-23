@@ -57,6 +57,15 @@ class FormFieldRegistry {
     return null;
   }
 
+  /// Returns an unmodifiable list of field definitions matching [groupName].
+  ///
+  /// Returns an empty list `[]` if no fields match [groupName].
+  List<FormFieldDefinition> getFieldsByGroup(String groupName) {
+    final matching =
+        _fields.where((field) => field.group == groupName).toList();
+    return List.unmodifiable(matching);
+  }
+
   /// Throws [FormFieldError.fieldNotFound] if [fieldName] is not in the registry.
   void checkFieldExists(
     String fieldName, {

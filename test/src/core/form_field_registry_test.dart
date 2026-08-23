@@ -85,6 +85,42 @@ void main() {
         expect(registry.getField('username'), equals(usernameField));
         expect(registry.getField('unknown'), isNull);
       });
+
+      test('getFieldsByGroup returns matching field definitions in unmodifiable list', () {
+        const step1Field1 = FormFieldDefinition<String>(
+          name: 'firstName',
+          validators: [],
+          group: 'step1',
+        );
+        const step1Field2 = FormFieldDefinition<String>(
+          name: 'lastName',
+          validators: [],
+          group: 'step1',
+        );
+        const step2Field = FormFieldDefinition<String>(
+          name: 'address',
+          validators: [],
+          group: 'step2',
+        );
+
+        final registry = FormFieldRegistry([
+          step1Field1,
+          step1Field2,
+          step2Field,
+          usernameField, // group: null
+        ]);
+
+        final step1Fields = registry.getFieldsByGroup('step1');
+        expect(step1Fields, equals([step1Field1, step1Field2]));
+        expect(() => step1Fields.add(step2Field), throwsUnsupportedError);
+
+        final step2Fields = registry.getFieldsByGroup('step2');
+        expect(step2Fields, equals([step2Field]));
+
+        final unknownGroupFields = registry.getFieldsByGroup('unknown');
+        expect(unknownGroupFields, isEmpty);
+        expect(unknownGroupFields, equals([]));
+      });
     });
 
     group('Exception checks', () {
