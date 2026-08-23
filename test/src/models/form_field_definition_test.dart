@@ -9,21 +9,31 @@ class _TestValidator<T> implements Validator<T> {
   String? validate(T? value, dynamic context) => null;
 }
 
+class _TestAsyncValidator<T> implements AsyncValidator<T> {
+  const _TestAsyncValidator();
+
+  @override
+  String? validate(T? value, dynamic context) => null;
+}
+
 void main() {
   group('FormFieldDefinition', () {
-    test('defaults group to null', () {
+    test('defaults group and asyncValidators to null', () {
       const def = FormFieldDefinition<String>(
         name: 'email',
         validators: [],
       );
 
       expect(def.group, isNull);
+      expect(def.asyncValidators, isNull);
     });
 
-    test('accepts optional group parameter in constructor', () {
+    test('accepts optional group and asyncValidators parameters in constructor', () {
+      const asyncVal = _TestAsyncValidator<String>();
       const def = FormFieldDefinition<String>(
         name: 'email',
         validators: [],
+        asyncValidators: [asyncVal],
         initialValue: 'test@example.com',
         group: 'step1',
       );
@@ -31,12 +41,15 @@ void main() {
       expect(def.name, equals('email'));
       expect(def.group, equals('step1'));
       expect(def.initialValue, equals('test@example.com'));
+      expect(def.asyncValidators, equals([asyncVal]));
     });
 
-    test('copyWith updates and preserves group correctly', () {
+    test('copyWith updates and preserves asyncValidators correctly', () {
+      const asyncVal1 = _TestAsyncValidator<String>();
       const def = FormFieldDefinition<String>(
         name: 'email',
         validators: [],
+        asyncValidators: [asyncVal1],
         initialValue: 'a@b.com',
         group: 'step1',
       );
@@ -45,14 +58,14 @@ void main() {
       expect(copy1.name, 'newEmail');
       expect(copy1.initialValue, 'a@b.com');
       expect(copy1.group, 'step1');
+      expect(copy1.asyncValidators, equals([asyncVal1]));
 
-      final copy2 = def.copyWith(group: 'step2');
-      expect(copy2.name, 'email');
-      expect(copy2.group, 'step2');
+      final copy2 = def.copyWith(asyncValidators: []);
+      expect(copy2.asyncValidators, equals([]));
 
       final copy3 = def.copyWith(validators: [], initialValue: 'c@d.com');
       expect(copy3.initialValue, 'c@d.com');
-      expect(copy3.group, 'step1');
+      expect(copy3.asyncValidators, equals([asyncVal1]));
     });
 
     test('valueType and createValidator work correctly', () {
@@ -65,29 +78,34 @@ void main() {
       expect(def.createValidator(), isNotNull);
     });
 
-    test('equality and hashCode reflect group parameter', () {
+    test('equality and hashCode reflect asyncValidators parameter', () {
+      const asyncVal = _TestAsyncValidator<String>();
       const def1 = FormFieldDefinition<String>(
         name: 'email',
         validators: [],
+        asyncValidators: [asyncVal],
         initialValue: 'a@b.com',
         group: 'step1',
       );
       const def2 = FormFieldDefinition<String>(
         name: 'email',
         validators: [],
+        asyncValidators: [asyncVal],
         initialValue: 'a@b.com',
         group: 'step1',
       );
       const def3 = FormFieldDefinition<String>(
         name: 'email',
         validators: [],
+        asyncValidators: [],
         initialValue: 'a@b.com',
-        group: 'step2',
+        group: 'step1',
       );
       const def4 = FormFieldDefinition<String>(
         name: 'email',
         validators: [],
         initialValue: 'a@b.com',
+        group: 'step1',
       );
 
       expect(def1, equals(def2));
@@ -100,19 +118,20 @@ void main() {
       expect(def1.hashCode, isNot(equals(def4.hashCode)));
     });
 
-    test('toString includes group parameter', () {
-      const defWithGroup = FormFieldDefinition<String>(
+    test('toString includes asyncValidators parameter', () {
+      const asyncVal = _TestAsyncValidator<String>();
+      const defWithAsync = FormFieldDefinition<String>(
         name: 'email',
         validators: [],
-        group: 'step1',
+        asyncValidators: [asyncVal],
       );
-      const defNullGroup = FormFieldDefinition<String>(
+      const defNullAsync = FormFieldDefinition<String>(
         name: 'email',
         validators: [],
       );
 
-      expect(defWithGroup.toString(), contains('group: step1'));
-      expect(defNullGroup.toString(), contains('group: null'));
+      expect(defWithAsync.toString(), contains('asyncValidators: ['));
+      expect(defNullAsync.toString(), contains('asyncValidators: null'));
     });
   });
 }

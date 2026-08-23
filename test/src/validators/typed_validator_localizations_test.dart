@@ -254,6 +254,10 @@ void main() {
         expect(localizations.minLengthError(5),
             'Debe tener al menos 5 caracteres.');
       });
+
+      test('should provide Spanish async validation error message', () {
+        expect(localizations.asyncValidationError, 'La validación falló.');
+      });
     });
 
     group('FrenchValidatorLocalizations', () {
@@ -270,6 +274,10 @@ void main() {
       test('should provide French email error message', () {
         expect(localizations.invalidEmailError,
             'Veuillez saisir une adresse email valide.');
+      });
+
+      test('should provide French async validation error message', () {
+        expect(localizations.asyncValidationError, 'La validation a échoué.');
       });
     });
 
@@ -288,6 +296,10 @@ void main() {
       test('should provide German email error message', () {
         expect(localizations.invalidEmailError,
             'Bitte geben Sie eine gültige E-Mail-Adresse ein.');
+      });
+
+      test('should provide German async validation error message', () {
+        expect(localizations.asyncValidationError, 'Validierung fehlgeschlagen.');
       });
     });
 
@@ -310,6 +322,10 @@ void main() {
       test('should provide Arabic min length error message', () {
         expect(
             localizations.minLengthError(5), 'يجب أن يكون على الأقل 5 حرفاً.');
+      });
+
+      test('should provide Arabic async validation error message', () {
+        expect(localizations.asyncValidationError, 'فشل في التحقق.');
       });
     });
   });
