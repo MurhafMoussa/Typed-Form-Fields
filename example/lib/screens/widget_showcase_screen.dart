@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:typed_form_fields/typed_form_fields.dart';
 
-/// Comprehensive showcase of all 7 pre-built widgets
-/// demonstrating their features and capabilities
+/// Comprehensive showcase of TypedFieldWrapper integration
+/// with various Flutter widgets and design systems
 class WidgetShowcaseScreen extends StatelessWidget {
   const WidgetShowcaseScreen({super.key});
 
@@ -112,28 +112,38 @@ class WidgetShowcaseView extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const Text(
-            'Pre-built Widget Showcase',
+            'TypedFieldWrapper Showcase',
             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
           Text(
-            '7 ready-to-use form widgets with built-in validation',
+            'Universal widget integration with built-in validation and performance optimizations',
             style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
           ),
           const SizedBox(height: 24),
 
-          // TypedTextField
+          // Text Field
           const Text(
-            'TypedTextField',
+            'Text Field with TypedFieldWrapper',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
-          TypedTextField(
-            name: 'textField',
-            label: 'Text Input',
-            hintText: 'Enter some text',
-            prefixIcon: const Icon(Icons.text_fields),
-            helperText: 'Minimum 3 characters',
+          TypedFieldWrapper<String>(
+            fieldName: 'textField',
+            builder: (context, value, error, hasError, updateValue) {
+              return TextFormField(
+                initialValue: value,
+                onChanged: updateValue,
+                decoration: InputDecoration(
+                  labelText: 'Text Input',
+                  hintText: 'Enter some text',
+                  prefixIcon: const Icon(Icons.text_fields),
+                  helperText: 'Minimum 3 characters',
+                  errorText: hasError ? error : null,
+                  border: const OutlineInputBorder(),
+                ),
+              );
+            },
           ),
           const SizedBox(height: 24),
 
@@ -244,32 +254,55 @@ class WidgetShowcaseView extends StatelessWidget {
           ),
           const SizedBox(height: 24),
 
-          // TypedCheckbox
+          // Checkbox with TypedFieldWrapper
           const Text(
-            'TypedCheckbox',
+            'Checkbox Field with TypedFieldWrapper',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
-          TypedCheckbox(
-            name: 'checkboxField',
-            title: const Text('I agree to the terms'),
-            subtitle: const Text('This checkbox must be checked'),
+          TypedFieldWrapper<bool>(
+            fieldName: 'checkboxField',
+            builder: (context, value, error, hasError, updateValue) {
+              return CheckboxListTile(
+                title: const Text('I agree to the terms'),
+                subtitle: Text(
+                  hasError ? (error ?? '') : 'This checkbox must be checked',
+                  style: TextStyle(color: hasError ? Colors.red : null),
+                ),
+                value: value ?? false,
+                onChanged: (val) => updateValue(val ?? false),
+              );
+            },
           ),
           const SizedBox(height: 24),
 
-          // TypedDropdown
+          // Dropdown with TypedFieldWrapper
           const Text(
-            'TypedDropdown',
+            'Dropdown Field with TypedFieldWrapper',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
-          TypedDropdown<String>(
-            name: 'dropdownField',
-            label: 'Select an option',
-            hintText: 'Choose from the list',
-            items: const ['option1', 'option2', 'option3'],
-            prefixIcon: const Icon(Icons.arrow_drop_down),
-            helperText: 'Please select an option',
+          TypedFieldWrapper<String>(
+            fieldName: 'dropdownField',
+            builder: (context, value, error, hasError, updateValue) {
+              return DropdownButtonFormField<String>(
+                initialValue: (value == null || value.isEmpty) ? null : value,
+                decoration: InputDecoration(
+                  labelText: 'Select an option',
+                  hintText: 'Choose from the list',
+                  prefixIcon: const Icon(Icons.arrow_drop_down),
+                  helperText: 'Please select an option',
+                  errorText: hasError ? error : null,
+                  border: const OutlineInputBorder(),
+                ),
+                items: const [
+                  DropdownMenuItem(value: 'option1', child: Text('Option 1')),
+                  DropdownMenuItem(value: 'option2', child: Text('Option 2')),
+                  DropdownMenuItem(value: 'option3', child: Text('Option 3')),
+                ],
+                onChanged: updateValue,
+              );
+            },
           ),
 
           const SizedBox(height: 32),
@@ -352,29 +385,15 @@ class WidgetShowcaseView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Pre-built Widget Benefits:',
+                    'TypedFieldWrapper Benefits:',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 8),
-                  Text('✅ Ready-to-use - no custom builders needed'),
-                  Text('✅ Consistent styling - Material Design'),
-                  Text('✅ Built-in validation - automatic error display'),
+                  Text('✅ UI-Agnostic - works with any widget or design system'),
+                  Text('✅ Consistent validation - automatic error handling'),
                   Text('✅ Type-safe - compile-time type checking'),
-                  Text('✅ Performance optimized - minimal rebuilds'),
-                  Text('✅ Accessibility - screen reader support'),
-                  Text('✅ Internationalization - localized error messages'),
-                  SizedBox(height: 12),
-                  Text(
-                    'Available Widgets:',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  Text('• TypedTextField - text input'),
-                  Text('• TypedNumberField - numeric input'),
-                  Text('• TypedEmailField - email validation'),
-                  Text('• TypedPasswordField - password with strength'),
-                  Text('• TypedPhoneField - phone number validation'),
-                  Text('• TypedCheckbox - boolean input'),
-                  Text('• TypedDropdownField - selection dropdown'),
+                  Text('✅ Performance optimized - field-specific rebuilds'),
+                  Text('✅ Zero UI coupling - lightweight & future-proof'),
                 ],
               ),
             ),

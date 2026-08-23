@@ -1,5 +1,18 @@
 # Changelog
 
+## 2.0.0 - Decoupled Built-in Widgets for Zero UI-Coupling
+
+### 🚀 **Breaking Changes**
+
+- **Removed Pre-built Material Widgets**: Deleted design-system coupled widgets (`TypedTextField`, `TypedCheckbox`, `TypedSwitch`, `TypedDropdown`, `TypedSlider`, `TypedDatePicker`, `TypedTimePicker`) from core package exports.
+- **Migration**: Use `TypedFieldWrapper<T>` with any Flutter widget or design system (Material, Cupertino, Shadcn, Fluent, or custom controls).
+
+### 🛠 **Architectural Improvements**
+
+- **100% UI-Agnostic Core**: The package core is now completely decoupled from Material/Cupertino design systems, aligning with Flutter's modular framework direction.
+- **Zero UI-Coupling**: `TypedFieldWrapper<T>` provides high-performance, type-safe form field validation and state management for any widget tree without bloated parameter forwarding.
+- **Updated Showcase & Documentation**: Refactored example app screens and README documentation to showcase `TypedFieldWrapper<T>` usage across various form field controls.
+
 ## 1.3.3 - Dynamic Validator Localization & Comprehensive Test Suite
 
 ### 🌍 **Localization & Validator Enhancements**

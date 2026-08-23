@@ -354,25 +354,55 @@ class StrategyExampleScreen extends StatelessWidget {
                   const SizedBox(height: 16),
 
                   // Form Fields
-                  TypedTextField(
-                    name: 'email',
-                    label: 'Email Address',
-                    keyboardType: TextInputType.emailAddress,
-                    prefixIcon: const Icon(Icons.email),
+                  TypedFieldWrapper<String>(
+                    fieldName: 'email',
+                    builder: (context, value, error, hasError, updateValue) {
+                      return TextFormField(
+                        initialValue: value,
+                        onChanged: updateValue,
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: InputDecoration(
+                          labelText: 'Email Address',
+                          prefixIcon: const Icon(Icons.email),
+                          errorText: hasError ? error : null,
+                          border: const OutlineInputBorder(),
+                        ),
+                      );
+                    },
                   ),
                   const SizedBox(height: 16),
-                  TypedTextField(
-                    name: 'password',
-                    label: 'Password',
-                    obscureText: true,
-                    prefixIcon: const Icon(Icons.lock),
+                  TypedFieldWrapper<String>(
+                    fieldName: 'password',
+                    builder: (context, value, error, hasError, updateValue) {
+                      return TextFormField(
+                        initialValue: value,
+                        onChanged: updateValue,
+                        obscureText: true,
+                        decoration: InputDecoration(
+                          labelText: 'Password',
+                          prefixIcon: const Icon(Icons.lock),
+                          errorText: hasError ? error : null,
+                          border: const OutlineInputBorder(),
+                        ),
+                      );
+                    },
                   ),
                   const SizedBox(height: 16),
-                  TypedTextField(
-                    name: 'confirmPassword',
-                    label: 'Confirm Password',
-                    obscureText: true,
-                    prefixIcon: const Icon(Icons.lock_outline),
+                  TypedFieldWrapper<String>(
+                    fieldName: 'confirmPassword',
+                    builder: (context, value, error, hasError, updateValue) {
+                      return TextFormField(
+                        initialValue: value,
+                        onChanged: updateValue,
+                        obscureText: true,
+                        decoration: InputDecoration(
+                          labelText: 'Confirm Password',
+                          prefixIcon: const Icon(Icons.lock_outline),
+                          errorText: hasError ? error : null,
+                          border: const OutlineInputBorder(),
+                        ),
+                      );
+                    },
                   ),
                   const SizedBox(height: 24),
 

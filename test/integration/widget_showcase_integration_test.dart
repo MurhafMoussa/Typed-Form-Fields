@@ -33,20 +33,20 @@ void main() {
 
       expect(find.text('Widget Showcase'), findsOneWidget);
 
-      // Verify TypedTextField
-      final textField = find.byType(TypedTextField).first;
+      // Verify Text Field
+      final textField = find.byType(TextFormField).first;
       expect(textField, findsOneWidget);
       await tester.enterText(textField, 'Sample Text');
       await tester.pumpAndSettle();
 
-      // Verify TypedCheckbox
-      final checkbox = find.byType(TypedCheckbox).first;
+      // Verify Checkbox
+      final checkbox = find.byType(CheckboxListTile).first;
       expect(checkbox, findsOneWidget);
       await tester.tap(checkbox);
       await tester.pumpAndSettle();
 
-      // Verify TypedDropdown
-      final dropdown = find.byType(TypedDropdown<String>).first;
+      // Verify Dropdown
+      final dropdown = find.byType(DropdownButtonFormField<String>).first;
       expect(dropdown, findsOneWidget);
     });
   });

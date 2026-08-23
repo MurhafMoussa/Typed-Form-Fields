@@ -18,13 +18,5 @@ export 'src/validators/validator_localizations.dart';
 export 'src/validators/validator_localizations_delegate.dart';
 export 'src/validators/validators.dart';
 // Widgets exports
-export 'src/widgets/typed_checkbox.dart';
-export 'src/widgets/typed_date_picker.dart';
-export 'src/widgets/typed_dropdown.dart';
 export 'src/widgets/typed_field_wrapper.dart';
 export 'src/widgets/typed_form_provider.dart';
-export 'src/widgets/typed_slider.dart';
-export 'src/widgets/typed_switch.dart';
-// Pre-built widgets
-export 'src/widgets/typed_text_field.dart';
-export 'src/widgets/typed_time_picker.dart';

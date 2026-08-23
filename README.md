@@ -42,20 +42,35 @@ class MyForm extends StatelessWidget {
       ],
       child: (context) => Column(
         children: [
-          // Using pre-built widget
-          TypedTextField(
-            name: 'email',
-            label: 'Email Address',
-            keyboardType: TextInputType.emailAddress,
+          // Email field using TypedFieldWrapper
+          TypedFieldWrapper<String>(
+            fieldName: 'email',
             debounceTime: Duration(milliseconds: 300),
+            builder: (context, value, error, hasError, updateValue) {
+              return TextFormField(
+                initialValue: value,
+                onChanged: updateValue,
+                keyboardType: TextInputType.emailAddress,
+                decoration: InputDecoration(
+                  labelText: 'Email Address',
+                  errorText: hasError ? error : null,
+                ),
+              );
+            },
           ),
 
           SizedBox(height: 16),
 
-          // Using pre-built checkbox
-          TypedCheckbox(
-            name: 'subscribe',
-            title: Text('Subscribe to newsletter'),
+          // Checkbox field using TypedFieldWrapper
+          TypedFieldWrapper<bool>(
+            fieldName: 'subscribe',
+            builder: (context, value, error, hasError, updateValue) {
+              return CheckboxListTile(
+                title: Text('Subscribe to newsletter'),
+                value: value ?? false,
+                onChanged: (val) => updateValue(val ?? false),
+              );
+            },
           ),
 
           SizedBox(height: 24),
@@ -103,12 +118,12 @@ if (state.isValid) {
 
 - **Type-safe, universal form field wrapper**
 - **Zero dependencies** - no flutter_bloc required for users
+- **UI-Agnostic** - works with Material, Cupertino, Shadcn, Fluent, or custom design systems
 - **TypedFormProvider** for clean, simple API
 - **High performance** - uses BLoC internally with buildWhen/listenWhen optimizations
 - **5 validation strategies** (onSubmitOnly, onSubmitThenRealTime, realTimeOnly, allFieldsRealTime, disabled)
 - **Debouncing, performance optimizations**
 - **Cross-field, conditional, and composite validation**
-- **Pre-built widgets** for all common form controls
 - **Localization** in 5 languages
 
 ## ⚡ **Performance Optimizations**
@@ -134,129 +149,67 @@ The package uses **BLoC internally** for maximum performance while maintaining a
 - **Optimized rebuilds** - Uses Flutter BLoC's proven optimization patterns
 - **Debouncing support** - Configurable delays to reduce update frequency
 
-## 🎨 **Pre-built Widgets**
+## 🎨 **Universal Integration via `TypedFieldWrapper<T>`**
 
-The library includes **7 production-ready widgets** that work seamlessly with the form system:
+`TypedFieldWrapper<T>` connects **any UI widget or design system** to the form engine with zero coupling to Material or Cupertino:
 
-### 📝 **Text Input Widgets**
-
-#### `TypedTextField`
-
-Universal text input with all TextFormField parameters:
+### 📝 **Text Input Example**
 
 ```dart
-TypedTextField(
-  name: 'email',
-  label: 'Email Address',
-  keyboardType: TextInputType.emailAddress,
-  hintText: 'Enter your email',
-  obscureText: false, // For passwords
-  maxLines: 1, // Or null for multiline
+TypedFieldWrapper<String>(
+  fieldName: 'email',
   debounceTime: Duration(milliseconds: 300),
   transformValue: (value) => value.toLowerCase().trim(),
+  builder: (context, value, error, hasError, updateValue) {
+    return TextFormField(
+      initialValue: value,
+      onChanged: updateValue,
+      keyboardType: TextInputType.emailAddress,
+      decoration: InputDecoration(
+        labelText: 'Email Address',
+        errorText: hasError ? error : null,
+      ),
+    );
+  },
 )
 ```
 
-### ✅ **Selection Widgets**
-
-#### `TypedCheckbox`
-
-Checkbox with title and subtitle support:
+### ✅ **Selection / Toggle Example**
 
 ```dart
-TypedCheckbox(
-  name: 'terms',
-  title: Text('I agree to the terms'),
-  subtitle: Text('Please read our terms and conditions'),
-  tristate: false, // true/false/null support
-)
-
-// For checkboxes that must be checked, use mustBeTrue validator:
-FormFieldDefinition<bool>(
-  name: 'terms',
-  validators: [TypedCommonValidators.mustBeTrue()],
-  initialValue: false,
+TypedFieldWrapper<bool>(
+  fieldName: 'terms',
+  builder: (context, value, error, hasError, updateValue) {
+    return CheckboxListTile(
+      title: Text('I agree to terms'),
+      value: value ?? false,
+      onChanged: (val) => updateValue(val ?? false),
+      subtitle: hasError ? Text(error!, style: TextStyle(color: Colors.red)) : null,
+    );
+  },
 )
 ```
 
-#### `TypedSwitch`
-
-Switch with title and subtitle support:
+### 🔽 **Dropdown Example**
 
 ```dart
-TypedSwitch(
-  name: 'notifications',
-  title: Text('Enable notifications'),
-  subtitle: Text('Receive push notifications'),
-  activeColor: Colors.green,
+TypedFieldWrapper<String>(
+  fieldName: 'country',
+  builder: (context, value, error, hasError, updateValue) {
+    return DropdownButtonFormField<String>(
+      value: (value == null || value.isEmpty) ? null : value,
+      onChanged: updateValue,
+      decoration: InputDecoration(
+        labelText: 'Select Country',
+        errorText: hasError ? error : null,
+      ),
+      items: ['USA', 'Canada', 'UK']
+          .map((c) => DropdownMenuItem(value: c, child: Text(c)))
+          .toList(),
+    );
+  },
 )
 ```
-
-#### `TypedDropdown<T>`
-
-Generic dropdown with custom item builders:
-
-```dart
-TypedDropdown<String>(
-  name: 'country',
-  label: 'Select Country',
-  items: ['USA', 'Canada', 'UK'],
-  itemBuilder: (item) => Text('🌍 $item'),
-  isExpanded: true,
-)
-```
-
-### 🎚️ **Range Widgets**
-
-#### `TypedSlider`
-
-Slider with value display and range validation:
-
-```dart
-TypedSlider(
-  name: 'volume',
-  label: 'Volume Level',
-  min: 0.0,
-  max: 100.0,
-  divisions: 10,
-  showValue: true,
-  activeColor: Colors.blue,
-)
-```
-
-### 📅 **Date & Time Widgets**
-
-#### `TypedDatePicker`
-
-Date picker with formatting options:
-
-```dart
-TypedDatePicker(
-  name: 'birthdate',
-  label: 'Date of Birth',
-  firstDate: DateTime(1900),
-  lastDate: DateTime.now(),
-  dateFormat: 'dd/MM/yyyy',
-  prefixIcon: Icon(Icons.calendar_today),
-)
-```
-
-#### `TypedTimePicker`
-
-Time picker with 12/24 hour support:
-
-```dart
-TypedTimePicker(
-  name: 'meeting_time',
-  label: 'Meeting Time',
-  use24HourFormat: true,
-  prefixIcon: Icon(Icons.access_time),
-)
-```
-
-### 🔧 **All Widgets Support**
-
-- **Form Integration** - Automatic state management via `TypedFieldWrapper<T>`
 - **Validation** - Built-in error display and validation
 - **Customization** - All original widget parameters supported
 - **Controllers** - Optional `TextEditingController` support with proper disposal
@@ -707,8 +660,7 @@ TypedCommonValidators.required<String>().validate(null, context)
 
 ### Current Features (Production Ready)
 
-- ✅ **TypedFieldWrapper<T>** - Universal widget integration
-- ✅ **Pre-built widgets** - 7 production-ready widgets (TextField, Checkbox, Switch, Dropdown, Slider, DatePicker, TimePicker)
+- ✅ **TypedFieldWrapper<T>** - Universal, UI-agnostic widget integration
 - ✅ **Type-safe validation** - Compile-time type checking
 - ✅ **Custom validators** - Easy to create and reuse
 - ✅ **BLoC integration** - Reactive state management
