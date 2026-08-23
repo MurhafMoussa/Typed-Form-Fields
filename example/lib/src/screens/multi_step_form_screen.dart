@@ -438,9 +438,11 @@ class _MultiStepFormScreenState extends State<MultiStepFormScreen> {
                                             : (isGroupValid ? Colors.green : Colors.grey),
                                         child: Text(
                                           '${index + 1}',
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontSize: 11,
-                                            color: Colors.white,
+                                            color: isCurrent
+                                                ? Theme.of(context).colorScheme.onPrimary
+                                                : Colors.white,
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
@@ -452,6 +454,9 @@ class _MultiStepFormScreenState extends State<MultiStepFormScreen> {
                                           fontSize: 11,
                                           fontWeight:
                                               isCurrent ? FontWeight.w600 : FontWeight.normal,
+                                          color: isCurrent
+                                              ? Theme.of(context).colorScheme.onPrimaryContainer
+                                              : Theme.of(context).colorScheme.onSurface,
                                         ),
                                         overflow: TextOverflow.ellipsis,
                                       ),

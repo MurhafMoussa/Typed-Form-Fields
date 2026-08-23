@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import '../lib/main.dart';
+import '../lib/src/screens/multi_step_form_screen.dart';
 import '../lib/src/shell/app_routes.dart';
 import '../lib/src/shell/app_shell.dart';
 import '../lib/src/theme/app_theme.dart';
@@ -58,20 +59,88 @@ void main() {
   });
 
   group('AppTheme', () {
-    test('lightTheme has M3 enabled and correct Shadcn background/card colors', () {
+    test('lightTheme has M3 enabled, correct Shadcn colors and explicit primaryContainer tokens', () {
       final theme = AppTheme.lightTheme;
       expect(theme.useMaterial3, isTrue);
       expect(theme.brightness, Brightness.light);
       expect(theme.scaffoldBackgroundColor, ShadcnColors.lightBackground);
       expect(theme.cardTheme.color, ShadcnColors.lightCard);
+      expect(theme.colorScheme.primaryContainer, ShadcnColors.slate100);
+      expect(theme.colorScheme.onPrimaryContainer, ShadcnColors.slate900);
     });
 
-    test('darkTheme has M3 enabled and correct Shadcn dark colors', () {
+    test('darkTheme has M3 enabled, correct Shadcn colors and explicit primaryContainer tokens', () {
       final theme = AppTheme.darkTheme;
       expect(theme.useMaterial3, isTrue);
       expect(theme.brightness, Brightness.dark);
       expect(theme.scaffoldBackgroundColor, ShadcnColors.darkBackground);
       expect(theme.cardTheme.color, ShadcnColors.darkCard);
+      expect(theme.colorScheme.primaryContainer, ShadcnColors.slate800);
+      expect(theme.colorScheme.onPrimaryContainer, ShadcnColors.slate50);
+    });
+  });
+
+  group('MultiStepFormScreen Theme Contrast', () {
+    testWidgets('renders active step avatar badge text and step header card with high-contrast theme colors in light mode',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(800, 1200);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.lightTheme,
+          home: const Scaffold(
+            body: MultiStepFormScreen(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Active step avatar badge text for Step 1 ('1')
+      final avatarTextWidget = tester.widget<Text>(find.text('1'));
+      expect(avatarTextWidget.style?.color, AppTheme.lightTheme.colorScheme.onPrimary);
+
+      // Current step header card container fill
+      final stepCardContainer = tester.widget<Container>(
+        find.ancestor(
+          of: find.text('Personal Info'),
+          matching: find.byType(Container),
+        ).first,
+      );
+      final decoration = stepCardContainer.decoration as BoxDecoration;
+      expect(decoration.color, AppTheme.lightTheme.colorScheme.primaryContainer);
+    });
+
+    testWidgets('renders active step avatar badge text and step header card with high-contrast theme colors in dark mode',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(800, 1200);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.darkTheme,
+          home: const Scaffold(
+            body: MultiStepFormScreen(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Active step avatar badge text for Step 1 ('1')
+      final avatarTextWidget = tester.widget<Text>(find.text('1'));
+      expect(avatarTextWidget.style?.color, AppTheme.darkTheme.colorScheme.onPrimary);
+
+      // Current step header card container fill
+      final stepCardContainer = tester.widget<Container>(
+        find.ancestor(
+          of: find.text('Personal Info'),
+          matching: find.byType(Container),
+        ).first,
+      );
+      final decoration = stepCardContainer.decoration as BoxDecoration;
+      expect(decoration.color, AppTheme.darkTheme.colorScheme.primaryContainer);
     });
   });
 
