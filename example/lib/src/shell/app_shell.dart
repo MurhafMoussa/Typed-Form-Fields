@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../docs/doc_search_overlay.dart';
 import '../theme/theme_controller.dart';
 import 'app_routes.dart';
 import 'top_app_bar.dart';
@@ -52,7 +53,11 @@ class AppShell extends StatelessWidget {
           themeController: themeController,
           currentLocale: currentLocale,
           onLocaleChanged: onLocaleChanged,
-          onSearchPressed: onSearchPressed,
+          onSearchPressed: onSearchPressed ??
+              () => DocSearchOverlay.show(
+                    context,
+                    onSelectRoute: onNavigate,
+                  ),
           onGitHubPressed: onGitHubPressed,
         ),
         body: isDesktop ? _buildDesktopLayout(context) : child,

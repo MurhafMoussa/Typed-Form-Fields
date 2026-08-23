@@ -64,21 +64,26 @@ class _JsonViewerState extends State<JsonViewer> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             if (widget.title != null)
-              Row(
-                children: [
-                  Icon(
-                    Icons.code_rounded,
-                    size: 16,
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    widget.title!,
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w600,
+              Expanded(
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.code_rounded,
+                      size: 16,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 6),
+                    Flexible(
+                      child: Text(
+                        widget.title!,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             TextButton.icon(
               key: const Key('copy_json_button'),

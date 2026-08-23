@@ -160,14 +160,18 @@ class _InspectorPanelState extends State<InspectorPanel> {
                         children: [
                           SingleChildScrollView(child: widget.child!),
                           ShowcaseCard(
-                            child: JsonViewer(
-                              jsonMap: _buildFormStateJson(state),
+                            child: SingleChildScrollView(
+                              child: JsonViewer(
+                                jsonMap: _buildFormStateJson(state),
+                              ),
                             ),
                           ),
                           ShowcaseCard(
-                            child: EventLogWidget(
-                              logs: _eventLogs,
-                              onClearLogs: _clearLogs,
+                            child: SingleChildScrollView(
+                              child: EventLogWidget(
+                                logs: _eventLogs,
+                                onClearLogs: _clearLogs,
+                              ),
                             ),
                           ),
                           ShowcaseCard(
@@ -222,7 +226,7 @@ class _InspectorPanelState extends State<InspectorPanel> {
             ),
             const SizedBox(height: 12),
             SizedBox(
-              height: 500,
+              height: 420,
               child: TabBarView(
                 children: [
                   JsonViewer(

@@ -72,7 +72,7 @@ class ShowcaseCard extends StatelessWidget {
                   ),
                   if (headerTrailing != null) ...[
                     const SizedBox(width: 8),
-                    headerTrailing!,
+                    Flexible(child: headerTrailing!),
                   ],
                 ],
               ),

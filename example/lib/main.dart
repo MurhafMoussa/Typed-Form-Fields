@@ -3,14 +3,14 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:typed_form_fields/typed_form_fields.dart';
 
 import 'screens/bloc_form_screen.dart';
-import 'screens/dynamic_form_screen.dart';
 import 'screens/field_wrapper_screen.dart';
 import 'screens/login_form_screen.dart';
-import 'screens/multi_step_form_screen.dart';
-import 'screens/registration_form_screen.dart';
 import 'screens/validation_strategies_screen.dart';
-import 'screens/widget_showcase_screen.dart';
-import 'src/screens/docs_placeholder_screen.dart';
+import 'src/docs/doc_viewer_widget.dart';
+import 'src/screens/dynamic_form_screen.dart';
+import 'src/screens/multi_step_form_screen.dart';
+import 'src/screens/registration_form_screen.dart';
+import 'src/screens/widget_gallery_screen.dart';
 import 'src/shell/app_routes.dart';
 import 'src/shell/app_shell.dart';
 import 'src/theme/app_theme.dart';
@@ -92,7 +92,7 @@ class _TypedFormFieldsExampleAppState
                 break;
               case AppRoutes.widgetGallery:
               case '/widget-showcase':
-                page = const WidgetShowcaseScreen();
+                page = const WidgetGalleryScreen();
                 break;
               case AppRoutes.multiStep:
               case '/multi-step-form':
@@ -107,7 +107,15 @@ class _TypedFormFieldsExampleAppState
               case AppRoutes.docsAsyncValidation:
               case AppRoutes.docsFieldGrouping:
               case AppRoutes.docsCustomWidgets:
-                page = DocsPlaceholderScreen(docRoute: normalizedRoute);
+                page = DocViewerWidget(
+                  docRoute: normalizedRoute,
+                  locale: _currentLocale,
+                  onNavigate: (route) {
+                    if (ModalRoute.of(context)?.settings.name != route) {
+                      Navigator.of(context).pushReplacementNamed(route);
+                    }
+                  },
+                );
                 break;
               case '/login-form':
                 page = const LoginFormScreen();
