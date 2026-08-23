@@ -19,3 +19,7 @@ _Avoid_: Debugger overlay, Form monitor bar
 **Async Validator**:
 An asynchronous validation rule or function assigned to a form field that returns a `Future<String?>` (or `FutureOr<String?>`) to validate asynchronous conditions like network availability checks.
 _Avoid_: Remote Validator, Backend Checker
+
+**Documentation Hub**:
+The embedded documentation system within the Flutter showcase application that renders Markdown guides alongside interactive live form demos.
+_Avoid_: Static Doc Site, Wiki, Documentation Portal
