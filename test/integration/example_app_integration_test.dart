@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../example/lib/main.dart';
-import '../../example/lib/screens/dynamic_form_screen.dart';
-import '../../example/lib/screens/multi_step_form_screen.dart';
-import '../../example/lib/screens/registration_form_screen.dart';
-import '../../example/lib/screens/widget_showcase_screen.dart';
+import '../../example/lib/src/screens/dynamic_form_screen.dart';
+import '../../example/lib/src/screens/multi_step_form_screen.dart';
+import '../../example/lib/src/screens/registration_form_screen.dart';
+import '../../example/lib/src/screens/widget_gallery_screen.dart';
 import '../../example/lib/src/shell/app_shell.dart';
 
 void main() {
@@ -53,6 +53,31 @@ void main() {
       expect(find.text('ES'), findsOneWidget);
     });
 
+    testWidgets('should render RTL layout when Arabic locale selected', (tester) async {
+      tester.view.physicalSize = const Size(1200, 900);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      await tester.pumpWidget(const TypedFormFieldsExampleApp());
+      await tester.pumpAndSettle();
+
+      final languageDropdown = find.byKey(const Key('locale_switcher_dropdown'));
+      await tester.tap(languageDropdown);
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('العربية').last);
+      await tester.pumpAndSettle();
+
+      expect(find.text('AR'), findsOneWidget);
+
+      final scaffoldElement = tester.element(find.byType(Scaffold).first);
+      final textDirection = Directionality.of(scaffoldElement);
+      expect(textDirection, TextDirection.rtl);
+    });
+
     testWidgets('should navigate between showcase screens using shell navigation', (tester) async {
       tester.view.physicalSize = const Size(1200, 900);
       tester.view.devicePixelRatio = 1.0;
@@ -70,7 +95,7 @@ void main() {
       // Navigate to Widget Gallery
       await tester.tap(find.byKey(const Key('nav_widget_gallery')).first);
       await tester.pumpAndSettle();
-      expect(find.byType(WidgetShowcaseScreen), findsOneWidget);
+      expect(find.byType(WidgetGalleryScreen), findsOneWidget);
 
       // Navigate to Multi-Step
       await tester.tap(find.byKey(const Key('nav_multi_step')).first);

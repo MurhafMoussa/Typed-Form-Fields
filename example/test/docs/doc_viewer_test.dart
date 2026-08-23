@@ -1,13 +1,15 @@
+// ignore_for_file: avoid_relative_lib_imports
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:typed_form_fields/typed_form_fields.dart';
-import 'package:example/src/docs/doc_search_overlay.dart';
-import 'package:example/src/docs/doc_sidebar.dart';
-import 'package:example/src/docs/doc_viewer_widget.dart';
-import 'package:example/src/docs/embedded_live_demo.dart';
-import 'package:example/src/docs/table_of_contents_widget.dart';
-import 'package:example/src/shell/app_routes.dart';
+import '../../lib/src/docs/doc_search_overlay.dart';
+import '../../lib/src/docs/doc_sidebar.dart';
+import '../../lib/src/docs/doc_viewer_widget.dart';
+import '../../lib/src/docs/embedded_live_demo.dart';
+import '../../lib/src/docs/table_of_contents_widget.dart';
+import '../../lib/src/shell/app_routes.dart';
 
 Widget _wrapWithApp(Widget child, {Locale locale = const Locale('en')}) {
   return MaterialApp(

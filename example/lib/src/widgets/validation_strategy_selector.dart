@@ -61,7 +61,7 @@ class ValidationStrategySelector extends StatelessWidget {
         const SizedBox(height: 8),
         DropdownButtonFormField<ValidationStrategy>(
           key: const Key('strategy_dropdown'),
-          value: currentStrategy,
+          initialValue: currentStrategy,
           isExpanded: true,
           decoration: const InputDecoration(
             contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),

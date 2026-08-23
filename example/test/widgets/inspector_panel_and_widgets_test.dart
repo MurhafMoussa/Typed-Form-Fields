@@ -1,13 +1,15 @@
+// ignore_for_file: avoid_relative_lib_imports
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:typed_form_fields/typed_form_fields.dart';
 
-import 'package:example/src/widgets/diagnostic_actions.dart';
-import 'package:example/src/widgets/event_log_widget.dart';
-import 'package:example/src/widgets/inspector_panel.dart';
-import 'package:example/src/widgets/json_viewer.dart';
-import 'package:example/src/widgets/showcase_card.dart';
-import 'package:example/src/widgets/validation_strategy_selector.dart';
+import '../../lib/src/widgets/diagnostic_actions.dart';
+import '../../lib/src/widgets/event_log_widget.dart';
+import '../../lib/src/widgets/inspector_panel.dart';
+import '../../lib/src/widgets/json_viewer.dart';
+import '../../lib/src/widgets/showcase_card.dart';
+import '../../lib/src/widgets/validation_strategy_selector.dart';
 
 void main() {
   group('ShowcaseCard Widget Tests', () {

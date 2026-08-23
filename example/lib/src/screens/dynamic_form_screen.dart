@@ -240,21 +240,23 @@ class _DynamicFormScreenState extends State<DynamicFormScreen> {
       );
     }
 
-    return Container(
+    return Card(
       key: Key('dynamic_card_$fieldName'),
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        border: Border.all(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+        side: BorderSide(
           color: Theme.of(context).colorScheme.outline,
           width: 1,
         ),
-        borderRadius: BorderRadius.circular(8),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
+      color: Theme.of(context).cardColor,
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
           Row(
             children: [
               Chip(
@@ -298,7 +300,8 @@ class _DynamicFormScreenState extends State<DynamicFormScreen> {
           inputWidget,
         ],
       ),
-    );
+    ),
+  );
   }
 
   @override

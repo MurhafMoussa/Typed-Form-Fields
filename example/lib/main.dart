@@ -2,10 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:typed_form_fields/typed_form_fields.dart';
 
-import 'screens/bloc_form_screen.dart';
-import 'screens/field_wrapper_screen.dart';
-import 'screens/login_form_screen.dart';
-import 'screens/validation_strategies_screen.dart';
 import 'src/docs/doc_viewer_widget.dart';
 import 'src/screens/dynamic_form_screen.dart';
 import 'src/screens/multi_step_form_screen.dart';
@@ -88,10 +84,14 @@ class _TypedFormFieldsExampleAppState
 
             switch (normalizedRoute) {
               case AppRoutes.registration:
+              case '/login-form':
+              case '/bloc-form':
                 page = const RegistrationFormScreen();
                 break;
               case AppRoutes.widgetGallery:
               case '/widget-showcase':
+              case '/field-wrapper':
+              case '/validation-strategies':
                 page = const WidgetGalleryScreen();
                 break;
               case AppRoutes.multiStep:
@@ -116,18 +116,6 @@ class _TypedFormFieldsExampleAppState
                     }
                   },
                 );
-                break;
-              case '/login-form':
-                page = const LoginFormScreen();
-                break;
-              case '/field-wrapper':
-                page = const FieldWrapperScreen();
-                break;
-              case '/validation-strategies':
-                page = const ValidationStrategiesScreen();
-                break;
-              case '/bloc-form':
-                page = const BlocFormScreen();
                 break;
               default:
                 page = const RegistrationFormScreen();

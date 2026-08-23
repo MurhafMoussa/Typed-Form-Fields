@@ -12,11 +12,11 @@ Add doc hub widget tests in `example/test/docs/doc_viewer_test.dart` verifying M
 - `ai_specs/0005-example-application-ui-ux-rebuild/spec.md`
 
 ## Acceptance criteria
-- [ ] Widget tests added in `example/test/docs/doc_viewer_test.dart` for Markdown rendering, live demo embedding, locale fallback, and TOC link generation.
-- [ ] All 4 showcase integration test suites updated in `test/integration/` with new widget keys (`Key('nav_registration')`, `Key('nav_docs')`, `Key('inspector_panel')`, `Key('strategy_dropdown')`, etc.) and verified for RTL layout rendering.
-- [ ] Obsolete integration test files removed/merged cleanly.
-- [ ] `flutter build web --release` succeeds without errors.
-- [ ] All package unit and widget tests pass 100%.
+- [x] Widget tests added in `example/test/docs/doc_viewer_test.dart` for Markdown rendering, live demo embedding, locale fallback, and TOC link generation.
+- [x] All 4 showcase integration test suites updated in `test/integration/` with new widget keys (`Key('nav_registration')`, `Key('nav_docs')`, `Key('inspector_panel')`, `Key('strategy_dropdown')`, etc.) and verified for RTL layout rendering.
+- [x] Obsolete integration test files removed/merged cleanly.
+- [x] `flutter build web --release` succeeds without errors.
+- [x] All package unit and widget tests pass 100%.
 
 ## Covers
 - User Stories: 7

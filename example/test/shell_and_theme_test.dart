@@ -1,11 +1,13 @@
+// ignore_for_file: avoid_relative_lib_imports
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:example/main.dart';
-import 'package:example/src/shell/app_routes.dart';
-import 'package:example/src/shell/app_shell.dart';
-import 'package:example/src/theme/app_theme.dart';
-import 'package:example/src/theme/shadcn_colors.dart';
-import 'package:example/src/theme/theme_controller.dart';
+import '../lib/main.dart';
+import '../lib/src/shell/app_routes.dart';
+import '../lib/src/shell/app_shell.dart';
+import '../lib/src/theme/app_theme.dart';
+import '../lib/src/theme/shadcn_colors.dart';
+import '../lib/src/theme/theme_controller.dart';
 
 void main() {
   group('ThemeController', () {
