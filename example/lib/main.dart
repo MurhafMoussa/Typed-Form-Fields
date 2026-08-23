@@ -7,7 +7,6 @@ import 'src/docs/doc_viewer_widget.dart';
 import 'src/screens/dynamic_form_screen.dart';
 import 'src/screens/multi_step_form_screen.dart';
 import 'src/screens/registration_form_screen.dart';
-import 'src/screens/widget_gallery_screen.dart';
 import 'src/shell/app_routes.dart';
 import 'src/shell/app_shell.dart';
 import 'src/theme/app_theme.dart';
@@ -75,10 +74,6 @@ class _TypedFormFieldsExampleAppState
               builder: (context, state) => const RegistrationFormScreen(),
             ),
             GoRoute(
-              path: AppRoutes.widgetGallery,
-              builder: (context, state) => const WidgetGalleryScreen(),
-            ),
-            GoRoute(
               path: AppRoutes.multiStep,
               builder: (context, state) => const MultiStepFormScreen(),
             ),
@@ -113,15 +108,15 @@ class _TypedFormFieldsExampleAppState
             ),
             GoRoute(
               path: '/widget-showcase',
-              redirect: (context, state) => AppRoutes.widgetGallery,
+              redirect: (context, state) => AppRoutes.registration,
             ),
             GoRoute(
               path: '/field-wrapper',
-              redirect: (context, state) => AppRoutes.widgetGallery,
+              redirect: (context, state) => AppRoutes.registration,
             ),
             GoRoute(
               path: '/validation-strategies',
-              redirect: (context, state) => AppRoutes.widgetGallery,
+              redirect: (context, state) => AppRoutes.registration,
             ),
             GoRoute(
               path: '/multi-step-form',

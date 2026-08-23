@@ -105,17 +105,6 @@ More text.
       expect(find.text('Interactive Demo: Registration Form'), findsOneWidget);
     });
 
-    testWidgets('renders Widget Gallery demo correctly', (tester) async {
-      await tester.pumpWidget(_wrapWithApp(
-        const EmbeddedLiveDemo(demoId: 'widget-gallery'),
-      ));
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 300));
-
-      expect(find.byKey(const Key('live_demo_widget-gallery')), findsOneWidget);
-      expect(find.text('Interactive Demo: Typed Input Gallery'), findsOneWidget);
-    });
-
     testWidgets('renders Multi-Step demo correctly', (tester) async {
       await tester.pumpWidget(_wrapWithApp(
         const EmbeddedLiveDemo(demoId: 'multi-step'),

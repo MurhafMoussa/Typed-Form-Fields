@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 /// Canonical route path constants for the example application.
 abstract class AppRoutes {
   static const String registration = '/registration';
-  static const String widgetGallery = '/widget-gallery';
   static const String multiStep = '/multi-step';
   static const String dynamicForm = '/dynamic-form';
 
@@ -54,13 +53,6 @@ const List<NavItem> primaryNavItems = [
     icon: Icons.app_registration_outlined,
     selectedIcon: Icons.app_registration,
     key: Key('nav_registration'),
-  ),
-  NavItem(
-    route: AppRoutes.widgetGallery,
-    label: 'Widget Gallery',
-    icon: Icons.widgets_outlined,
-    selectedIcon: Icons.widgets,
-    key: Key('nav_widget_gallery'),
   ),
   NavItem(
     route: AppRoutes.multiStep,

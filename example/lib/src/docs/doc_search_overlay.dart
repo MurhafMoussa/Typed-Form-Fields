@@ -29,13 +29,6 @@ const List<SearchManifestEntry> searchManifestEntries = [
     keywords: ['registration', 'password', 'async', 'email', 'form'],
   ),
   SearchManifestEntry(
-    title: 'Widget Gallery Showcase',
-    subtitle: 'Pre-built input fields, sliders, checkboxes, custom FieldWrapper',
-    route: AppRoutes.widgetGallery,
-    category: 'Showcase',
-    keywords: ['gallery', 'widgets', 'inputs', 'checkbox', 'wrapper', 'slider'],
-  ),
-  SearchManifestEntry(
     title: 'Multi-Step Form Showcase',
     subtitle: 'Wizard navigation with fieldGroup partial validation',
     route: AppRoutes.multiStep,

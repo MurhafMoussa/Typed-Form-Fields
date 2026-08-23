@@ -248,8 +248,8 @@ void main() {
       await tester.tap(find.byKey(const Key('theme_toggle_button')));
       await tester.pumpAndSettle();
 
-      // Tap on widget gallery navigation item
-      await tester.tap(find.byKey(const Key('nav_widget_gallery')).first);
+      // Tap on multi-step navigation item
+      await tester.tap(find.byKey(const Key('nav_multi_step')).first);
       await tester.pumpAndSettle();
 
       // Tap on docs navigation item

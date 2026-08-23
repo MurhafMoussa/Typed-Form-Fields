@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../screens/dynamic_form_screen.dart';
 import '../screens/multi_step_form_screen.dart';
 import '../screens/registration_form_screen.dart';
-import '../screens/widget_gallery_screen.dart';
 
 /// Embedded live interactive form component for documentation guides.
 class EmbeddedLiveDemo extends StatelessWidget {
@@ -23,13 +22,10 @@ class EmbeddedLiveDemo extends StatelessWidget {
     switch (demoId) {
       case 'registration':
       case 'registration-form':
-        demoContent = const RegistrationFormScreen(embedded: true);
-        title = 'Interactive Demo: Registration Form';
-        break;
       case 'widget-gallery':
       case 'widget-showcase':
-        demoContent = const WidgetGalleryScreen(embedded: true);
-        title = 'Interactive Demo: Typed Input Gallery';
+        demoContent = const RegistrationFormScreen(embedded: true);
+        title = 'Interactive Demo: Registration Form';
         break;
       case 'multi-step':
       case 'multi-step-form':

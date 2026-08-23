@@ -7,7 +7,6 @@ import '../../example/lib/main.dart';
 import '../../example/lib/src/screens/dynamic_form_screen.dart';
 import '../../example/lib/src/screens/multi_step_form_screen.dart';
 import '../../example/lib/src/screens/registration_form_screen.dart';
-import '../../example/lib/src/screens/widget_gallery_screen.dart';
 import '../../example/lib/src/shell/app_shell.dart';
 
 void main() {
@@ -91,11 +90,6 @@ void main() {
 
       // Initial route defaults to Registration
       expect(find.byType(RegistrationFormScreen), findsOneWidget);
-
-      // Navigate to Widget Gallery
-      await tester.tap(find.byKey(const Key('nav_widget_gallery')).first);
-      await tester.pumpAndSettle();
-      expect(find.byType(WidgetGalleryScreen), findsOneWidget);
 
       // Navigate to Multi-Step
       await tester.tap(find.byKey(const Key('nav_multi_step')).first);
