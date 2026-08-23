@@ -1,18 +1,19 @@
+// ignore_for_file: avoid_relative_lib_imports
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../example/lib/main.dart';
 import '../../example/lib/screens/dynamic_form_screen.dart';
-import '../../example/lib/screens/field_wrapper_screen.dart';
-import '../../example/lib/screens/login_form_screen.dart';
+import '../../example/lib/screens/multi_step_form_screen.dart';
 import '../../example/lib/screens/registration_form_screen.dart';
-import '../../example/lib/screens/validation_strategies_screen.dart';
 import '../../example/lib/screens/widget_showcase_screen.dart';
+import '../../example/lib/src/shell/app_shell.dart';
 
 void main() {
   group('Example App Integration Tests', () {
-    testWidgets('should render home screen and display example cards', (tester) async {
-      tester.view.physicalSize = const Size(1080, 1920);
+    testWidgets('should render AppShell and top app bar controls', (tester) async {
+      tester.view.physicalSize = const Size(1200, 900);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() {
         tester.view.resetPhysicalSize();
@@ -22,17 +23,16 @@ void main() {
       await tester.pumpWidget(const TypedFormFieldsExampleApp());
       await tester.pumpAndSettle();
 
-      expect(find.text('Typed Form Fields Examples'), findsWidgets);
-      expect(find.text('Registration Form'), findsOneWidget);
-      expect(find.text('Login Form Example'), findsOneWidget);
-      expect(find.text('FieldWrapper Showcase'), findsOneWidget);
-      expect(find.text('Validation Strategies'), findsOneWidget);
-      expect(find.text('Dynamic Form'), findsOneWidget);
-      expect(find.text('Widget Showcase'), findsOneWidget);
+      expect(find.byType(AppShell), findsOneWidget);
+      expect(find.text('Typed Form Fields'), findsOneWidget);
+      expect(find.byKey(const Key('theme_toggle_button')), findsOneWidget);
+      expect(find.byKey(const Key('locale_switcher_dropdown')), findsOneWidget);
+      expect(find.byKey(const Key('search_button')), findsOneWidget);
+      expect(find.byKey(const Key('github_link')), findsOneWidget);
     });
 
-    testWidgets('should switch application locale via language picker', (tester) async {
-      tester.view.physicalSize = const Size(1080, 1920);
+    testWidgets('should switch application locale via language picker dropdown', (tester) async {
+      tester.view.physicalSize = const Size(1200, 900);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() {
         tester.view.resetPhysicalSize();
@@ -42,19 +42,19 @@ void main() {
       await tester.pumpWidget(const TypedFormFieldsExampleApp());
       await tester.pumpAndSettle();
 
-      final languageButton = find.byTooltip('Change Language');
-      expect(languageButton, findsOneWidget);
-      await tester.tap(languageButton);
+      final languageDropdown = find.byKey(const Key('locale_switcher_dropdown'));
+      expect(languageDropdown, findsOneWidget);
+      await tester.tap(languageDropdown);
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Español').last);
       await tester.pumpAndSettle();
 
-      expect(find.text('Español'), findsWidgets);
+      expect(find.text('ES'), findsOneWidget);
     });
 
-    testWidgets('should navigate to all example screens and return home', (tester) async {
-      tester.view.physicalSize = const Size(1080, 1920);
+    testWidgets('should navigate between showcase screens using shell navigation', (tester) async {
+      tester.view.physicalSize = const Size(1200, 900);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() {
         tester.view.resetPhysicalSize();
@@ -64,47 +64,28 @@ void main() {
       await tester.pumpWidget(const TypedFormFieldsExampleApp());
       await tester.pumpAndSettle();
 
-      // 1. Registration Form
-      await tester.tap(find.text('Registration Form'));
-      await tester.pumpAndSettle();
+      // Initial route defaults to Registration
       expect(find.byType(RegistrationFormScreen), findsOneWidget);
-      await tester.tap(find.byType(BackButton));
-      await tester.pumpAndSettle();
 
-      // 2. Login Form Example
-      await tester.tap(find.text('Login Form Example'));
-      await tester.pumpAndSettle();
-      expect(find.byType(LoginFormScreen), findsOneWidget);
-      await tester.tap(find.byType(BackButton));
-      await tester.pumpAndSettle();
-
-      // 3. FieldWrapper Showcase
-      await tester.tap(find.text('FieldWrapper Showcase'));
-      await tester.pumpAndSettle();
-      expect(find.byType(FieldWrapperScreen), findsOneWidget);
-      await tester.tap(find.byType(BackButton));
-      await tester.pumpAndSettle();
-
-      // 4. Validation Strategies
-      await tester.tap(find.text('Validation Strategies'));
-      await tester.pumpAndSettle();
-      expect(find.byType(ValidationStrategiesScreen), findsOneWidget);
-      await tester.tap(find.byType(BackButton));
-      await tester.pumpAndSettle();
-
-      // 5. Dynamic Form
-      await tester.tap(find.text('Dynamic Form'));
-      await tester.pumpAndSettle();
-      expect(find.byType(DynamicFormScreen), findsOneWidget);
-      await tester.tap(find.byType(BackButton));
-      await tester.pumpAndSettle();
-
-      // 6. Widget Showcase
-      await tester.tap(find.text('Widget Showcase'));
+      // Navigate to Widget Gallery
+      await tester.tap(find.byKey(const Key('nav_widget_gallery')).first);
       await tester.pumpAndSettle();
       expect(find.byType(WidgetShowcaseScreen), findsOneWidget);
-      await tester.tap(find.byType(BackButton));
+
+      // Navigate to Multi-Step
+      await tester.tap(find.byKey(const Key('nav_multi_step')).first);
       await tester.pumpAndSettle();
+      expect(find.byType(MultiStepFormScreen), findsOneWidget);
+
+      // Navigate to Dynamic Form
+      await tester.tap(find.byKey(const Key('nav_dynamic_form')).first);
+      await tester.pumpAndSettle();
+      expect(find.byType(DynamicFormScreen), findsOneWidget);
+
+      // Navigate to Docs
+      await tester.tap(find.byKey(const Key('nav_docs')).first);
+      await tester.pumpAndSettle();
+      expect(find.text('Getting Started'), findsOneWidget);
     });
   });
 }
