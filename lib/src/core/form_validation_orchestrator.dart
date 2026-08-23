@@ -31,6 +31,26 @@ class FormValidationOrchestrator {
   final void Function(Object error, StackTrace stackTrace, String fieldName)?
       _onAsyncValidationError;
 
+  /// Returns an unmodifiable map of field names to touched status.
+  Map<String, bool> get touchedFields => _touchedTracker.touchedFields;
+
+  /// Returns whether a specific field is marked as touched.
+  bool isTouched(String fieldName) => _touchedTracker.isTouched(fieldName);
+
+  /// Returns initial values for all registered fields.
+  Map<String, Object?> get initialValues => _registry.initialValues;
+
+  /// Checks if any field value differs from its initial value.
+  bool isDirty(Map<String, Object?> currentValues) {
+    final initial = _registry.initialValues;
+    if (initial.length != currentValues.length) return true;
+    for (final entry in initial.entries) {
+      if (!currentValues.containsKey(entry.key)) return true;
+      if (currentValues[entry.key] != entry.value) return true;
+    }
+    return false;
+  }
+
   /// Schedules async validation for a field with debouncing and token cancellation.
   void scheduleFieldAsyncValidation<T>({
     required String fieldName,

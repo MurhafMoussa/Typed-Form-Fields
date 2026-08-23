@@ -58,6 +58,26 @@ void main() {
         expect(formCubit.state.validationStrategy,
             ValidationStrategy.onSubmitThenRealTime);
       });
+
+      test('should expose touchedFields, initialValues, isDirty, and isTouched', () {
+        final fields = TestFieldFactory.createEmailAndAgeFields();
+        formCubit = TypedFormController(fields: fields);
+
+        expect(formCubit.touchedFields, equals({'email': false, 'age': false}));
+        expect(formCubit.initialValues, equals({'email': 'test@example.com', 'age': 25}));
+        expect(formCubit.isDirty, isFalse);
+        expect(formCubit.isTouched('email'), isFalse);
+
+        formCubit.updateField(
+          fieldName: 'email',
+          value: 'changed@example.com',
+          context: mockContext,
+        );
+
+        expect(formCubit.isDirty, isTrue);
+        expect(formCubit.isTouched('email'), isTrue);
+        expect(formCubit.touchedFields['email'], isTrue);
+      });
     });
 
     group('Type Safety and Value Access', () {

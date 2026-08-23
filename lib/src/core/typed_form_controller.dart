@@ -77,6 +77,18 @@ class TypedFormController extends Cubit<TypedFormState> {
   void Function(Object error, StackTrace stackTrace, String fieldName)?
       get onAsyncValidationError => _onAsyncValidationError;
 
+  /// Returns map of field names to touched status
+  Map<String, bool> get touchedFields => _orchestrator.touchedFields;
+
+  /// Returns map of initial field values when form was created or reset
+  Map<String, Object?> get initialValues => _orchestrator.initialValues;
+
+  /// Whether any field value currently differs from its initial value
+  bool get isDirty => _orchestrator.isDirty(state.values);
+
+  /// Returns whether a specific field is touched
+  bool isTouched(String fieldName) => _orchestrator.isTouched(fieldName);
+
   /// Type-safe getter for field values
   T? getValue<T>(String fieldName) => state.getValue<T>(fieldName);
 
