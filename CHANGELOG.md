@@ -1,37 +1,42 @@
 # Changelog
 
-## 2.1.0 - Field Grouping & Multi-Step Validation API
-
-### ✨ **New Features**
-
-- **Field Grouping Metadata**: Added optional `group` (`String?`) parameter to `FormFieldDefinition<T>` and `copyWith()` method for categorizing fields by step or section.
-- **Group Validation API (`validateGroup`)**: Added `validateGroup` on `TypedFormController` and `context.validateGroup()` on `BuildContext` to validate and mark all fields in a specific step/group as touched, with `onValidationPass` and `onValidationFail` callbacks. Automatically switches `onSubmitThenRealTime` strategy to `realTimeOnly` if step validation fails.
-- **Field Subset Validation API (`validateFields`)**: Added `validateFields` on `TypedFormController` and `context.validateFields()` on `BuildContext` for validating explicit subsets of fields by name. Throws `FormFieldError.fieldNotFound` if a specified field is missing.
-- **Passive Group & Subset Validity Checks**: Added `isGroupValid` / `context.isGroupValid()` and `areFieldsValid` / `context.areFieldsValid()` for real-time passive validity checks without modifying `touched` state or triggering error displays prematurely.
-- **Group Touching API (`touchGroup`)**: Added `touchGroup` and `context.touchGroup()` to mark entire field groups as touched.
-- **Interactive Multi-Step Wizard Example**: Added `MultiStepFormScreen` in the example app showcasing group tagging, step validation callbacks, and passive step progress indicators.
-
-### 🛠 **Architectural & Core Improvements**
-
-- **Registry Group Indexing**: Updated `FormFieldRegistry` with `getFieldsByGroup()` returning unmodifiable lists of group fields for fast O(N) lookup.
-- **Controller Refactoring**: Internal delegation of field registry and touched state tracking to dedicated `FormFieldRegistry` and `FormTouchedTracker` helpers.
-
-### 🧪 **Testing & Quality**
-
-- **Multi-step Integration Tests**: Added integration tests in `test/integration/multi_step_form_integration_test.dart` covering 3-step wizard navigation, error highlighting, passive status checks, step correction, and form submission.
-
-## 2.0.0 - Decoupled Built-in Widgets for Zero UI-Coupling
+## 2.0.0 - Major Refactor: 100% UI-Agnostic Architecture, TypedFieldState, Async Validation & Field Grouping
 
 ### 🚀 **Breaking Changes**
 
-- **Removed Pre-built Material Widgets**: Deleted design-system coupled widgets (`TypedTextField`, `TypedCheckbox`, `TypedSwitch`, `TypedDropdown`, `TypedSlider`, `TypedDatePicker`, `TypedTimePicker`) from core package exports.
-- **Migration**: Use `TypedFieldWrapper<T>` with any Flutter widget or design system (Material, Cupertino, Shadcn, Fluent, or custom controls).
+- **Decoupled Built-in Material Widgets**: Removed design-system coupled widgets (`TypedTextField`, `TypedCheckbox`, `TypedSwitch`, `TypedDropdown`, `TypedSlider`, `TypedDatePicker`, `TypedTimePicker`) to achieve 100% zero UI-coupling. Use `TypedFieldWrapper<T>` with any widget or design system.
+- **`TypedFieldWrapper<T>` Builder Refactor**: Replaced multi-parameter positional callback with a single clean `TypedFieldState<T>` object parameter:
+  ```dart
+  // Before
+  builder: (context, value, error, hasError, isValidating, updateValue)
+  // After
+  builder: (context, field) => TextFormField(
+    initialValue: field.value,
+    onChanged: field.updateValue,
+    decoration: InputDecoration(errorText: field.displayError),
+  )
+  ```
 
-### 🛠 **Architectural Improvements**
+### ✨ **New Features**
 
-- **100% UI-Agnostic Core**: The package core is now completely decoupled from Material/Cupertino design systems, aligning with Flutter's modular framework direction.
-- **Zero UI-Coupling**: `TypedFieldWrapper<T>` provides high-performance, type-safe form field validation and state management for any widget tree without bloated parameter forwarding.
-- **Updated Showcase & Documentation**: Refactored example app screens and README documentation to showcase `TypedFieldWrapper<T>` usage across various form field controls.
+- **Field State Encapsulation (`TypedFieldState<T>`)**: Introduced lightweight immutable field state class containing `fieldName`, `value`, `error`, `hasError`, `isValidating`, `updateValue`, and convenience getter `displayError`.
+- **Form-Level Async Validating State**: Added `validatingFields` (`Set<String>`) and `isValidating` getter to `TypedFormState`.
+- **Async Validator Interface (`AsyncValidator<T>`)**: Introduced `AsyncValidator<T>` signature `FutureOr<String?> validate(T? value, BuildContext context)` and `asyncValidators` list on `FormFieldDefinition<T>`.
+- **Field Grouping Metadata**: Added optional `group` (`String?`) parameter to `FormFieldDefinition<T>` for tagging multi-step form fields.
+- **Group & Subset Validation APIs**: Added `validateGroup` and `validateFields` on `TypedFormController` and `BuildContext` extensions for validating step groups and field subsets.
+- **Passive Group & Subset Validity Checks**: Added `isGroupValid` and `areFieldsValid` for non-intrusive step status checks.
+- **Group Touching API (`touchGroup`)**: Added `touchGroup` for marking entire field groups as touched.
+- **Multi-Step Form Wizard Example**: Added interactive multi-step form screen and showcase in example app.
+
+### 🛠 **Architectural & Core Improvements**
+
+- **100% UI-Agnostic Core**: Completely decoupled from Material/Cupertino design systems.
+- **Registry & Tracker Delegation**: Modularized `TypedFormController` state logic into dedicated `FormFieldRegistry` and `FormTouchedTracker` helpers with O(1)/O(N) group lookups.
+- **Dynamic Localization**: Added `asyncValidationError` string and Arabic/English localizations across validator delegate.
+
+### 🧪 **Testing & Quality**
+
+- **Comprehensive Test Suite**: 520+ unit, widget, and integration tests covering field wrapper rebuilds, field grouping, multi-step navigation, and state immutability.
 
 ## 1.3.3 - Dynamic Validator Localization & Comprehensive Test Suite
 
