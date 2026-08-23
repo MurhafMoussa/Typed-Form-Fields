@@ -15,11 +15,25 @@ class FormValidator {
   final Duration _debounceDelay;
   final Map<String, Timer> _debounceTimers = {};
   final Map<String, Timer> _asyncDebounceTimers = {};
+  final Map<String, void Function()> _pendingDebounceExecutions = {};
+  final Map<String, Completer<void>> _asyncTaskCompleters = {};
   final Map<String, int> _asyncRequestTokens = {};
   final Set<String> _activeValidatingFields = {};
 
   /// Set of field names currently undergoing async validation.
   Set<String> get activeValidatingFields => Set.unmodifiable(_activeValidatingFields);
+
+  /// Checks if a field is currently undergoing async validation.
+  bool isFieldValidating(String fieldName) => _activeValidatingFields.contains(fieldName);
+
+  /// Checks if a field has a pending debounced async validation task.
+  bool isFieldDebouncing(String fieldName) => _asyncDebounceTimers.containsKey(fieldName);
+
+  /// Checks if there are any active or pending async validation tasks.
+  bool get hasActiveOrPendingAsyncValidations =>
+      _activeValidatingFields.isNotEmpty ||
+      _asyncDebounceTimers.isNotEmpty ||
+      _asyncTaskCompleters.isNotEmpty;
 
   /// Helper check for type matching generics
   bool _isA<T>(dynamic value) => value is T;
@@ -246,43 +260,98 @@ class FormValidator {
     final token = (_asyncRequestTokens[fieldName] ?? 0) + 1;
     _asyncRequestTokens[fieldName] = token;
 
-    _asyncDebounceTimers[fieldName] = Timer(debounceDelay, () async {
-      _asyncDebounceTimers.remove(fieldName);
+    final completer = Completer<void>();
+    _asyncTaskCompleters[fieldName] = completer;
 
-      if (_asyncRequestTokens[fieldName] != token) return;
+    void runExecution() {
+      _pendingDebounceExecutions.remove(fieldName);
+      () async {
+        if (_isStale(fieldName, token)) {
+          if (!completer.isCompleted) completer.complete();
+          _asyncTaskCompleters.remove(fieldName);
+          return;
+        }
 
-      _activeValidatingFields.add(fieldName);
-      onValidationStart(fieldName);
+        _activeValidatingFields.add(fieldName);
+        onValidationStart(fieldName);
 
-      String? validationError;
-      final fallbackError =
-          ValidatorLocalizations.of(context).asyncValidationError;
+        String? validationError;
+        final fallbackError =
+            ValidatorLocalizations.of(context).asyncValidationError;
 
-      for (final asyncValidator in asyncValidators) {
-        if (_isStale(fieldName, token)) return;
+        for (final asyncValidator in asyncValidators) {
+          if (_isStale(fieldName, token)) {
+            if (!completer.isCompleted) completer.complete();
+            _asyncTaskCompleters.remove(fieldName);
+            return;
+          }
 
-        try {
-          final error = await asyncValidator.validate(value, context);
-          if (_isStale(fieldName, token)) return;
+          try {
+            final error = await asyncValidator.validate(value, context);
+            if (_isStale(fieldName, token)) {
+              if (!completer.isCompleted) completer.complete();
+              _asyncTaskCompleters.remove(fieldName);
+              return;
+            }
 
-          if (error != null) {
-            validationError = error;
+            if (error != null) {
+              validationError = error;
+              break;
+            }
+          } catch (err, stackTrace) {
+            if (_isStale(fieldName, token)) {
+              if (!completer.isCompleted) completer.complete();
+              _asyncTaskCompleters.remove(fieldName);
+              return;
+            }
+
+            onError(err, stackTrace, fieldName);
+            validationError = fallbackError;
             break;
           }
-        } catch (err, stackTrace) {
-          if (_isStale(fieldName, token)) return;
-
-          onError(err, stackTrace, fieldName);
-          validationError = fallbackError;
-          break;
         }
-      }
 
-      if (_isStale(fieldName, token)) return;
+        if (_isStale(fieldName, token)) {
+          if (!completer.isCompleted) completer.complete();
+          _asyncTaskCompleters.remove(fieldName);
+          return;
+        }
 
-      _activeValidatingFields.remove(fieldName);
-      onValidationComplete(fieldName, validationError);
-    });
+        _activeValidatingFields.remove(fieldName);
+        onValidationComplete(fieldName, validationError);
+
+        if (!completer.isCompleted) completer.complete();
+        _asyncTaskCompleters.remove(fieldName);
+      }();
+    }
+
+    if (debounceDelay == Duration.zero) {
+      runExecution();
+    } else {
+      _pendingDebounceExecutions[fieldName] = runExecution;
+      _asyncDebounceTimers[fieldName] = Timer(debounceDelay, () {
+        _asyncDebounceTimers.remove(fieldName);
+        runExecution();
+      });
+    }
+  }
+
+  /// Immediately flushes all pending async debounce timers and awaits all active/pending async validations.
+  Future<void> flushAndAwaitAsyncValidations() async {
+    final pendingFields = _pendingDebounceExecutions.keys.toList();
+    for (final fieldName in pendingFields) {
+      _asyncDebounceTimers[fieldName]?.cancel();
+      _asyncDebounceTimers.remove(fieldName);
+      final runExec = _pendingDebounceExecutions.remove(fieldName);
+      runExec?.call();
+    }
+
+    while (_asyncTaskCompleters.isNotEmpty) {
+      final futures = _asyncTaskCompleters.values
+          .map((completer) => completer.future)
+          .toList();
+      await Future.wait(futures);
+    }
   }
 
   bool _isStale(String fieldName, int token) {
@@ -303,8 +372,13 @@ class FormValidator {
   void cancelAsyncValidation(String fieldName) {
     _asyncDebounceTimers[fieldName]?.cancel();
     _asyncDebounceTimers.remove(fieldName);
+    _pendingDebounceExecutions.remove(fieldName);
     _asyncRequestTokens[fieldName] = (_asyncRequestTokens[fieldName] ?? 0) + 1;
     _activeValidatingFields.remove(fieldName);
+    final completer = _asyncTaskCompleters.remove(fieldName);
+    if (completer != null && !completer.isCompleted) {
+      completer.complete();
+    }
   }
 
   /// Cancels active debounce timers and invalidates in-flight async validations for all fields.
@@ -313,10 +387,17 @@ class FormValidator {
       timer.cancel();
     }
     _asyncDebounceTimers.clear();
+    _pendingDebounceExecutions.clear();
     for (final field in _asyncRequestTokens.keys.toList()) {
       _asyncRequestTokens[field] = (_asyncRequestTokens[field] ?? 0) + 1;
     }
     _activeValidatingFields.clear();
+    for (final completer in _asyncTaskCompleters.values) {
+      if (!completer.isCompleted) {
+        completer.complete();
+      }
+    }
+    _asyncTaskCompleters.clear();
   }
 
   /// Cancels all active debouncing timers

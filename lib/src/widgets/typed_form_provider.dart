@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:typed_form_fields/src/core/typed_form_controller.dart';
@@ -243,11 +245,11 @@ extension TypedFormProviderExtension on BuildContext {
   }
 
   /// Validates the entire form.
-  void validateForm({
+  FutureOr<void> validateForm({
     required VoidCallback onValidationPass,
     VoidCallback? onValidationFail,
   }) {
-    TypedFormProvider.of(this).validateForm(
+    return TypedFormProvider.of(this).validateForm(
       this,
       onValidationPass: onValidationPass,
       onValidationFail: onValidationFail,

@@ -776,5 +776,241 @@ void main() {
 
       controller.close();
     });
+
+    group('Submission and Reset Lifecycle', () {
+      test('Form submission flushes active debounce timers immediately and awaits async validation', () async {
+        bool passCalled = false;
+        bool failCalled = false;
+
+        final asyncValidator = TestAsyncValidator<String>((value, context) async {
+          await Future<void>.delayed(const Duration(milliseconds: 50));
+          return value == 'valid@test.com' ? null : 'Invalid email';
+        });
+
+        final controller = TypedFormController(
+          fields: [
+            FormFieldDefinition<String>(
+              name: 'email',
+              validators: [],
+              asyncValidators: [asyncValidator],
+              initialValue: '',
+            ),
+          ],
+          asyncDebounceDelay: const Duration(milliseconds: 500),
+        );
+
+        // Update field value (starts 500ms debounce timer)
+        controller.updateField<String>(
+          fieldName: 'email',
+          value: 'valid@test.com',
+          context: mockContext,
+        );
+
+        expect(asyncValidator.callCount, 0);
+
+        // Submit form almost immediately at t=30ms (well before 500ms debounce)
+        await Future<void>.delayed(const Duration(milliseconds: 30));
+        expect(asyncValidator.callCount, 0);
+
+        final submitFuture = controller.validateForm(
+          mockContext,
+          onValidationPass: () => passCalled = true,
+          onValidationFail: () => failCalled = true,
+        );
+
+        await submitFuture;
+
+        expect(asyncValidator.callCount, 1);
+        expect(passCalled, isTrue);
+        expect(failCalled, isFalse);
+        expect(controller.state.validatingFields, isEmpty);
+        expect(controller.state.isValid, isTrue);
+
+        controller.close();
+      });
+
+      test('Form submission awaits in-flight async validation and calls onValidationFail when invalid', () async {
+        bool passCalled = false;
+        bool failCalled = false;
+
+        final asyncValidator = TestAsyncValidator<String>((value, context) async {
+          await Future<void>.delayed(const Duration(milliseconds: 100));
+          return value == 'taken' ? 'Username already taken' : null;
+        });
+
+        final controller = TypedFormController(
+          fields: [
+            FormFieldDefinition<String>(
+              name: 'username',
+              validators: [],
+              asyncValidators: [asyncValidator],
+              initialValue: '',
+            ),
+          ],
+          asyncDebounceDelay: const Duration(milliseconds: 20),
+        );
+
+        controller.updateField<String>(
+          fieldName: 'username',
+          value: 'taken',
+          context: mockContext,
+        );
+
+        // Wait for debounce (20ms) to fire so async check is in flight
+        await Future<void>.delayed(const Duration(milliseconds: 35));
+        expect(controller.state.validatingFields, contains('username'));
+
+        // Call submission while async check is in flight
+        await controller.validateForm(
+          mockContext,
+          onValidationPass: () => passCalled = true,
+          onValidationFail: () => failCalled = true,
+        );
+
+        expect(passCalled, isFalse);
+        expect(failCalled, isTrue);
+        expect(controller.state.getError('username'), 'Username already taken');
+        expect(controller.state.validatingFields, isEmpty);
+
+        controller.close();
+      });
+
+      test('Form reset cancels active debounced and in-flight async tasks and clears validatingFields immediately', () async {
+        final completer = Completer<String?>();
+        final asyncValidator = TestAsyncValidator<String>((value, context) {
+          return completer.future;
+        });
+
+        final controller = TypedFormController(
+          fields: [
+            FormFieldDefinition<String>(
+              name: 'username',
+              validators: [],
+              asyncValidators: [asyncValidator],
+              initialValue: 'initial_val',
+            ),
+          ],
+          asyncDebounceDelay: const Duration(milliseconds: 30),
+        );
+
+        controller.updateField<String>(
+          fieldName: 'username',
+          value: 'new_val',
+          context: mockContext,
+        );
+
+        // Wait for debounce timer to fire
+        await Future<void>.delayed(const Duration(milliseconds: 50));
+        expect(controller.state.validatingFields, contains('username'));
+
+        // Reset form while async validation is in flight
+        controller.resetForm();
+
+        expect(controller.state.validatingFields, isEmpty);
+        expect(controller.state.isValidating, isFalse);
+        expect(controller.state.getValue<String>('username'), 'initial_val');
+        expect(controller.state.errors, isEmpty);
+
+        // Complete the in-flight future with an error after reset
+        completer.complete('Late error');
+        await Future<void>.delayed(const Duration(milliseconds: 50));
+
+        // The late error should be ignored and not reflected in form state
+        expect(controller.state.getError('username'), isNull);
+        expect(controller.state.validatingFields, isEmpty);
+
+        controller.close();
+      });
+
+      test('Form reset cancels pending debounce timers before execution', () async {
+        final asyncValidator = TestAsyncValidator<String>((value, context) async {
+          return 'Should never run';
+        });
+
+        final controller = TypedFormController(
+          fields: [
+            FormFieldDefinition<String>(
+              name: 'email',
+              validators: [],
+              asyncValidators: [asyncValidator],
+              initialValue: '',
+            ),
+          ],
+          asyncDebounceDelay: const Duration(milliseconds: 300),
+        );
+
+        controller.updateField<String>(
+          fieldName: 'email',
+          value: 'test@example.com',
+          context: mockContext,
+        );
+
+        // Reset form immediately before 300ms debounce expires
+        controller.resetForm();
+
+        await Future<void>.delayed(const Duration(milliseconds: 400));
+
+        expect(asyncValidator.callCount, 0);
+        expect(controller.state.validatingFields, isEmpty);
+
+        controller.close();
+      });
+
+      test('Form submission with multiple async fields flushes and awaits all fields concurrently', () async {
+        bool passCalled = false;
+
+        final userValidator = TestAsyncValidator<String>((value, context) async {
+          await Future<void>.delayed(const Duration(milliseconds: 60));
+          return null;
+        });
+
+        final emailValidator = TestAsyncValidator<String>((value, context) async {
+          await Future<void>.delayed(const Duration(milliseconds: 60));
+          return null;
+        });
+
+        final controller = TypedFormController(
+          fields: [
+            FormFieldDefinition<String>(
+              name: 'username',
+              validators: [],
+              asyncValidators: [userValidator],
+              initialValue: '',
+            ),
+            FormFieldDefinition<String>(
+              name: 'email',
+              validators: [],
+              asyncValidators: [emailValidator],
+              initialValue: '',
+            ),
+          ],
+          asyncDebounceDelay: const Duration(milliseconds: 400),
+        );
+
+        controller.updateField<String>(
+          fieldName: 'username',
+          value: 'john',
+          context: mockContext,
+        );
+        controller.updateField<String>(
+          fieldName: 'email',
+          value: 'john@example.com',
+          context: mockContext,
+        );
+
+        // Submit form while both are debouncing
+        await controller.validateForm(
+          mockContext,
+          onValidationPass: () => passCalled = true,
+        );
+
+        expect(userValidator.callCount, 1);
+        expect(emailValidator.callCount, 1);
+        expect(passCalled, isTrue);
+        expect(controller.state.validatingFields, isEmpty);
+
+        controller.close();
+      });
+    });
   });
 }
