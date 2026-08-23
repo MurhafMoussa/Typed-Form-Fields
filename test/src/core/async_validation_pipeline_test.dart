@@ -1011,6 +1011,47 @@ void main() {
 
         controller.close();
       });
+
+      test('Form submission under ValidationStrategy.onSubmitOnly schedules and awaits async validation for fields passing sync check', () async {
+        bool passCalled = false;
+
+        final asyncValidator = TestAsyncValidator<String>((value, context) async {
+          await Future<void>.delayed(const Duration(milliseconds: 30));
+          return value == 'valid' ? null : 'Invalid value';
+        });
+
+        final controller = TypedFormController(
+          fields: [
+            FormFieldDefinition<String>(
+              name: 'username',
+              validators: [],
+              asyncValidators: [asyncValidator],
+              initialValue: '',
+            ),
+          ],
+          validationStrategy: ValidationStrategy.onSubmitOnly,
+        );
+
+        controller.updateField<String>(
+          fieldName: 'username',
+          value: 'valid',
+          context: mockContext,
+        );
+
+        // In onSubmitOnly mode, updateField does NOT schedule async validation
+        expect(asyncValidator.callCount, 0);
+
+        // Call validateForm -> schedules async validation and awaits it
+        await controller.validateForm(
+          mockContext,
+          onValidationPass: () => passCalled = true,
+        );
+
+        expect(asyncValidator.callCount, 1);
+        expect(passCalled, isTrue);
+
+        controller.close();
+      });
     });
   });
 }

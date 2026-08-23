@@ -263,14 +263,19 @@ class FormValidator {
     final completer = Completer<void>();
     _asyncTaskCompleters[fieldName] = completer;
 
+    bool checkStaleAndCleanup() {
+      if (_isStale(fieldName, token)) {
+        if (!completer.isCompleted) completer.complete();
+        _asyncTaskCompleters.remove(fieldName);
+        return true;
+      }
+      return false;
+    }
+
     void runExecution() {
       _pendingDebounceExecutions.remove(fieldName);
       () async {
-        if (_isStale(fieldName, token)) {
-          if (!completer.isCompleted) completer.complete();
-          _asyncTaskCompleters.remove(fieldName);
-          return;
-        }
+        if (checkStaleAndCleanup()) return;
 
         _activeValidatingFields.add(fieldName);
         onValidationStart(fieldName);
@@ -280,41 +285,21 @@ class FormValidator {
             ValidatorLocalizations.of(context).asyncValidationError;
 
         for (final asyncValidator in asyncValidators) {
-          if (_isStale(fieldName, token)) {
-            if (!completer.isCompleted) completer.complete();
-            _asyncTaskCompleters.remove(fieldName);
-            return;
-          }
-
           try {
             final error = await asyncValidator.validate(value, context);
-            if (_isStale(fieldName, token)) {
-              if (!completer.isCompleted) completer.complete();
-              _asyncTaskCompleters.remove(fieldName);
-              return;
-            }
+            if (checkStaleAndCleanup()) return;
 
             if (error != null) {
               validationError = error;
               break;
             }
           } catch (err, stackTrace) {
-            if (_isStale(fieldName, token)) {
-              if (!completer.isCompleted) completer.complete();
-              _asyncTaskCompleters.remove(fieldName);
-              return;
-            }
+            if (checkStaleAndCleanup()) return;
 
             onError(err, stackTrace, fieldName);
             validationError = fallbackError;
             break;
           }
-        }
-
-        if (_isStale(fieldName, token)) {
-          if (!completer.isCompleted) completer.complete();
-          _asyncTaskCompleters.remove(fieldName);
-          return;
         }
 
         _activeValidatingFields.remove(fieldName);
