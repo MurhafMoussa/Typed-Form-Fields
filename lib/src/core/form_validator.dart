@@ -259,27 +259,18 @@ class FormValidator {
           ValidatorLocalizations.of(context).asyncValidationError;
 
       for (final asyncValidator in asyncValidators) {
-        if (_asyncRequestTokens[fieldName] != token) {
-          _activeValidatingFields.remove(fieldName);
-          return;
-        }
+        if (_isStale(fieldName, token)) return;
 
         try {
           final error = await asyncValidator.validate(value, context);
-          if (_asyncRequestTokens[fieldName] != token) {
-            _activeValidatingFields.remove(fieldName);
-            return;
-          }
+          if (_isStale(fieldName, token)) return;
 
           if (error != null) {
             validationError = error;
             break;
           }
         } catch (err, stackTrace) {
-          if (_asyncRequestTokens[fieldName] != token) {
-            _activeValidatingFields.remove(fieldName);
-            return;
-          }
+          if (_isStale(fieldName, token)) return;
 
           onError(err, stackTrace, fieldName);
           validationError = fallbackError;
@@ -287,14 +278,19 @@ class FormValidator {
         }
       }
 
-      if (_asyncRequestTokens[fieldName] != token) {
-        _activeValidatingFields.remove(fieldName);
-        return;
-      }
+      if (_isStale(fieldName, token)) return;
 
       _activeValidatingFields.remove(fieldName);
       onValidationComplete(fieldName, validationError);
     });
+  }
+
+  bool _isStale(String fieldName, int token) {
+    if (_asyncRequestTokens[fieldName] != token) {
+      _activeValidatingFields.remove(fieldName);
+      return true;
+    }
+    return false;
   }
 
   /// Cancels debouncing timer for a specific field

@@ -457,6 +457,323 @@ void main() {
       expect(asyncValidator.callCount, 1);
       expect(controller.state.getError('email'), 'Dynamic error');
 
+      // Now call updateFieldValidators without providing asyncValidators on field that already has asyncValidators
+      controller.updateFieldValidators<String>(
+        name: 'email',
+        validators: [TestSyncValidator<String>((v, c) => 'Sync fail')],
+        context: mockContext,
+      );
+
+      expect(controller.state.getError('email'), 'Sync fail');
+
+      controller.close();
+    });
+
+    test('updateField under realTimeOnly validation strategy with async validators', () async {
+      final asyncValidator = TestAsyncValidator<String>((value, context) async {
+        return value == 'bad' ? 'Bad value' : null;
+      });
+
+      final controller = TypedFormController(
+        fields: [
+          FormFieldDefinition<String>(
+            name: 'email',
+            validators: [],
+            asyncValidators: [asyncValidator],
+            initialValue: '',
+          ),
+        ],
+        validationStrategy: ValidationStrategy.realTimeOnly,
+        asyncDebounceDelay: const Duration(milliseconds: 50),
+      );
+
+      controller.updateField<String>(
+        fieldName: 'email',
+        value: 'bad',
+        context: mockContext,
+      );
+
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+
+      expect(asyncValidator.callCount, 1);
+      expect(controller.state.getError('email'), 'Bad value');
+
+      controller.close();
+    });
+
+    test('updateFieldWithDebounce triggers async validation when sync check passes or cancels when sync fails', () async {
+      final syncValidator = TestSyncValidator<String>((v, c) => v == 'invalid' ? 'Invalid sync' : null);
+      final asyncValidator = TestAsyncValidator<String>((v, c) async => 'Async error');
+
+      final controller = TypedFormController(
+        fields: [
+          FormFieldDefinition<String>(
+            name: 'field1',
+            validators: [syncValidator],
+            asyncValidators: [asyncValidator],
+            initialValue: '',
+          ),
+        ],
+        asyncDebounceDelay: const Duration(milliseconds: 50),
+      );
+
+      // Case A: allFieldsRealTime with sync pass
+      controller.updateFieldWithDebounce<String>(
+        fieldName: 'field1',
+        value: 'valid',
+        context: mockContext,
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 400));
+      expect(asyncValidator.callCount, 1);
+
+      // Case B: allFieldsRealTime with sync fail
+      controller.updateFieldWithDebounce<String>(
+        fieldName: 'field1',
+        value: 'invalid',
+        context: mockContext,
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 400));
+      expect(controller.state.getError('field1'), 'Invalid sync');
+
+      // Case C: realTimeOnly strategy with sync pass
+      controller.setValidationStrategy(ValidationStrategy.realTimeOnly);
+      controller.updateFieldWithDebounce<String>(
+        fieldName: 'field1',
+        value: 'valid2',
+        context: mockContext,
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 400));
+      expect(asyncValidator.callCount, 2);
+
+      // Case D: realTimeOnly strategy with sync fail
+      controller.updateFieldWithDebounce<String>(
+        fieldName: 'field1',
+        value: 'invalid',
+        context: mockContext,
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 400));
+      expect(controller.state.getError('field1'), 'Invalid sync');
+
+      controller.close();
+    });
+
+    test('updateFields under विभिन्न validation strategies and sync pass/fail', () async {
+      final syncValidator = TestSyncValidator<String>((v, c) => v == 'bad_sync' ? 'Sync error' : null);
+      final asyncValidator = TestAsyncValidator<String>((v, c) async => v == 'bad_async' ? 'Async error' : null);
+
+      final controller = TypedFormController(
+        fields: [
+          FormFieldDefinition<String>(
+            name: 'f1',
+            validators: [syncValidator],
+            asyncValidators: [asyncValidator],
+            initialValue: '',
+          ),
+          FormFieldDefinition<String>(
+            name: 'f2',
+            validators: [],
+            initialValue: '',
+          ),
+        ],
+        asyncDebounceDelay: const Duration(milliseconds: 50),
+      );
+
+      // Strategy onSubmitOnly
+      controller.setValidationStrategy(ValidationStrategy.onSubmitOnly);
+      controller.updateFields<String>(
+        fieldValues: {'f1': 'bad_async', 'f2': 'val'},
+        context: mockContext,
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+      expect(asyncValidator.callCount, 0);
+
+      // Strategy allFieldsRealTime with sync pass
+      controller.setValidationStrategy(ValidationStrategy.allFieldsRealTime);
+      controller.updateFields<String>(
+        fieldValues: {'f1': 'bad_async', 'f2': 'val'},
+        context: mockContext,
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+      expect(asyncValidator.callCount, 1);
+      expect(controller.state.getError('f1'), 'Async error');
+
+      // Strategy allFieldsRealTime with sync fail
+      controller.updateFields<String>(
+        fieldValues: {'f1': 'bad_sync', 'f2': 'val'},
+        context: mockContext,
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+      expect(controller.state.getError('f1'), 'Sync error');
+
+      // Strategy realTimeOnly with sync pass
+      controller.setValidationStrategy(ValidationStrategy.realTimeOnly);
+      controller.updateFields<String>(
+        fieldValues: {'f1': 'bad_async', 'f2': 'val'},
+        context: mockContext,
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+      expect(asyncValidator.callCount, 2);
+
+      // Strategy realTimeOnly with sync fail
+      controller.updateFields<String>(
+        fieldValues: {'f1': 'bad_sync', 'f2': 'val'},
+        context: mockContext,
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+      expect(controller.state.getError('f1'), 'Sync error');
+
+      controller.close();
+    });
+
+    test('validateFieldImmediately for field without sync validators', () async {
+      final asyncValidator = TestAsyncValidator<String>((v, c) async => 'Async err');
+
+      final controller = TypedFormController(
+        fields: [
+          FormFieldDefinition<String>(
+            name: 'noSyncWithAsync',
+            validators: [],
+            asyncValidators: [asyncValidator],
+            initialValue: '',
+          ),
+          FormFieldDefinition<String>(
+            name: 'noSyncNoAsync',
+            validators: [],
+            initialValue: '',
+          ),
+        ],
+        asyncDebounceDelay: const Duration(milliseconds: 500),
+      );
+
+      controller.validateFieldImmediately(
+        fieldName: 'noSyncWithAsync',
+        context: mockContext,
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      expect(asyncValidator.callCount, 1);
+
+      controller.validateFieldImmediately(
+        fieldName: 'noSyncNoAsync',
+        context: mockContext,
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      expect(controller.state.getError('noSyncNoAsync'), isNull);
+
+      controller.close();
+    });
+
+    test('Token invalidation mid-flight and in catch block removes active field and exits', () async {
+      final completer1 = Completer<String?>();
+      final asyncVal1 = TestAsyncValidator<String>((v, c) => completer1.future);
+
+      final controller = TypedFormController(
+        fields: [
+          FormFieldDefinition<String>(
+            name: 'f1',
+            validators: [],
+            asyncValidators: [asyncVal1],
+            initialValue: '',
+          ),
+        ],
+        asyncDebounceDelay: const Duration(milliseconds: 50),
+      );
+
+      // Start async check
+      controller.updateField<String>(
+        fieldName: 'f1',
+        value: 'first',
+        context: mockContext,
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 70));
+      expect(controller.state.validatingFields, contains('f1'));
+
+      // Invalidate token mid-flight by updating field value again
+      controller.updateField<String>(
+        fieldName: 'f1',
+        value: 'second',
+        context: mockContext,
+      );
+
+      // Complete first check mid-flight (now stale token)
+      completer1.complete('stale error');
+      await Future<void>.delayed(Duration.zero);
+
+      // Second check runs and completes
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+
+      controller.close();
+    });
+
+    test('Mid-flight exception with stale token exits cleanly', () async {
+      final completer = Completer<String?>();
+      final asyncVal = TestAsyncValidator<String>((v, c) async {
+        if (v == 'val1') {
+          await completer.future;
+          throw Exception('Throw after wait');
+        }
+        return null;
+      });
+
+      bool errorCalled = false;
+      final controller = TypedFormController(
+        fields: [
+          FormFieldDefinition<String>(
+            name: 'f1',
+            validators: [],
+            asyncValidators: [asyncVal],
+            initialValue: '',
+          ),
+        ],
+        asyncDebounceDelay: const Duration(milliseconds: 50),
+        onAsyncValidationError: (_, __, ___) => errorCalled = true,
+      );
+
+      controller.updateField<String>(
+        fieldName: 'f1',
+        value: 'val1',
+        context: mockContext,
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 70));
+
+      // Invalidate token before exception is thrown by updating field to val2 (which does not throw)
+      controller.updateField<String>(
+        fieldName: 'f1',
+        value: 'val2',
+        context: mockContext,
+      );
+
+      // Throw exception on first task (stale token)
+      completer.complete('done');
+      await Future<void>.delayed(const Duration(milliseconds: 150));
+
+      // Callback should not be called for stale exception
+      expect(errorCalled, isFalse);
+
+      controller.close();
+    });
+
+    test('updateFieldWithDebounce under realTimeOnly strategy for field without asyncValidators', () async {
+      final controller = TypedFormController(
+        fields: [
+          FormFieldDefinition<String>(
+            name: 'noAsync',
+            validators: [],
+            initialValue: '',
+          ),
+        ],
+        validationStrategy: ValidationStrategy.realTimeOnly,
+        asyncDebounceDelay: const Duration(milliseconds: 50),
+      );
+
+      controller.updateFieldWithDebounce<String>(
+        fieldName: 'noAsync',
+        value: 'hello',
+        context: mockContext,
+      );
+
+      await Future<void>.delayed(const Duration(milliseconds: 400));
+      expect(controller.state.getError('noAsync'), isNull);
+
       controller.close();
     });
   });

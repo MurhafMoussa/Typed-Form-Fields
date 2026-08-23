@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:typed_form_fields/src/core/form_errors.dart';
 import 'package:typed_form_fields/src/core/form_validator.dart';
+import 'package:typed_form_fields/src/models/form_field_definition.dart';
 import 'package:typed_form_fields/src/validators/typed_cross_field_validator.dart';
 import 'package:typed_form_fields/src/validators/validator.dart';
 
@@ -97,6 +98,21 @@ void main() {
         expect(
           formValidator.isValueCompatibleWithExpectedType(null, dynamic),
           isTrue,
+        );
+      });
+
+      test('should return true for null when type string ends with ? or is dynamic', () {
+        const field = FormFieldDefinition<DateTime?>(
+          name: 'optionalDate',
+          validators: [],
+        );
+        expect(
+          formValidator.isValueCompatibleWithExpectedType(null, field.valueType),
+          isTrue,
+        );
+        expect(
+          formValidator.isValueCompatibleWithExpectedType(null, DateTime),
+          isFalse,
         );
       });
     });
@@ -575,6 +591,27 @@ void main() {
 
         expect(completed1, isFalse);
         expect(completed2, isFalse);
+      });
+
+      test('activeValidatingFields and cancelAllAsyncValidations', () async {
+        expect(formValidator.activeValidatingFields, isEmpty);
+
+        bool completed = false;
+        formValidator.scheduleAsyncValidation<String>(
+          fieldName: 'email',
+          value: 'test',
+          asyncValidators: [],
+          context: mockContext,
+          debounceDelay: const Duration(milliseconds: 100),
+          onValidationStart: (_) {},
+          onValidationComplete: (_, __) => completed = true,
+          onError: (_, __, ___) {},
+        );
+
+        formValidator.cancelAllAsyncValidations();
+        await Future<void>.delayed(const Duration(milliseconds: 150));
+        expect(completed, isFalse);
+        expect(formValidator.activeValidatingFields, isEmpty);
       });
     });
   });
