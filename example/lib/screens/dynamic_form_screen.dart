@@ -331,7 +331,7 @@ class _DynamicFormScreenState extends State<DynamicFormScreen> {
         fieldType.toString() == 'String') {
       return TypedFieldWrapper<String>(
         fieldName: fieldName,
-        builder: (context, value, error, hasError, updateValue) {
+        builder: (context, value, error, hasError, isValidating, updateValue) {
           return TextFormField(
             initialValue: value ?? '',
             onChanged: updateValue,
@@ -351,7 +351,7 @@ class _DynamicFormScreenState extends State<DynamicFormScreen> {
         fieldType.toString() == 'num') {
       return TypedFieldWrapper<num>(
         fieldName: fieldName,
-        builder: (context, value, error, hasError, updateValue) {
+        builder: (context, value, error, hasError, isValidating, updateValue) {
           return TextFormField(
             initialValue: value?.toString() ?? '0',
             onChanged: (text) {
@@ -374,7 +374,7 @@ class _DynamicFormScreenState extends State<DynamicFormScreen> {
         fieldType.toString() == 'bool') {
       return TypedFieldWrapper<bool>(
         fieldName: fieldName,
-        builder: (context, value, error, hasError, updateValue) {
+        builder: (context, value, error, hasError, isValidating, updateValue) {
           return SwitchListTile(
             title: Text(_getFieldLabel(fieldName)),
             subtitle: hasError

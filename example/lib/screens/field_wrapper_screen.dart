@@ -128,7 +128,7 @@ class TypedFieldWrapperView extends StatelessWidget {
             onFieldStateChanged: (value, error, hasError) {
               debugPrint('Text field changed: $value, hasError: $hasError');
             },
-            builder: (context, value, error, hasError, updateValue) {
+            builder: (context, value, error, hasError, isValidating, updateValue) {
               return TextFormField(
                 initialValue: value,
                 onChanged: updateValue,
@@ -154,7 +154,7 @@ class TypedFieldWrapperView extends StatelessWidget {
           const SizedBox(height: 8),
           TypedFieldWrapper<bool>(
             fieldName: 'checkbox',
-            builder: (context, value, error, hasError, updateValue) {
+            builder: (context, value, error, hasError, isValidating, updateValue) {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -189,7 +189,7 @@ class TypedFieldWrapperView extends StatelessWidget {
           const SizedBox(height: 8),
           TypedFieldWrapper<double>(
             fieldName: 'slider',
-            builder: (context, value, error, hasError, updateValue) {
+            builder: (context, value, error, hasError, isValidating, updateValue) {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

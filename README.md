@@ -46,7 +46,7 @@ class MyForm extends StatelessWidget {
           TypedFieldWrapper<String>(
             fieldName: 'email',
             debounceTime: Duration(milliseconds: 300),
-            builder: (context, value, error, hasError, updateValue) {
+            builder: (context, value, error, hasError, isValidating, updateValue) {
               return TextFormField(
                 initialValue: value,
                 onChanged: updateValue,
@@ -64,7 +64,7 @@ class MyForm extends StatelessWidget {
           // Checkbox field using TypedFieldWrapper
           TypedFieldWrapper<bool>(
             fieldName: 'subscribe',
-            builder: (context, value, error, hasError, updateValue) {
+            builder: (context, value, error, hasError, isValidating, updateValue) {
               return CheckboxListTile(
                 title: Text('Subscribe to newsletter'),
                 value: value ?? false,
@@ -161,7 +161,7 @@ TypedFieldWrapper<String>(
   fieldName: 'email',
   debounceTime: Duration(milliseconds: 300),
   transformValue: (value) => value.toLowerCase().trim(),
-  builder: (context, value, error, hasError, updateValue) {
+  builder: (context, value, error, hasError, isValidating, updateValue) {
     return TextFormField(
       initialValue: value,
       onChanged: updateValue,
@@ -180,7 +180,7 @@ TypedFieldWrapper<String>(
 ```dart
 TypedFieldWrapper<bool>(
   fieldName: 'terms',
-  builder: (context, value, error, hasError, updateValue) {
+  builder: (context, value, error, hasError, isValidating, updateValue) {
     return CheckboxListTile(
       title: Text('I agree to terms'),
       value: value ?? false,
@@ -196,7 +196,7 @@ TypedFieldWrapper<bool>(
 ```dart
 TypedFieldWrapper<String>(
   fieldName: 'country',
-  builder: (context, value, error, hasError, updateValue) {
+  builder: (context, value, error, hasError, isValidating, updateValue) {
     return DropdownButtonFormField<String>(
       value: (value == null || value.isEmpty) ? null : value,
       onChanged: updateValue,
@@ -231,7 +231,7 @@ TypedFieldWrapper<String>(
     // React to changes without rebuilding
     print('Field changed: $value, hasError: $hasError');
   },
-  builder: (context, value, error, hasError, updateValue) {
+  builder: (context, value, error, hasError, isValidating, updateValue) {
     // Use ANY Flutter widget here!
     return TextFormField(
       initialValue: value,
@@ -819,7 +819,7 @@ TypedFieldWrapper<String>(
   fieldName: 'email',
   debounceTime: Duration(milliseconds: 300),
   transformValue: (value) => value.toLowerCase().trim(),
-  builder: (context, value, error, hasError, updateValue) {
+  builder: (context, value, error, hasError, isValidating, updateValue) {
     return TextFormField(
       initialValue: value,
       onChanged: updateValue,

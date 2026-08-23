@@ -30,13 +30,14 @@ import 'package:typed_form_fields/typed_form_fields.dart';
 ///     // React to field changes without rebuilding
 ///     print('Field changed: $value, hasError: $hasError');
 ///   },
-///   builder: (context, value, error, hasError, updateValue) {
+///   builder: (context, value, error, hasError, isValidating, updateValue) {
 ///     return TextFormField(
 ///       initialValue: value,
 ///       onChanged: updateValue,
 ///       decoration: InputDecoration(
 ///         labelText: 'Email',
 ///         errorText: hasError ? error : null,
+///         suffixIcon: isValidating ? CircularProgressIndicator() : null,
 ///       ),
 ///     );
 ///   },
@@ -64,12 +65,14 @@ class TypedFieldWrapper<T> extends StatefulWidget {
   /// - `value`: Current field value (can be null)
   /// - `error`: Current error message (can be null)
   /// - `hasError`: Whether the field has an error
+  /// - `isValidating`: Whether the field is currently undergoing async validation
   /// - `updateValue`: Function to call when the field value changes
   final Widget Function(
     BuildContext context,
     T? value,
     String? error,
     bool hasError,
+    bool isValidating,
     void Function(T? value) updateValue,
   ) builder;
 
@@ -159,13 +162,19 @@ class _TypedFieldWrapperState<T> extends State<TypedFieldWrapper<T>> {
     return BlocConsumer<TypedFormController, TypedFormState>(
       bloc: cubit,
       buildWhen: (previous, current) {
-        // Only rebuild if this specific field's value or error changed
+        // Only rebuild if this specific field's value, error, or validation state changed
         final prevValue = previous.values[widget.fieldName];
         final currValue = current.values[widget.fieldName];
         final prevError = previous.errors[widget.fieldName];
         final currError = current.errors[widget.fieldName];
+        final prevValidating =
+            previous.validatingFields.contains(widget.fieldName);
+        final currValidating =
+            current.validatingFields.contains(widget.fieldName);
 
-        return prevValue != currValue || prevError != currError;
+        return prevValue != currValue ||
+            prevError != currError ||
+            prevValidating != currValidating;
       },
       listenWhen: (previous, current) {
         // Only listen if this specific field's state changed
@@ -173,8 +182,14 @@ class _TypedFieldWrapperState<T> extends State<TypedFieldWrapper<T>> {
         final currValue = current.values[widget.fieldName];
         final prevError = previous.errors[widget.fieldName];
         final currError = current.errors[widget.fieldName];
+        final prevValidating =
+            previous.validatingFields.contains(widget.fieldName);
+        final currValidating =
+            current.validatingFields.contains(widget.fieldName);
 
-        return prevValue != currValue || prevError != currError;
+        return prevValue != currValue ||
+            prevError != currError ||
+            prevValidating != currValidating;
       },
       listener: (context, state) {
         // Call the field state change listener if provided
@@ -191,6 +206,8 @@ class _TypedFieldWrapperState<T> extends State<TypedFieldWrapper<T>> {
         final error = state.errors[widget.fieldName];
         final hasError = error != null && error.isNotEmpty;
         final formValue = state.values[widget.fieldName] as T?;
+        final isValidating =
+            state.validatingFields.contains(widget.fieldName);
 
         // Use form value if available, otherwise use current local value
         final effectiveValue = formValue ?? _currentValue;
@@ -200,6 +217,7 @@ class _TypedFieldWrapperState<T> extends State<TypedFieldWrapper<T>> {
           effectiveValue,
           error,
           hasError,
+          isValidating,
           _updateValue,
         );
       },

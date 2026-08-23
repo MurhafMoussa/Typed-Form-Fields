@@ -162,7 +162,7 @@ class RegistrationFormView extends StatelessWidget {
           TypedFieldWrapper<String>(
             fieldName: 'firstName',
             transformValue: (value) => value.trim(),
-            builder: (context, value, error, hasError, updateValue) {
+            builder: (context, value, error, hasError, isValidating, updateValue) {
               return TextFormField(
                 initialValue: value,
                 onChanged: updateValue,
@@ -184,7 +184,7 @@ class RegistrationFormView extends StatelessWidget {
           TypedFieldWrapper<String>(
             fieldName: 'lastName',
             transformValue: (value) => value.trim(),
-            builder: (context, value, error, hasError, updateValue) {
+            builder: (context, value, error, hasError, isValidating, updateValue) {
               return TextFormField(
                 initialValue: value,
                 onChanged: updateValue,
@@ -206,7 +206,7 @@ class RegistrationFormView extends StatelessWidget {
           TypedFieldWrapper<String>(
             fieldName: 'email',
             transformValue: (value) => value.toLowerCase().trim(),
-            builder: (context, value, error, hasError, updateValue) {
+            builder: (context, value, error, hasError, isValidating, updateValue) {
               return TextFormField(
                 initialValue: value,
                 onChanged: updateValue,
@@ -228,7 +228,7 @@ class RegistrationFormView extends StatelessWidget {
           TypedFieldWrapper<String>(
             fieldName: 'phone',
             transformValue: (value) => value.replaceAll(RegExp(r'[^\d+]'), ''),
-            builder: (context, value, error, hasError, updateValue) {
+            builder: (context, value, error, hasError, isValidating, updateValue) {
               return TextFormField(
                 initialValue: value,
                 onChanged: updateValue,
@@ -249,7 +249,7 @@ class RegistrationFormView extends StatelessWidget {
           // Password with TypedFieldWrapper
           TypedFieldWrapper<String>(
             fieldName: 'password',
-            builder: (context, value, error, hasError, updateValue) {
+            builder: (context, value, error, hasError, isValidating, updateValue) {
               return TextFormField(
                 initialValue: value,
                 onChanged: updateValue,
@@ -270,7 +270,7 @@ class RegistrationFormView extends StatelessWidget {
           // Confirm Password with TypedFieldWrapper
           TypedFieldWrapper<String>(
             fieldName: 'confirmPassword',
-            builder: (context, value, error, hasError, updateValue) {
+            builder: (context, value, error, hasError, isValidating, updateValue) {
               return TextFormField(
                 initialValue: value,
                 onChanged: updateValue,
@@ -291,7 +291,7 @@ class RegistrationFormView extends StatelessWidget {
           // Terms Agreement with TypedFieldWrapper
           TypedFieldWrapper<bool>(
             fieldName: 'agreeToTerms',
-            builder: (context, value, error, hasError, updateValue) {
+            builder: (context, value, error, hasError, isValidating, updateValue) {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

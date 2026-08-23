@@ -356,7 +356,7 @@ class StrategyExampleScreen extends StatelessWidget {
                   // Form Fields
                   TypedFieldWrapper<String>(
                     fieldName: 'email',
-                    builder: (context, value, error, hasError, updateValue) {
+                    builder: (context, value, error, hasError, isValidating, updateValue) {
                       return TextFormField(
                         initialValue: value,
                         onChanged: updateValue,
@@ -373,7 +373,7 @@ class StrategyExampleScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   TypedFieldWrapper<String>(
                     fieldName: 'password',
-                    builder: (context, value, error, hasError, updateValue) {
+                    builder: (context, value, error, hasError, isValidating, updateValue) {
                       return TextFormField(
                         initialValue: value,
                         onChanged: updateValue,
@@ -390,7 +390,7 @@ class StrategyExampleScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   TypedFieldWrapper<String>(
                     fieldName: 'confirmPassword',
-                    builder: (context, value, error, hasError, updateValue) {
+                    builder: (context, value, error, hasError, isValidating, updateValue) {
                       return TextFormField(
                         initialValue: value,
                         onChanged: updateValue,

@@ -401,7 +401,7 @@ class _MultiStepFormViewState extends State<MultiStepFormView> {
             const SizedBox(height: 16),
             TypedFieldWrapper<String>(
               fieldName: 'fullName',
-              builder: (context, value, error, hasError, updateValue) {
+              builder: (context, value, error, hasError, isValidating, updateValue) {
                 return TextFormField(
                   initialValue: value,
                   onChanged: updateValue,
@@ -418,7 +418,7 @@ class _MultiStepFormViewState extends State<MultiStepFormView> {
             const SizedBox(height: 16),
             TypedFieldWrapper<String>(
               fieldName: 'email',
-              builder: (context, value, error, hasError, updateValue) {
+              builder: (context, value, error, hasError, isValidating, updateValue) {
                 return TextFormField(
                   initialValue: value,
                   onChanged: updateValue,
@@ -454,7 +454,7 @@ class _MultiStepFormViewState extends State<MultiStepFormView> {
             const SizedBox(height: 16),
             TypedFieldWrapper<String>(
               fieldName: 'street',
-              builder: (context, value, error, hasError, updateValue) {
+              builder: (context, value, error, hasError, isValidating, updateValue) {
                 return TextFormField(
                   initialValue: value,
                   onChanged: updateValue,
@@ -471,7 +471,7 @@ class _MultiStepFormViewState extends State<MultiStepFormView> {
             const SizedBox(height: 16),
             TypedFieldWrapper<String>(
               fieldName: 'city',
-              builder: (context, value, error, hasError, updateValue) {
+              builder: (context, value, error, hasError, isValidating, updateValue) {
                 return TextFormField(
                   initialValue: value,
                   onChanged: updateValue,
@@ -488,7 +488,7 @@ class _MultiStepFormViewState extends State<MultiStepFormView> {
             const SizedBox(height: 16),
             TypedFieldWrapper<String>(
               fieldName: 'zipCode',
-              builder: (context, value, error, hasError, updateValue) {
+              builder: (context, value, error, hasError, isValidating, updateValue) {
                 return TextFormField(
                   initialValue: value,
                   onChanged: updateValue,
@@ -524,7 +524,7 @@ class _MultiStepFormViewState extends State<MultiStepFormView> {
             const SizedBox(height: 16),
             TypedFieldWrapper<bool>(
               fieldName: 'subscribeNewsletter',
-              builder: (context, value, error, hasError, updateValue) {
+              builder: (context, value, error, hasError, isValidating, updateValue) {
                 return CheckboxListTile(
                   title: const Text('Subscribe to product updates and newsletter'),
                   value: value ?? false,
@@ -537,7 +537,7 @@ class _MultiStepFormViewState extends State<MultiStepFormView> {
             const SizedBox(height: 8),
             TypedFieldWrapper<bool>(
               fieldName: 'acceptTerms',
-              builder: (context, value, error, hasError, updateValue) {
+              builder: (context, value, error, hasError, isValidating, updateValue) {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

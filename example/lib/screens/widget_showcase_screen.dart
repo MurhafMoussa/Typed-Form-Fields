@@ -130,7 +130,7 @@ class WidgetShowcaseView extends StatelessWidget {
           const SizedBox(height: 8),
           TypedFieldWrapper<String>(
             fieldName: 'textField',
-            builder: (context, value, error, hasError, updateValue) {
+            builder: (context, value, error, hasError, isValidating, updateValue) {
               return TextFormField(
                 initialValue: value,
                 onChanged: updateValue,
@@ -155,7 +155,7 @@ class WidgetShowcaseView extends StatelessWidget {
           const SizedBox(height: 8),
           TypedFieldWrapper<double>(
             fieldName: 'numberField',
-            builder: (context, value, error, hasError, updateValue) {
+            builder: (context, value, error, hasError, isValidating, updateValue) {
               return TextFormField(
                 initialValue: value?.toString() ?? '0',
                 onChanged: (text) {
@@ -184,7 +184,7 @@ class WidgetShowcaseView extends StatelessWidget {
           const SizedBox(height: 8),
           TypedFieldWrapper<String>(
             fieldName: 'emailField',
-            builder: (context, value, error, hasError, updateValue) {
+            builder: (context, value, error, hasError, isValidating, updateValue) {
               return TextFormField(
                 initialValue: value,
                 onChanged: updateValue,
@@ -210,7 +210,7 @@ class WidgetShowcaseView extends StatelessWidget {
           const SizedBox(height: 8),
           TypedFieldWrapper<String>(
             fieldName: 'passwordField',
-            builder: (context, value, error, hasError, updateValue) {
+            builder: (context, value, error, hasError, isValidating, updateValue) {
               return TextFormField(
                 initialValue: value,
                 onChanged: updateValue,
@@ -236,7 +236,7 @@ class WidgetShowcaseView extends StatelessWidget {
           const SizedBox(height: 8),
           TypedFieldWrapper<String>(
             fieldName: 'phoneField',
-            builder: (context, value, error, hasError, updateValue) {
+            builder: (context, value, error, hasError, isValidating, updateValue) {
               return TextFormField(
                 initialValue: value,
                 onChanged: updateValue,
@@ -262,7 +262,7 @@ class WidgetShowcaseView extends StatelessWidget {
           const SizedBox(height: 8),
           TypedFieldWrapper<bool>(
             fieldName: 'checkboxField',
-            builder: (context, value, error, hasError, updateValue) {
+            builder: (context, value, error, hasError, isValidating, updateValue) {
               return CheckboxListTile(
                 title: const Text('I agree to the terms'),
                 subtitle: Text(
@@ -284,7 +284,7 @@ class WidgetShowcaseView extends StatelessWidget {
           const SizedBox(height: 8),
           TypedFieldWrapper<String>(
             fieldName: 'dropdownField',
-            builder: (context, value, error, hasError, updateValue) {
+            builder: (context, value, error, hasError, isValidating, updateValue) {
               return DropdownButtonFormField<String>(
                 initialValue: (value == null || value.isEmpty) ? null : value,
                 decoration: InputDecoration(

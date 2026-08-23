@@ -67,6 +67,8 @@ void main() {
         expect(state.isValid, isFalse);
         expect(state.validationStrategy, ValidationStrategy.allFieldsRealTime);
         expect(state.fieldTypes, {'email': String, 'age': int, 'name': String});
+        expect(state.validatingFields, isEmpty);
+        expect(state.isValidating, isFalse);
       });
 
       test('should use default validation type when not provided', () {
@@ -94,6 +96,8 @@ void main() {
         expect(
             initialState.validationStrategy, ValidationStrategy.realTimeOnly);
         expect(initialState.fieldTypes, isEmpty);
+        expect(initialState.validatingFields, isEmpty);
+        expect(initialState.isValidating, isFalse);
       });
     });
 
@@ -226,6 +230,16 @@ void main() {
         ); // copyWith replaces the entire fieldTypes map
         expect(newState.values, state.values); // Should remain unchanged
       });
+
+      test('should create new state with updated validating fields', () {
+        final newState = state.copyWith(
+          validatingFields: {'email'},
+        );
+
+        expect(newState.validatingFields, {'email'});
+        expect(newState.isValidating, isTrue);
+        expect(newState.values, state.values); // Should remain unchanged
+      });
     });
 
     group('equality', () {
@@ -236,24 +250,27 @@ void main() {
           isValid: state.isValid,
           validationStrategy: state.validationStrategy,
           fieldTypes: state.fieldTypes,
+          validatingFields: state.validatingFields,
         );
 
         expect(state, equals(identicalState));
         expect(state.hashCode, equals(identicalState.hashCode));
       });
 
-      test('should compare map collections deeply', () {
+      test('should compare map and set collections deeply', () {
         final state1 = TypedFormState(
           values: Map<String, Object?>.from({'a': 1, 'b': 'two'}),
           errors: Map<String, String>.from({'a': 'err1'}),
           isValid: true,
           fieldTypes: Map<String, Type>.from({'a': int, 'b': String}),
+          validatingFields: Set<String>.from({'a'}),
         );
         final state2 = TypedFormState(
           values: {'a': 1, 'b': 'two'},
           errors: {'a': 'err1'},
           isValid: true,
           fieldTypes: {'a': int, 'b': String},
+          validatingFields: {'a'},
         );
 
         expect(state1, equals(state2));
@@ -262,8 +279,10 @@ void main() {
 
       test('should not be equal to different state', () {
         final differentState = state.copyWith(isValid: true);
+        final differentValidating = state.copyWith(validatingFields: {'email'});
 
         expect(state, isNot(equals(differentState)));
+        expect(state, isNot(equals(differentValidating)));
       });
     });
 
@@ -276,6 +295,7 @@ void main() {
         expect(stringRepresentation, contains('false'));
         expect(stringRepresentation,
             contains('ValidationStrategy.allFieldsRealTime'));
+        expect(stringRepresentation, contains('validatingFields: {}'));
       });
     });
   });

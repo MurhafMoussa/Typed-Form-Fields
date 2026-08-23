@@ -8,6 +8,7 @@ class TypedFormState {
     required this.isValid,
     this.validationStrategy = ValidationStrategy.realTimeOnly,
     required this.fieldTypes,
+    this.validatingFields = const {},
   });
 
   factory TypedFormState.initial() => const TypedFormState(
@@ -15,6 +16,7 @@ class TypedFormState {
         errors: {},
         isValid: false,
         fieldTypes: {},
+        validatingFields: {},
       );
 
   final Map<String, Object?> values;
@@ -22,6 +24,10 @@ class TypedFormState {
   final bool isValid;
   final ValidationStrategy validationStrategy;
   final Map<String, Type> fieldTypes;
+  final Set<String> validatingFields;
+
+  /// Whether any field in the form is currently undergoing validation
+  bool get isValidating => validatingFields.isNotEmpty;
 
   /// Type-safe getter for field values
   @useResult
@@ -70,6 +76,7 @@ class TypedFormState {
     bool? isValid,
     ValidationStrategy? validationStrategy,
     Map<String, Type>? fieldTypes,
+    Set<String>? validatingFields,
   }) {
     return TypedFormState(
       values: values ?? this.values,
@@ -77,6 +84,7 @@ class TypedFormState {
       isValid: isValid ?? this.isValid,
       validationStrategy: validationStrategy ?? this.validationStrategy,
       fieldTypes: fieldTypes ?? this.fieldTypes,
+      validatingFields: validatingFields ?? this.validatingFields,
     );
   }
 
@@ -88,7 +96,8 @@ class TypedFormState {
         validationStrategy == other.validationStrategy &&
         const MapEquality<String, Object?>().equals(values, other.values) &&
         const MapEquality<String, String>().equals(errors, other.errors) &&
-        const MapEquality<String, Type>().equals(fieldTypes, other.fieldTypes);
+        const MapEquality<String, Type>().equals(fieldTypes, other.fieldTypes) &&
+        const SetEquality<String>().equals(validatingFields, other.validatingFields);
   }
 
   @override
@@ -99,11 +108,12 @@ class TypedFormState {
       const MapEquality<String, Object?>().hash(values),
       const MapEquality<String, String>().hash(errors),
       const MapEquality<String, Type>().hash(fieldTypes),
+      const SetEquality<String>().hash(validatingFields),
     );
   }
 
   @override
   String toString() {
-    return 'TypedFormState(values: $values, errors: $errors, isValid: $isValid, validationStrategy: $validationStrategy, fieldTypes: $fieldTypes)';
+    return 'TypedFormState(values: $values, errors: $errors, isValid: $isValid, validationStrategy: $validationStrategy, fieldTypes: $fieldTypes, validatingFields: $validatingFields)';
   }
 }

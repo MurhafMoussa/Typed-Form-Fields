@@ -184,7 +184,7 @@ class LoginFormView extends StatelessWidget {
                     );
                   }
                 },
-                builder: (context, value, error, hasError, updateValue) {
+                builder: (context, value, error, hasError, isValidating, updateValue) {
                   return TextFormField(
                     initialValue: value,
                     onChanged: updateValue,
@@ -206,7 +206,7 @@ class LoginFormView extends StatelessWidget {
               TypedFieldWrapper<String>(
                 fieldName: 'password',
                 debounceTime: const Duration(milliseconds: 300),
-                builder: (context, value, error, hasError, updateValue) {
+                builder: (context, value, error, hasError, isValidating, updateValue) {
                   return TextFormField(
                     initialValue: value,
                     onChanged: updateValue,
@@ -227,7 +227,7 @@ class LoginFormView extends StatelessWidget {
               // Remember Me with TypedFieldWrapper
               TypedFieldWrapper<bool>(
                 fieldName: 'rememberMe',
-                builder: (context, value, error, hasError, updateValue) {
+                builder: (context, value, error, hasError, isValidating, updateValue) {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [

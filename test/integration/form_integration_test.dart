@@ -75,7 +75,7 @@ void main() {
                   // First Name Field
                   TypedFieldWrapper<String>(
                     fieldName: 'firstName',
-                    builder: (context, value, error, hasError, updateValue) =>
+                    builder: (context, value, error, hasError, isValidating, updateValue) =>
                         TextFormField(
                       initialValue: value ?? '',
                       onChanged: updateValue,
@@ -89,7 +89,7 @@ void main() {
                   // Last Name Field
                   TypedFieldWrapper<String>(
                     fieldName: 'lastName',
-                    builder: (context, value, error, hasError, updateValue) =>
+                    builder: (context, value, error, hasError, isValidating, updateValue) =>
                         TextFormField(
                       initialValue: value ?? '',
                       onChanged: (value) => updateValue(value),
@@ -103,7 +103,7 @@ void main() {
                   // Email Field
                   TypedFieldWrapper<String>(
                     fieldName: 'email',
-                    builder: (context, value, error, hasError, updateValue) =>
+                    builder: (context, value, error, hasError, isValidating, updateValue) =>
                         TextFormField(
                       initialValue: value ?? '',
                       onChanged: (value) => updateValue(value),
@@ -117,7 +117,7 @@ void main() {
                   // Password Field
                   TypedFieldWrapper<String>(
                     fieldName: 'password',
-                    builder: (context, value, error, hasError, updateValue) =>
+                    builder: (context, value, error, hasError, isValidating, updateValue) =>
                         TextFormField(
                       initialValue: value ?? '',
                       obscureText: true,
@@ -132,7 +132,7 @@ void main() {
                   // Confirm Password Field
                   TypedFieldWrapper<String>(
                     fieldName: 'confirmPassword',
-                    builder: (context, value, error, hasError, updateValue) =>
+                    builder: (context, value, error, hasError, isValidating, updateValue) =>
                         TextFormField(
                       initialValue: value ?? '',
                       obscureText: true,
@@ -147,7 +147,7 @@ void main() {
                   // Terms Checkbox
                   TypedFieldWrapper<bool>(
                     fieldName: 'acceptTerms',
-                    builder: (context, value, error, hasError, updateValue) =>
+                    builder: (context, value, error, hasError, isValidating, updateValue) =>
                         CheckboxListTile(
                       title: const Text('I accept the terms and conditions'),
                       value: value ?? false,
@@ -251,7 +251,7 @@ void main() {
                 children: [
                   TypedFieldWrapper<String>(
                     fieldName: 'email',
-                    builder: (context, value, error, hasError, updateValue) =>
+                    builder: (context, value, error, hasError, isValidating, updateValue) =>
                         TextFormField(
                       initialValue: value ?? '',
                       onChanged: (value) => updateValue(value),
@@ -263,7 +263,7 @@ void main() {
                   ),
                   TypedFieldWrapper<String>(
                     fieldName: 'password',
-                    builder: (context, value, error, hasError, updateValue) =>
+                    builder: (context, value, error, hasError, isValidating, updateValue) =>
                         TextFormField(
                       initialValue: value ?? '',
                       onChanged: (value) => updateValue(value),
@@ -350,7 +350,7 @@ void main() {
                 children: [
                   TypedFieldWrapper<String>(
                     fieldName: 'name',
-                    builder: (context, value, error, hasError, updateValue) =>
+                    builder: (context, value, error, hasError, isValidating, updateValue) =>
                         TextFormField(
                       initialValue: value ?? '',
                       onChanged: (value) => updateValue(value),
@@ -362,7 +362,7 @@ void main() {
                   ),
                   TypedFieldWrapper<String>(
                     fieldName: 'email',
-                    builder: (context, value, error, hasError, updateValue) =>
+                    builder: (context, value, error, hasError, isValidating, updateValue) =>
                         TextFormField(
                       initialValue: value ?? '',
                       onChanged: (value) => updateValue(value),
@@ -424,7 +424,7 @@ void main() {
                 children: [
                   TypedFieldWrapper<String>(
                     fieldName: 'email',
-                    builder: (context, value, error, hasError, updateValue) =>
+                    builder: (context, value, error, hasError, isValidating, updateValue) =>
                         TextFormField(
                       initialValue: value ?? '',
                       onChanged: (value) => updateValue(value),
@@ -489,7 +489,7 @@ class DynamicFormTestWidgetState extends State<DynamicFormTestWidget> {
         children: [
           TypedFieldWrapper<String>(
             fieldName: 'name',
-            builder: (context, value, error, hasError, updateValue) =>
+            builder: (context, value, error, hasError, isValidating, updateValue) =>
                 TextFormField(
               initialValue: value ?? '',
               onChanged: updateValue,
@@ -502,7 +502,7 @@ class DynamicFormTestWidgetState extends State<DynamicFormTestWidget> {
           if (_showEmailField)
             TypedFieldWrapper<String>(
               fieldName: 'email',
-              builder: (context, value, error, hasError, updateValue) =>
+              builder: (context, value, error, hasError, isValidating, updateValue) =>
                   TextFormField(
                 initialValue: value ?? '',
                 onChanged: updateValue,
