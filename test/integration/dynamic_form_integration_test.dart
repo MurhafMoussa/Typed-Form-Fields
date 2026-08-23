@@ -88,6 +88,51 @@ void main() {
       expect(find.byType(TextFormField), findsAtLeastNWidgets(1));
     });
 
+    testWidgets('should not display validation errors for untouched or newly added fields until interaction or submit', (tester) async {
+      tester.view.physicalSize = const Size(1280, 1200);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      await tester.pumpWidget(buildTestableWidget(const DynamicFormScreen()));
+      await tester.pumpAndSettle();
+
+      // Initial template fields exist but are untouched -> no validation errors visible
+      expect(find.text('This field is required'), findsNothing);
+      expect(find.text('Please enter a valid email address.'), findsNothing);
+
+      // Add dynamic email field
+      final addEmailButton = find.byKey(const Key('btn_add_email_field'));
+      await tester.ensureVisible(addEmailButton);
+      await tester.tap(addEmailButton);
+      await tester.pumpAndSettle();
+
+      // Newly added email field remains untouched and error-free
+      expect(find.text('Please enter a valid email address.'), findsNothing);
+
+      // Interact with first text field with invalid text
+      final textInput = find.byKey(const Key('dynamic_input_text_1'));
+      await tester.enterText(textInput, 'a'); // min length is 2
+      await tester.pumpAndSettle();
+
+      // Interacted text field shows validation error
+      expect(find.text('Must be at least 2 characters long.'), findsOneWidget);
+
+      // Uninteracted fields still show no validation errors
+      expect(find.text('Please enter a valid email address.'), findsNothing);
+
+      // Tap submit button -> form validation triggers on all fields
+      final submitButton = find.byKey(const Key('btn_submit_dynamic_form'));
+      await tester.ensureVisible(submitButton);
+      await tester.tap(submitButton);
+      await tester.pumpAndSettle();
+
+      // Now untouched empty fields show validation errors
+      expect(find.text('This field is required.'), findsAtLeastNWidgets(1));
+    });
+
     testWidgets('should verify RTL layout rendering for Arabic locale', (tester) async {
       tester.view.physicalSize = const Size(1280, 1000);
       tester.view.devicePixelRatio = 1.0;

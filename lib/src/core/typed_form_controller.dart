@@ -97,6 +97,7 @@ class TypedFormController extends Cubit<TypedFormState> {
     required String fieldName,
     T? value,
     required BuildContext context,
+    bool touched = true,
   }) {
     final newState = _orchestrator.updateField<T>(
       fieldName: fieldName,
@@ -105,6 +106,7 @@ class TypedFormController extends Cubit<TypedFormState> {
       state: state,
       getState: () => state,
       emitState: _emitIfChanged,
+      touched: touched,
     );
     _emitIfChanged(newState);
   }

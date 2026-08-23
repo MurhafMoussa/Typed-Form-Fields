@@ -1,7 +1,9 @@
 // ignore_for_file: avoid_relative_lib_imports
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:typed_form_fields/typed_form_fields.dart';
 import '../../lib/src/docs/doc_search_overlay.dart';
@@ -201,21 +203,48 @@ More text.
   });
 
   group('DocViewerWidget Asset Integration Tests', () {
-    testWidgets('loads and renders Getting Started document', (tester) async {
-      await tester.pumpWidget(_wrapWithApp(
-        DocViewerWidget(
-          docRoute: AppRoutes.docsGettingStarted,
-          locale: const Locale('en'),
-          onNavigate: (_) {},
-        ),
-      ));
+    test('loads all 6 English documentation markdown files from rootBundle', () async {
+      final guideFiles = [
+        'getting_started.md',
+        'core_concepts.md',
+        'validation_strategies.md',
+        'async_validation.md',
+        'field_grouping.md',
+        'dynamic_form_management.md',
+      ];
 
-      // Wait for asset loading
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 300));
+      for (final fileName in guideFiles) {
+        final content = await rootBundle.loadString('assets/docs/en/$fileName');
+        expect(content, isNotEmpty, reason: '$fileName should not be empty');
+        expect(content, contains('<live-demo'), reason: '$fileName should contain live-demo tag');
+      }
+    });
 
-      expect(find.byType(DocViewerWidget), findsOneWidget);
-      expect(find.textContaining('Getting Started'), findsWidgets);
+    testWidgets('loads and renders all 6 documentation guide routes', (tester) async {
+      final routes = [
+        AppRoutes.docsGettingStarted,
+        AppRoutes.docsCoreConcepts,
+        AppRoutes.docsValidationStrategies,
+        AppRoutes.docsAsyncValidation,
+        AppRoutes.docsFieldGrouping,
+        AppRoutes.docsDynamicFormManagement,
+      ];
+
+      for (final route in routes) {
+        await tester.pumpWidget(_wrapWithApp(
+          DocViewerWidget(
+            docRoute: route,
+            locale: const Locale('en'),
+            onNavigate: (_) {},
+          ),
+        ));
+
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 300));
+
+        expect(find.byType(DocViewerWidget), findsOneWidget);
+        expect(find.textContaining('Failed to load document'), findsNothing);
+      }
     });
 
     testWidgets('handles locale fallback to English when localized asset missing', (tester) async {
@@ -231,6 +260,40 @@ More text.
       await tester.pump(const Duration(milliseconds: 300));
 
       expect(find.byType(DocViewerWidget), findsOneWidget);
+    });
+  });
+
+  group('ShadcnCodeBlockBuilder Tests', () {
+    testWidgets('renders copy code button and copies code to clipboard on tap', (tester) async {
+      const markdownData = '''
+```dart
+void main() {
+  print("Hello World");
+}
+```
+''';
+
+      await tester.pumpWidget(_wrapWithApp(
+        Builder(
+          builder: (context) {
+            return MarkdownBody(
+              data: markdownData,
+              builders: {
+                'code': ShadcnCodeBlockBuilder(context),
+              },
+            );
+          },
+        ),
+      ));
+      await tester.pumpAndSettle();
+
+      final copyButton = find.byKey(const Key('copy_code_button')).first;
+      expect(copyButton, findsOneWidget);
+
+      await tester.tap(copyButton);
+      await tester.pump();
+
+      expect(find.text('Code copied to clipboard!'), findsOneWidget);
     });
   });
 }

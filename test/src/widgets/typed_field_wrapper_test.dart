@@ -66,6 +66,43 @@ void main() {
         expect(formCubit.state.values['email'], equals('test@example.com'));
       });
 
+      testWidgets(
+          'should preserve untouched status (isTouched == false) on initial value registration',
+          (tester) async {
+        await tester.pumpWidget(
+          createTestWidget(
+            TypedFieldWrapper<String>(
+              fieldName: 'email',
+              initialValue: 'test@example.com',
+              builder: (context, field) {
+                return TextFormField(
+                  key: const Key('email_field'),
+                  initialValue: field.value,
+                  onChanged: field.updateValue,
+                  decoration: InputDecoration(
+                    labelText: 'Email',
+                    errorText: field.displayError,
+                  ),
+                );
+              },
+            ),
+          ),
+        );
+
+        await tester.pump();
+
+        // Initial field value registration preserves untouched status
+        expect(formCubit.state.values['email'], equals('test@example.com'));
+        expect(formCubit.isTouched('email'), isFalse);
+
+        // User interaction marks field as touched
+        await tester.enterText(
+            find.byKey(const Key('email_field')), 'updated@example.com');
+        await tester.pump();
+
+        expect(formCubit.isTouched('email'), isTrue);
+      });
+
       testWidgets('should update value when user input changes',
           (tester) async {
         await tester.pumpWidget(

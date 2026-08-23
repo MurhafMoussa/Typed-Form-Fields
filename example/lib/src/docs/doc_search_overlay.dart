@@ -80,11 +80,11 @@ const List<SearchManifestEntry> searchManifestEntries = [
     keywords: ['grouping', 'fieldGroup', 'partial', 'wizard', 'step'],
   ),
   SearchManifestEntry(
-    title: 'Custom Widgets & Dynamic Forms',
-    subtitle: 'Using FieldWrapper and dynamic field array manipulation',
-    route: AppRoutes.docsCustomWidgets,
+    title: 'Dynamic Form Management',
+    subtitle: 'Runtime form modification APIs and dynamic field array manipulation',
+    route: AppRoutes.docsDynamicFormManagement,
     category: 'Documentation',
-    keywords: ['custom', 'wrapper', 'FieldWrapper', 'dynamic', 'array'],
+    keywords: ['dynamic', 'management', 'addField', 'removeField', 'runtime'],
   ),
 ];
 

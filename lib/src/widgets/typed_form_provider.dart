@@ -236,11 +236,16 @@ extension TypedFormProviderExtension on BuildContext {
       TypedFormProvider.of(this).getValue<T>(fieldName);
 
   /// Updates a form field value.
-  void updateFormField<T>(String fieldName, T? value) {
+  void updateFormField<T>(
+    String fieldName,
+    T? value, {
+    bool touched = true,
+  }) {
     TypedFormProvider.of(this).updateField(
       fieldName: fieldName,
       value: value,
       context: this,
+      touched: touched,
     );
   }
 

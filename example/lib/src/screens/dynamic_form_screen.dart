@@ -23,6 +23,7 @@ class _DynamicFormScreenState extends State<DynamicFormScreen> {
   late final TypedFormController _controller;
   final List<FormFieldDefinition> _orderedFields = [];
   int _counter = 0;
+  bool _submitted = false;
 
   @override
   void initState() {
@@ -144,6 +145,39 @@ class _DynamicFormScreenState extends State<DynamicFormScreen> {
     });
   }
 
+  void _submitForm(BuildContext context) {
+    setState(() {
+      _submitted = true;
+    });
+    _controller.validateForm(
+      context,
+      onValidationPass: () {
+        showDialog(
+          context: context,
+          builder: (dlgCtx) => AlertDialog(
+            title: const Text('Form Data'),
+            content: Text('Active values:\n${_controller.state.values}'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(dlgCtx).pop(),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+      },
+      onValidationFail: () {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Form has validation errors. Please fix them.'),
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 2),
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildFieldItem(
     BuildContext context,
     FormFieldDefinition fieldDef,
@@ -160,6 +194,8 @@ class _DynamicFormScreenState extends State<DynamicFormScreen> {
       inputWidget = TypedFieldWrapper<bool>(
         fieldName: fieldName,
         builder: (context, field) {
+          final isTouched = _controller.isTouched(fieldName);
+          final showFieldError = isTouched || _submitted;
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -170,7 +206,7 @@ class _DynamicFormScreenState extends State<DynamicFormScreen> {
                 onChanged: field.updateValue,
                 contentPadding: EdgeInsets.zero,
               ),
-              if (field.hasError)
+              if (showFieldError && field.hasError)
                 Padding(
                   padding: const EdgeInsets.only(left: 12),
                   child: Text(
@@ -186,6 +222,8 @@ class _DynamicFormScreenState extends State<DynamicFormScreen> {
       inputWidget = TypedFieldWrapper<double>(
         fieldName: fieldName,
         builder: (context, field) {
+          final isTouched = _controller.isTouched(fieldName);
+          final showFieldError = isTouched || _submitted;
           return TextFormField(
             key: Key('dynamic_input_$fieldName'),
             initialValue: field.value?.toString() ?? '',
@@ -197,7 +235,7 @@ class _DynamicFormScreenState extends State<DynamicFormScreen> {
               labelText: 'Number Input (#${index + 1})',
               hintText: 'Enter positive number',
               prefixIcon: const Icon(Icons.numbers),
-              errorText: field.displayError,
+              errorText: showFieldError ? field.displayError : null,
             ),
             keyboardType: TextInputType.number,
           );
@@ -207,6 +245,8 @@ class _DynamicFormScreenState extends State<DynamicFormScreen> {
       inputWidget = TypedFieldWrapper<String>(
         fieldName: fieldName,
         builder: (context, field) {
+          final isTouched = _controller.isTouched(fieldName);
+          final showFieldError = isTouched || _submitted;
           return TextFormField(
             key: Key('dynamic_input_$fieldName'),
             initialValue: field.value,
@@ -215,7 +255,7 @@ class _DynamicFormScreenState extends State<DynamicFormScreen> {
               labelText: 'Email Field (#${index + 1})',
               hintText: 'Enter valid email',
               prefixIcon: const Icon(Icons.email_outlined),
-              errorText: field.displayError,
+              errorText: showFieldError ? field.displayError : null,
             ),
             keyboardType: TextInputType.emailAddress,
           );
@@ -225,6 +265,8 @@ class _DynamicFormScreenState extends State<DynamicFormScreen> {
       inputWidget = TypedFieldWrapper<String>(
         fieldName: fieldName,
         builder: (context, field) {
+          final isTouched = _controller.isTouched(fieldName);
+          final showFieldError = isTouched || _submitted;
           return TextFormField(
             key: Key('dynamic_input_$fieldName'),
             initialValue: field.value,
@@ -233,7 +275,7 @@ class _DynamicFormScreenState extends State<DynamicFormScreen> {
               labelText: 'Text Field (#${index + 1})',
               hintText: 'Enter text value',
               prefixIcon: const Icon(Icons.title),
-              errorText: field.displayError,
+              errorText: showFieldError ? field.displayError : null,
             ),
           );
         },
@@ -416,32 +458,15 @@ class _DynamicFormScreenState extends State<DynamicFormScreen> {
                     BlocBuilder<TypedFormController, TypedFormState>(
                       bloc: _controller,
                       builder: (context, state) {
+                        final hasFields = _orderedFields.isNotEmpty;
                         return ElevatedButton.icon(
                           key: const Key('btn_submit_dynamic_form'),
-                          onPressed: (state.isValid && _orderedFields.isNotEmpty)
-                              ? () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (dlgCtx) => AlertDialog(
-                                      title: const Text('Form Data'),
-                                      content: Text('Active values:\n${state.values}'),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () => Navigator.of(dlgCtx).pop(),
-                                          child: const Text('OK'),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                }
-                              : null,
+                          onPressed: hasFields ? () => _submitForm(ctx) : null,
                           icon: const Icon(Icons.check_circle_outline),
                           label: Text(
-                            _orderedFields.isEmpty
+                            !hasFields
                                 ? 'Add fields to submit'
-                                : state.isValid
-                                    ? 'Submit Dynamic Form'
-                                    : 'Fix validation errors',
+                                : 'Submit Dynamic Form',
                           ),
                         );
                       },

@@ -239,8 +239,8 @@ class _DocViewerWidgetState extends State<DocViewerWidget> {
         return 'async_validation.md';
       case AppRoutes.docsFieldGrouping:
         return 'field_grouping.md';
-      case AppRoutes.docsCustomWidgets:
-        return 'custom_widgets.md';
+      case AppRoutes.docsDynamicFormManagement:
+        return 'dynamic_form_management.md';
       default:
         return 'getting_started.md';
     }

@@ -42,9 +42,9 @@ const List<DocSectionItem> docGuideSections = [
     icon: Icons.grid_view,
   ),
   DocSectionItem(
-    route: AppRoutes.docsCustomWidgets,
-    title: 'Custom Widgets',
-    icon: Icons.extension_outlined,
+    route: AppRoutes.docsDynamicFormManagement,
+    title: 'Dynamic Form Management',
+    icon: Icons.dynamic_form_outlined,
   ),
 ];
 

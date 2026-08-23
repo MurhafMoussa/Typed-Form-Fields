@@ -18,10 +18,10 @@ Remove obsolete Widget Gallery code, routes, and test dependencies across the ap
 - `example/test/docs/doc_viewer_test.dart`
 
 ## Acceptance criteria
-- [ ] `widget_gallery_screen.dart` and `widget_gallery_integration_test.dart` are deleted.
-- [ ] `AppRoutes.widgetGallery` and `/widget-gallery` route/nav items are removed from `app_routes.dart`, `app_shell.dart`, and `main.dart`.
-- [ ] `EmbeddedLiveDemo`, `example_app_integration_test.dart`, and `doc_viewer_test.dart` compile and run cleanly without references to `WidgetGalleryScreen` or `nav_widget_gallery`.
-- [ ] `flutter analyze` passes with zero warnings or errors.
+- [x] `widget_gallery_screen.dart` and `widget_gallery_integration_test.dart` are deleted.
+- [x] `AppRoutes.widgetGallery` and `/widget-gallery` route/nav items are removed from `app_routes.dart`, `app_shell.dart`, and `main.dart`.
+- [x] `EmbeddedLiveDemo`, `example_app_integration_test.dart`, and `doc_viewer_test.dart` compile and run cleanly without references to `WidgetGalleryScreen` or `nav_widget_gallery`.
+- [x] `flutter analyze` passes with zero warnings or errors.
 
 ## Covers
 - User Stories: 5

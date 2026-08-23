@@ -102,10 +102,12 @@ class _TypedFieldWrapperState<T> extends State<TypedFieldWrapper<T>> {
     super.initState();
     _currentValue = widget.initialValue;
 
-    // Update form state with initial value if provided
+    // Update form state with initial value if provided while preserving untouched state
     if (_currentValue != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        _updateFormState(_currentValue);
+        if (mounted) {
+          _updateFormState(_currentValue, touched: false);
+        }
       });
     }
   }
@@ -128,14 +130,14 @@ class _TypedFieldWrapperState<T> extends State<TypedFieldWrapper<T>> {
     if (widget.debounceTime != null) {
       _debounceTimer?.cancel();
       _debounceTimer = Timer(widget.debounceTime!, () {
-        _updateFormState(value);
+        _updateFormState(value, touched: true);
       });
     } else {
-      _updateFormState(value);
+      _updateFormState(value, touched: true);
     }
   }
 
-  void _updateFormState(T? value) {
+  void _updateFormState(T? value, {bool touched = true}) {
     final transformedValue = value != null && widget.transformValue != null
         ? widget.transformValue!(value)
         : value;
@@ -144,6 +146,7 @@ class _TypedFieldWrapperState<T> extends State<TypedFieldWrapper<T>> {
       fieldName: widget.fieldName,
       value: transformedValue,
       context: context,
+      touched: touched,
     );
   }
 

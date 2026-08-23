@@ -21,11 +21,11 @@ Expand and refine the Documentation Hub into 6 comprehensive English guides (`as
 - `example/test/docs/doc_viewer_test.dart`
 
 ## Acceptance criteria
-- [ ] 6 English markdown guides exist under `assets/docs/en/` (`getting_started.md`, `core_concepts.md`, `validation_strategies.md`, `async_validation.md`, `field_grouping.md`, `dynamic_form_management.md`), each containing overview, walkthrough, copyable code block, and `<live-demo>` tag.
-- [ ] `AppRoutes.docsDynamicFormManagement` (`/docs/dynamic-form-management`) replaces `docsCustomWidgets` and correctly loads `dynamic_form_management.md`.
-- [ ] `DocSidebar` displays "Dynamic Form Management" and navigates to `/docs/dynamic-form-management`.
-- [ ] Legacy `custom_widgets.md` asset is deleted.
-- [ ] `doc_viewer_test.dart` includes tests verifying all 6 English doc assets load via `rootBundle` and tests `ShadcnCodeBlockBuilder` code copy button tap.
+- [x] 6 English markdown guides exist under `assets/docs/en/` (`getting_started.md`, `core_concepts.md`, `validation_strategies.md`, `async_validation.md`, `field_grouping.md`, `dynamic_form_management.md`), each containing overview, walkthrough, copyable code block, and `<live-demo>` tag.
+- [x] `AppRoutes.docsDynamicFormManagement` (`/docs/dynamic-form-management`) replaces `docsCustomWidgets` and correctly loads `dynamic_form_management.md`.
+- [x] `DocSidebar` displays "Dynamic Form Management" and navigates to `/docs/dynamic-form-management`.
+- [x] Legacy `custom_widgets.md` asset is deleted.
+- [x] `doc_viewer_test.dart` includes tests verifying all 6 English doc assets load via `rootBundle` and tests `ShadcnCodeBlockBuilder` code copy button tap.
 
 ## Covers
 - User Stories: 1, 2

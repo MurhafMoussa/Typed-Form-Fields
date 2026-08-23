@@ -67,10 +67,6 @@ flutter:
 
   assets:
     - assets/docs/en/
-    - assets/docs/es/
-    - assets/docs/fr/
-    - assets/docs/de/
-    - assets/docs/ar/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

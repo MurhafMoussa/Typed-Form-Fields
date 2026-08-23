@@ -120,6 +120,7 @@ class FormValidationOrchestrator {
     required TypedFormState state,
     required TypedFormState Function() getState,
     required void Function(TypedFormState newState) emitState,
+    bool touched = true,
   }) {
     _registry.checkFieldExists(fieldName, currentValues: state.values);
     _validator.validateValueType(
@@ -129,7 +130,7 @@ class FormValidationOrchestrator {
       operation: 'orchestrateFieldValidation',
     );
 
-    _touchedTracker.markTouched(fieldName);
+    _touchedTracker.markTouched(fieldName, touched);
 
     final newValues = Map<String, Object?>.from(state.values)
       ..[fieldName] = value;
