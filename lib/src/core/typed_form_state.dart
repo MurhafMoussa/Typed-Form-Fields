@@ -1,4 +1,8 @@
-part of 'typed_form_controller.dart';
+import 'package:collection/collection.dart';
+import 'package:meta/meta.dart';
+
+import 'form_errors.dart';
+import 'validation_strategy.dart';
 
 @immutable
 class TypedFormState {

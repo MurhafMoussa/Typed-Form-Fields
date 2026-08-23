@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:typed_form_fields/src/core/form_errors.dart';
 import 'package:typed_form_fields/src/core/typed_form_controller.dart';
+import 'package:typed_form_fields/src/core/typed_form_state.dart';
 import 'package:typed_form_fields/src/core/validation_strategy.dart';
 import 'package:typed_form_fields/src/models/models.dart';
 

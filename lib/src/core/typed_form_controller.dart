@@ -1,9 +1,7 @@
 import 'dart:async';
 
-import 'package:collection/collection.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:meta/meta.dart';
 import 'package:typed_form_fields/src/core/form_validator.dart';
 import 'package:typed_form_fields/src/models/models.dart';
 import 'package:typed_form_fields/src/validators/validator.dart';
@@ -11,9 +9,10 @@ import 'package:typed_form_fields/src/validators/validator.dart';
 import 'form_errors.dart';
 import 'form_field_registry.dart';
 import 'form_touched_tracker.dart';
+import 'typed_form_state.dart';
 import 'validation_strategy.dart';
 
-part 'typed_form_state.dart';
+export 'typed_form_state.dart';
 
 /// Form cubit with type-safe state access
 class TypedFormController extends Cubit<TypedFormState> {
@@ -73,7 +72,8 @@ class TypedFormController extends Cubit<TypedFormState> {
       context: context,
       debounceDelay: customDebounceDelay ?? _asyncDebounceDelay,
       onValidationStart: (fName) {
-        final newValidating = Set<String>.from(state.validatingFields)..add(fName);
+        final newValidating = Set<String>.from(state.validatingFields)
+          ..add(fName);
         _emitIfChanged(
           state.copyWith(
             validatingFields: newValidating,
@@ -82,7 +82,8 @@ class TypedFormController extends Cubit<TypedFormState> {
         );
       },
       onValidationComplete: (fName, error) {
-        final newValidating = Set<String>.from(state.validatingFields)..remove(fName);
+        final newValidating = Set<String>.from(state.validatingFields)
+          ..remove(fName);
         final newErrors = Map<String, String>.from(state.errors);
         if (error != null) {
           newErrors[fName] = error;
@@ -129,7 +130,8 @@ class TypedFormController extends Cubit<TypedFormState> {
 
     _touchedTracker.markTouched(fieldName);
 
-    final newValues = Map<String, Object?>.from(state.values)..[fieldName] = value;
+    final newValues = Map<String, Object?>.from(state.values)
+      ..[fieldName] = value;
     final newErrors = Map<String, String>.from(state.errors);
     final newValidatingFields = Set<String>.from(state.validatingFields);
 
@@ -241,14 +243,17 @@ class TypedFormController extends Cubit<TypedFormState> {
 
     _touchedTracker.markTouched(fieldName);
 
-    final newValues = Map<String, Object?>.from(state.values)..[fieldName] = value;
+    final newValues = Map<String, Object?>.from(state.values)
+      ..[fieldName] = value;
 
     switch (state.validationStrategy) {
       case ValidationStrategy.onSubmitOnly:
       case ValidationStrategy.onSubmitThenRealTime:
         _validator.cancelAsyncValidation(fieldName);
-        final newValidating = Set<String>.from(state.validatingFields)..remove(fieldName);
-        _emitIfChanged(state.copyWith(values: newValues, validatingFields: newValidating));
+        final newValidating = Set<String>.from(state.validatingFields)
+          ..remove(fieldName);
+        _emitIfChanged(
+            state.copyWith(values: newValues, validatingFields: newValidating));
         break;
 
       case ValidationStrategy.allFieldsRealTime:
@@ -259,7 +264,8 @@ class TypedFormController extends Cubit<TypedFormState> {
           onValidationComplete: (errors) {
             if (errors.containsKey(fieldName)) {
               _validator.cancelAsyncValidation(fieldName);
-              final newValidating = Set<String>.from(state.validatingFields)..remove(fieldName);
+              final newValidating = Set<String>.from(state.validatingFields)
+                ..remove(fieldName);
               final overallValid = _validator.computeOverallValidityWithErrors(
                 values: newValues,
                 errors: errors,
@@ -287,8 +293,10 @@ class TypedFormController extends Cubit<TypedFormState> {
                 );
               } else {
                 _validator.cancelAsyncValidation(fieldName);
-                final newValidating = Set<String>.from(state.validatingFields)..remove(fieldName);
-                final overallValid = _validator.computeOverallValidityWithErrors(
+                final newValidating = Set<String>.from(state.validatingFields)
+                  ..remove(fieldName);
+                final overallValid =
+                    _validator.computeOverallValidityWithErrors(
                   values: newValues,
                   errors: errors,
                   touchedFields: _touchedTracker.touchedFields,
@@ -321,7 +329,8 @@ class TypedFormController extends Cubit<TypedFormState> {
             if (error != null) {
               newErrors[fieldName] = error;
               _validator.cancelAsyncValidation(fieldName);
-              final newValidating = Set<String>.from(state.validatingFields)..remove(fieldName);
+              final newValidating = Set<String>.from(state.validatingFields)
+                ..remove(fieldName);
               final overallValid = _validator.computeOverallValidityWithErrors(
                 values: newValues,
                 errors: newErrors,
@@ -350,8 +359,10 @@ class TypedFormController extends Cubit<TypedFormState> {
                 );
               } else {
                 _validator.cancelAsyncValidation(fieldName);
-                final newValidating = Set<String>.from(state.validatingFields)..remove(fieldName);
-                final overallValid = _validator.computeOverallValidityWithErrors(
+                final newValidating = Set<String>.from(state.validatingFields)
+                  ..remove(fieldName);
+                final overallValid =
+                    _validator.computeOverallValidityWithErrors(
                   values: newValues,
                   errors: newErrors,
                   touchedFields: _touchedTracker.touchedFields,
@@ -623,7 +634,8 @@ class TypedFormController extends Cubit<TypedFormState> {
       ),
     );
 
-    final hasGroupErrors = groupFields.any((f) => newErrors.containsKey(f.name));
+    final hasGroupErrors =
+        groupFields.any((f) => newErrors.containsKey(f.name));
     if (hasGroupErrors) {
       onValidationFail?.call();
       if (state.validationStrategy == ValidationStrategy.onSubmitThenRealTime) {
@@ -823,7 +835,8 @@ class TypedFormController extends Cubit<TypedFormState> {
     final shouldValidate = strategy.shouldValidateOnSubmission();
 
     if (shouldValidate) {
-      final shouldSwitch = strategy.hasValidationErrorsFromEmptyValues(state.values);
+      final shouldSwitch =
+          strategy.hasValidationErrorsFromEmptyValues(state.values);
 
       _touchedTracker.markAllTouched();
 
@@ -858,14 +871,16 @@ class TypedFormController extends Cubit<TypedFormState> {
       if (_validator.hasActiveOrPendingAsyncValidations || hasAsyncToRun) {
         return () async {
           await _validator.flushAndAwaitAsyncValidations();
-          _finishValidation(
-            context: context,
-            strategy: strategy,
-            syncErrors: newErrors,
-            shouldSwitch: shouldSwitch,
-            onValidationPass: onValidationPass,
-            onValidationFail: onValidationFail,
-          );
+          if (context.mounted) {
+            _finishValidation(
+              context: context,
+              strategy: strategy,
+              syncErrors: newErrors,
+              shouldSwitch: shouldSwitch,
+              onValidationPass: onValidationPass,
+              onValidationFail: onValidationFail,
+            );
+          }
         }();
       } else {
         _finishValidation(
@@ -1188,9 +1203,12 @@ class TypedFormController extends Cubit<TypedFormState> {
     _touchedTracker.remove(fieldName);
     _validator.cancelAsyncValidation(fieldName);
 
-    final newValues = Map<String, Object?>.from(state.values)..remove(fieldName);
-    final newFieldTypes = Map<String, Type>.from(state.fieldTypes)..remove(fieldName);
-    final newValidatingFields = Set<String>.from(state.validatingFields)..remove(fieldName);
+    final newValues = Map<String, Object?>.from(state.values)
+      ..remove(fieldName);
+    final newFieldTypes = Map<String, Type>.from(state.fieldTypes)
+      ..remove(fieldName);
+    final newValidatingFields = Set<String>.from(state.validatingFields)
+      ..remove(fieldName);
 
     final validatedErrors = _validator.validateFields(
       values: newValues,

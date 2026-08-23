@@ -6,6 +6,9 @@ import 'package:typed_form_fields/typed_form_fields.dart';
 
 class MockBuildContext extends BuildContext {
   @override
+  bool get mounted => true;
+
+  @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 

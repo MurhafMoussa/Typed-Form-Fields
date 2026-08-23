@@ -9,6 +9,7 @@ library;
 export 'src/core/form_errors.dart';
 export 'src/core/form_validator.dart';
 export 'src/core/typed_form_controller.dart';
+export 'src/core/typed_form_state.dart';
 export 'src/core/validation_strategy.dart';
 // Models exports
 export 'src/models/form_field_definition.dart';
