@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:typed_form_fields/src/core/form_field_registry.dart';
 import 'package:typed_form_fields/src/core/form_touched_tracker.dart';
 import 'package:typed_form_fields/src/core/form_validator.dart';
 import 'package:typed_form_fields/src/core/typed_form_state.dart';
 import 'package:typed_form_fields/src/core/validation_strategy.dart';
+import 'package:typed_form_fields/src/models/models.dart';
 import 'package:typed_form_fields/src/validators/validator.dart';
 
 /// Package-private orchestrator for form validation strategies and group/subset evaluations.
@@ -788,6 +791,469 @@ class FormValidationOrchestrator {
     return state.copyWith(
       errors: newErrors,
       isValid: isValid,
+    );
+  }
+
+  /// Validates the entire form according to the current strategy.
+  FutureOr<void> validateForm({
+    required BuildContext context,
+    required TypedFormState state,
+    required TypedFormState Function() getState,
+    required void Function(TypedFormState newState) emitState,
+    required VoidCallback onValidationPass,
+    VoidCallback? onValidationFail,
+  }) {
+    final strategy = state.validationStrategy;
+    final shouldValidate = strategy.shouldValidateOnSubmission();
+
+    if (shouldValidate) {
+      final shouldSwitch =
+          strategy.hasValidationErrorsFromEmptyValues(state.values);
+
+      _touchedTracker.markAllTouched();
+
+      final newErrors = _validator.validateFields(
+        values: state.values,
+        validators: _registry.validators,
+        context: context,
+      );
+
+      bool hasAsyncToRun = false;
+      for (final field in _registry.fields) {
+        if (newErrors.containsKey(field.name)) {
+          _validator.cancelAsyncValidation(field.name);
+        } else {
+          final asyncVals = _registry.getAsyncValidators(field.name);
+          if (asyncVals != null && asyncVals.isNotEmpty) {
+            if (!_validator.isFieldValidating(field.name) &&
+                !_validator.isFieldDebouncing(field.name)) {
+              scheduleFieldAsyncValidation(
+                fieldName: field.name,
+                value: state.values[field.name],
+                asyncValidators: asyncVals,
+                context: context,
+                getState: getState,
+                emitState: emitState,
+                customDebounceDelay: Duration.zero,
+              );
+            }
+            hasAsyncToRun = true;
+          }
+        }
+      }
+
+      if (_validator.hasActiveOrPendingAsyncValidations || hasAsyncToRun) {
+        return () async {
+          await _validator.flushAndAwaitAsyncValidations();
+          if (context.mounted) {
+            _finishValidation(
+              context: context,
+              strategy: strategy,
+              syncErrors: newErrors,
+              shouldSwitch: shouldSwitch,
+              getState: getState,
+              emitState: emitState,
+              onValidationPass: onValidationPass,
+              onValidationFail: onValidationFail,
+            );
+          }
+        }();
+      } else {
+        _finishValidation(
+          context: context,
+          strategy: strategy,
+          syncErrors: newErrors,
+          shouldSwitch: shouldSwitch,
+          getState: getState,
+          emitState: emitState,
+          onValidationPass: onValidationPass,
+          onValidationFail: onValidationFail,
+        );
+      }
+    } else {
+      onValidationPass();
+    }
+  }
+
+  void _finishValidation({
+    required BuildContext context,
+    required ValidationStrategy strategy,
+    required Map<String, String> syncErrors,
+    required bool shouldSwitch,
+    required TypedFormState Function() getState,
+    required void Function(TypedFormState newState) emitState,
+    required VoidCallback onValidationPass,
+    VoidCallback? onValidationFail,
+  }) {
+    final state = getState();
+    final finalErrors = Map<String, String>.from(state.errors);
+    for (final entry in syncErrors.entries) {
+      finalErrors[entry.key] = entry.value;
+    }
+
+    final isValid = _validator.computeOverallValidityWithErrors(
+      values: state.values,
+      errors: finalErrors,
+      touchedFields: _touchedTracker.touchedFields,
+      validators: _registry.validators,
+      context: context,
+      validatingFields: state.validatingFields,
+    );
+
+    ValidationStrategy newStrategy = state.validationStrategy;
+    if (shouldSwitch) {
+      final s = strategy.getStrategyAfterValidationFailure();
+      if (s != null) {
+        newStrategy = s;
+      }
+    }
+
+    emitState(
+      state.copyWith(
+        errors: finalErrors,
+        isValid: isValid,
+        validationStrategy: newStrategy,
+      ),
+    );
+
+    if (isValid && finalErrors.isEmpty && state.validatingFields.isEmpty) {
+      onValidationPass();
+    } else {
+      onValidationFail?.call();
+    }
+  }
+
+  /// Validates a field immediately (no debouncing).
+  TypedFormState validateFieldImmediately({
+    required String fieldName,
+    required BuildContext context,
+    required TypedFormState state,
+    required TypedFormState Function() getState,
+    required void Function(TypedFormState newState) emitState,
+  }) {
+    _registry.checkFieldExists(fieldName, currentValues: state.values);
+    _validator.validateValueType(
+      fieldName: fieldName,
+      value: state.values[fieldName],
+      expectedType: _registry.getFieldType(fieldName),
+      operation: 'orchestrateFieldValidation',
+    );
+
+    final validator = _registry.getValidator(fieldName);
+    final newErrors = Map<String, String>.from(state.errors);
+    final newValidatingFields = Set<String>.from(state.validatingFields);
+    final value = state.values[fieldName];
+
+    if (validator != null) {
+      final error = validator.validate(value, context);
+      if (error != null) {
+        newErrors[fieldName] = error;
+        _validator.cancelAsyncValidation(fieldName);
+        newValidatingFields.remove(fieldName);
+      } else {
+        newErrors.remove(fieldName);
+        final asyncVals = _registry.getAsyncValidators(fieldName);
+        if (asyncVals != null && asyncVals.isNotEmpty) {
+          scheduleFieldAsyncValidation(
+            fieldName: fieldName,
+            value: value,
+            asyncValidators: asyncVals,
+            context: context,
+            getState: getState,
+            emitState: emitState,
+            customDebounceDelay: Duration.zero,
+          );
+        } else {
+          _validator.cancelAsyncValidation(fieldName);
+          newValidatingFields.remove(fieldName);
+        }
+      }
+    }
+
+    final isValid = _validator.computeOverallValidityWithErrors(
+      values: state.values,
+      errors: newErrors,
+      validators: _registry.validators,
+      touchedFields: _touchedTracker.touchedFields,
+      context: context,
+      validatingFields: newValidatingFields,
+    );
+
+    return state.copyWith(
+      errors: newErrors,
+      isValid: isValid,
+      validatingFields: newValidatingFields,
+    );
+  }
+
+  /// Resets the form to its initial state.
+  TypedFormState resetForm({
+    required TypedFormState state,
+  }) {
+    _touchedTracker.reset();
+    _validator.cancelAllAsyncValidations();
+
+    final resetValues = _registry.initialValues;
+
+    return state.copyWith(
+      values: resetValues,
+      errors: const {},
+      isValid: false,
+      validatingFields: const {},
+    );
+  }
+
+  /// Marks all fields as touched and validates them.
+  TypedFormState touchAllFields({
+    required BuildContext context,
+    required TypedFormState state,
+  }) {
+    _touchedTracker.markAllTouched();
+
+    final newErrors = _validator.validateFields(
+      values: state.values,
+      validators: _registry.validators,
+      context: context,
+    );
+
+    final isValid = _validator.computeOverallValidity(
+      values: state.values,
+      validators: _registry.validators,
+      touchedFields: _touchedTracker.touchedFields,
+      context: context,
+    );
+
+    return state.copyWith(
+      errors: newErrors,
+      isValid: isValid,
+    );
+  }
+
+  /// Manually set an error for a specific field.
+  TypedFormState updateError({
+    required String fieldName,
+    String? errorMessage,
+    required BuildContext context,
+    required TypedFormState state,
+  }) {
+    _registry.checkFieldExists(fieldName, currentValues: state.values);
+    _touchedTracker.markTouched(fieldName);
+
+    final newErrors = Map<String, String>.from(state.errors);
+    if (errorMessage != null) {
+      newErrors[fieldName] = errorMessage;
+    } else {
+      newErrors.remove(fieldName);
+    }
+
+    final overallValid = _validator.computeOverallValidityWithErrors(
+      values: state.values,
+      errors: newErrors,
+      touchedFields: _touchedTracker.touchedFields,
+      validators: _registry.validators,
+      context: context,
+    );
+
+    return state.copyWith(
+      errors: newErrors,
+      isValid: overallValid,
+    );
+  }
+
+  /// Manually set multiple errors at once.
+  TypedFormState updateErrors({
+    required Map<String, String?> errors,
+    required BuildContext context,
+    required TypedFormState state,
+  }) {
+    for (final fieldName in errors.keys) {
+      _registry.checkFieldExists(fieldName, currentValues: state.values);
+      _touchedTracker.markTouched(fieldName);
+    }
+
+    final newErrors = Map<String, String>.from(state.errors);
+    for (final entry in errors.entries) {
+      if (entry.value != null) {
+        newErrors[entry.key] = entry.value!;
+      } else {
+        newErrors.remove(entry.key);
+      }
+    }
+
+    final overallValid = _validator.computeOverallValidityWithErrors(
+      values: state.values,
+      errors: newErrors,
+      touchedFields: _touchedTracker.touchedFields,
+      validators: _registry.validators,
+      context: context,
+    );
+
+    return state.copyWith(
+      errors: newErrors,
+      isValid: overallValid,
+    );
+  }
+
+  /// Add a single field to the form dynamically.
+  TypedFormState addField<T>({
+    required FormFieldDefinition<T> field,
+    required BuildContext context,
+    required TypedFormState state,
+  }) {
+    _registry.addField<T>(field);
+    _touchedTracker.markTouched(field.name, false);
+
+    final newValues = Map<String, Object?>.from(state.values);
+    newValues[field.name] = field.initialValue;
+
+    final newFieldTypes = Map<String, Type>.from(state.fieldTypes);
+    newFieldTypes[field.name] = T;
+
+    final newErrors = _validator.validateFields(
+      values: newValues,
+      validators: _registry.validators,
+      context: context,
+    );
+
+    final newIsValid = _validator.computeOverallValidity(
+      values: newValues,
+      validators: _registry.validators,
+      touchedFields: _touchedTracker.touchedFields,
+      context: context,
+    );
+
+    return state.copyWith(
+      values: newValues,
+      fieldTypes: newFieldTypes,
+      errors: newErrors,
+      isValid: newIsValid,
+    );
+  }
+
+  /// Add multiple fields to the form dynamically.
+  TypedFormState addFields({
+    required List<FormFieldDefinition> fields,
+    required BuildContext context,
+    required TypedFormState state,
+  }) {
+    _registry.addFields(fields);
+    for (final field in fields) {
+      _touchedTracker.markTouched(field.name, false);
+    }
+
+    final newValues = Map<String, Object?>.from(state.values);
+    final newFieldTypes = Map<String, Type>.from(state.fieldTypes);
+
+    for (final field in fields) {
+      newValues[field.name] = field.initialValue;
+      newFieldTypes[field.name] = field.valueType;
+    }
+
+    final newErrors = _validator.validateFields(
+      values: newValues,
+      validators: _registry.validators,
+      context: context,
+    );
+
+    final newIsValid = _validator.computeOverallValidity(
+      values: newValues,
+      validators: _registry.validators,
+      touchedFields: _touchedTracker.touchedFields,
+      context: context,
+    );
+
+    return state.copyWith(
+      values: newValues,
+      fieldTypes: newFieldTypes,
+      errors: newErrors,
+      isValid: newIsValid,
+    );
+  }
+
+  /// Remove a field from the form dynamically.
+  TypedFormState removeField(
+    String fieldName, {
+    required BuildContext context,
+    required TypedFormState state,
+  }) {
+    _registry.removeField(fieldName, currentValues: state.values);
+    _touchedTracker.remove(fieldName);
+    _validator.cancelAsyncValidation(fieldName);
+
+    final newValues = Map<String, Object?>.from(state.values)
+      ..remove(fieldName);
+    final newFieldTypes = Map<String, Type>.from(state.fieldTypes)
+      ..remove(fieldName);
+    final newValidatingFields = Set<String>.from(state.validatingFields)
+      ..remove(fieldName);
+
+    final validatedErrors = _validator.validateFields(
+      values: newValues,
+      validators: _registry.validators,
+      context: context,
+    );
+
+    final newIsValid = _validator.computeOverallValidityWithErrors(
+      values: newValues,
+      errors: validatedErrors,
+      validators: _registry.validators,
+      touchedFields: _touchedTracker.touchedFields,
+      context: context,
+      validatingFields: newValidatingFields,
+    );
+
+    return state.copyWith(
+      values: newValues,
+      fieldTypes: newFieldTypes,
+      errors: validatedErrors,
+      isValid: newIsValid,
+      validatingFields: newValidatingFields,
+    );
+  }
+
+  /// Remove multiple fields from the form dynamically.
+  TypedFormState removeFields(
+    List<String> fieldNames, {
+    required BuildContext context,
+    required TypedFormState state,
+  }) {
+    _registry.removeFields(fieldNames, currentValues: state.values);
+    _touchedTracker.removeFields(fieldNames);
+    for (final f in fieldNames) {
+      _validator.cancelAsyncValidation(f);
+    }
+
+    final newValues = Map<String, Object?>.from(state.values);
+    final newFieldTypes = Map<String, Type>.from(state.fieldTypes);
+    final newValidatingFields = Set<String>.from(state.validatingFields);
+
+    for (final fieldName in fieldNames) {
+      newValues.remove(fieldName);
+      newFieldTypes.remove(fieldName);
+      newValidatingFields.remove(fieldName);
+    }
+
+    final validatedErrors = _validator.validateFields(
+      values: newValues,
+      validators: _registry.validators,
+      context: context,
+    );
+
+    final newIsValid = _validator.computeOverallValidityWithErrors(
+      values: newValues,
+      errors: validatedErrors,
+      validators: _registry.validators,
+      touchedFields: _touchedTracker.touchedFields,
+      context: context,
+      validatingFields: newValidatingFields,
+    );
+
+    return state.copyWith(
+      values: newValues,
+      fieldTypes: newFieldTypes,
+      errors: validatedErrors,
+      isValid: newIsValid,
+      validatingFields: newValidatingFields,
     );
   }
 }

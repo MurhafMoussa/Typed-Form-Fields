@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:typed_form_fields/src/validators/typed_common_validators.dart';
 import 'package:typed_form_fields/typed_form_fields.dart';
 
 class AsyncEmailValidator implements AsyncValidator<String> {

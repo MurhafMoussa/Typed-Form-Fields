@@ -12,6 +12,9 @@ import 'package:typed_form_fields/src/validators/validator.dart';
 
 class MockBuildContext extends BuildContext {
   @override
+  bool get mounted => true;
+
+  @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
@@ -1117,6 +1120,317 @@ void main() {
 
         expect(currentState.errors.containsKey('asyncUsername'), isFalse);
         testVal.dispose();
+      });
+    });
+
+    group('validateForm', () {
+      test('validates form and calls onValidationPass when valid', () {
+        var state = createInitialState(strategy: ValidationStrategy.onSubmitThenRealTime);
+        state = state.copyWith(values: {
+          ...state.values,
+          'username': 'john',
+          'email': 'john@example.com',
+          'age': 20,
+        });
+
+        bool passCalled = false;
+        orchestrator.validateForm(
+          context: mockContext,
+          state: state,
+          getState: () => state,
+          emitState: (s) => state = s,
+          onValidationPass: () => passCalled = true,
+        );
+
+        expect(passCalled, isTrue);
+        expect(state.isValid, isTrue);
+      });
+
+      test('validates form, calls onValidationFail, and switches strategy on error', () {
+        var state = createInitialState(strategy: ValidationStrategy.onSubmitThenRealTime);
+
+        bool failCalled = false;
+        orchestrator.validateForm(
+          context: mockContext,
+          state: state,
+          getState: () => state,
+          emitState: (s) => state = s,
+          onValidationPass: () {},
+          onValidationFail: () => failCalled = true,
+        );
+
+        expect(failCalled, isTrue);
+        expect(state.errors['username'], 'Username required');
+        expect(state.validationStrategy, ValidationStrategy.realTimeOnly);
+      });
+
+      test('bypasses validation when strategy is disabled', () {
+        final state = createInitialState(strategy: ValidationStrategy.disabled);
+        bool passCalled = false;
+
+        orchestrator.validateForm(
+          context: mockContext,
+          state: state,
+          getState: () => state,
+          emitState: (_) {},
+          onValidationPass: () => passCalled = true,
+        );
+
+        expect(passCalled, isTrue);
+      });
+
+      test('flushes and awaits async validators during validateForm', () async {
+        final asyncField = FormFieldDefinition<String>(
+          name: 'asyncUsername',
+          initialValue: 'taken',
+          validators: [],
+          asyncValidators: [
+            TestAsyncValidator<String>((v, c) async => v == 'taken' ? 'Username taken' : null),
+          ],
+        );
+
+        final testReg = FormFieldRegistry([asyncField]);
+        final testTracker = FormTouchedTracker(['asyncUsername']);
+        final testVal = FormValidator(debounceDelay: Duration.zero);
+        final testOrch = FormValidationOrchestrator(
+          registry: testReg,
+          touchedTracker: testTracker,
+          validator: testVal,
+          asyncDebounceDelay: Duration.zero,
+        );
+
+        var currentState = TypedFormState(
+          values: testReg.initialValues,
+          errors: const {},
+          isValid: false,
+          validationStrategy: ValidationStrategy.onSubmitOnly,
+          fieldTypes: testReg.fieldTypes,
+        );
+
+        bool failCalled = false;
+        await testOrch.validateForm(
+          context: mockContext,
+          state: currentState,
+          getState: () => currentState,
+          emitState: (s) => currentState = s,
+          onValidationPass: () {},
+          onValidationFail: () => failCalled = true,
+        );
+
+        expect(failCalled, isTrue);
+        expect(currentState.errors['asyncUsername'], 'Username taken');
+        testVal.dispose();
+      });
+    });
+
+    group('validateFieldImmediately', () {
+      test('validates single field immediately without debouncing', () {
+        final state = createInitialState();
+        final newState = orchestrator.validateFieldImmediately(
+          fieldName: 'username',
+          context: mockContext,
+          state: state,
+          getState: () => state,
+          emitState: (_) {},
+        );
+
+        expect(newState.errors['username'], 'Username required');
+      });
+
+      test('clears error when field becomes valid', () {
+        final state = createInitialState().copyWith(
+          values: {'username': 'john', 'email': '', 'age': 0, 'optionalNote': ''},
+          errors: {'username': 'Username required'},
+        );
+
+        final newState = orchestrator.validateFieldImmediately(
+          fieldName: 'username',
+          context: mockContext,
+          state: state,
+          getState: () => state,
+          emitState: (_) {},
+        );
+
+        expect(newState.errors.containsKey('username'), isFalse);
+      });
+
+      test('schedules async validation when field passes sync validation', () async {
+        final asyncField = FormFieldDefinition<String>(
+          name: 'asyncField',
+          initialValue: 'val',
+          validators: [],
+          asyncValidators: [
+            TestAsyncValidator<String>((v, c) async => 'Async Error'),
+          ],
+        );
+
+        final testReg = FormFieldRegistry([asyncField]);
+        final testTracker = FormTouchedTracker(['asyncField']);
+        final testVal = FormValidator(debounceDelay: Duration.zero);
+        final testOrch = FormValidationOrchestrator(
+          registry: testReg,
+          touchedTracker: testTracker,
+          validator: testVal,
+          asyncDebounceDelay: Duration.zero,
+        );
+
+        var currentState = TypedFormState(
+          values: testReg.initialValues,
+          errors: const {},
+          isValid: true,
+          validationStrategy: ValidationStrategy.allFieldsRealTime,
+          fieldTypes: testReg.fieldTypes,
+        );
+
+        testOrch.validateFieldImmediately(
+          fieldName: 'asyncField',
+          context: mockContext,
+          state: currentState,
+          getState: () => currentState,
+          emitState: (s) => currentState = s,
+        );
+
+        await Future<void>.delayed(const Duration(milliseconds: 50));
+
+        expect(currentState.errors['asyncField'], 'Async Error');
+        testVal.dispose();
+      });
+    });
+
+    group('resetForm', () {
+      test('resets touched tracker, cancels async validations, and restores initial values', () {
+        touchedTracker.markAllTouched();
+        final state = createInitialState().copyWith(
+          values: {'username': 'john', 'email': 'john@example.com'},
+          errors: {'email': 'Invalid email'},
+        );
+
+        final newState = orchestrator.resetForm(state: state);
+
+        expect(newState.values['username'], '');
+        expect(newState.errors, isEmpty);
+        expect(newState.isValid, isFalse);
+      });
+    });
+
+    group('touchAllFields', () {
+      test('marks all fields touched and evaluates validation errors', () {
+        final state = createInitialState();
+        final newState = orchestrator.touchAllFields(
+          context: mockContext,
+          state: state,
+        );
+
+        expect(touchedTracker.isTouched('username'), isTrue);
+        expect(touchedTracker.isTouched('email'), isTrue);
+        expect(newState.errors['username'], 'Username required');
+      });
+    });
+
+    group('updateError & updateErrors', () {
+      test('updateError sets and clears single field error', () {
+        final state = createInitialState();
+        final newState = orchestrator.updateError(
+          fieldName: 'username',
+          errorMessage: 'Server error',
+          context: mockContext,
+          state: state,
+        );
+
+        expect(newState.errors['username'], 'Server error');
+
+        final clearedState = orchestrator.updateError(
+          fieldName: 'username',
+          errorMessage: null,
+          context: mockContext,
+          state: newState,
+        );
+
+        expect(clearedState.errors.containsKey('username'), isFalse);
+      });
+
+      test('updateErrors sets multiple errors and clears error for null values', () {
+        final state = createInitialState();
+        final newState = orchestrator.updateErrors(
+          errors: {'username': 'Err1', 'email': 'Err2'},
+          context: mockContext,
+          state: state,
+        );
+
+        expect(newState.errors['username'], 'Err1');
+        expect(newState.errors['email'], 'Err2');
+
+        final clearedState = orchestrator.updateErrors(
+          errors: {'username': null},
+          context: mockContext,
+          state: newState,
+        );
+
+        expect(clearedState.errors.containsKey('username'), isFalse);
+        expect(clearedState.errors['email'], 'Err2');
+      });
+    });
+
+    group('addField & addFields', () {
+      test('addField adds field to registry and state', () {
+        final state = createInitialState();
+        final newField = FormFieldDefinition<String>(
+          name: 'city',
+          initialValue: 'NYC',
+          validators: [],
+        );
+
+        final newState = orchestrator.addField<String>(
+          field: newField,
+          context: mockContext,
+          state: state,
+        );
+
+        expect(newState.values['city'], 'NYC');
+        expect(newState.fieldTypes['city'], String);
+      });
+
+      test('addFields adds multiple fields to registry and state', () {
+        final state = createInitialState();
+        final newFields = [
+          const FormFieldDefinition<String>(name: 'f1', initialValue: 'v1', validators: []),
+          const FormFieldDefinition<int>(name: 'f2', initialValue: 10, validators: []),
+        ];
+
+        final newState = orchestrator.addFields(
+          fields: newFields,
+          context: mockContext,
+          state: state,
+        );
+
+        expect(newState.values['f1'], 'v1');
+        expect(newState.values['f2'], 10);
+      });
+    });
+
+    group('removeField & removeFields', () {
+      test('removeField removes field from registry and state', () {
+        final state = createInitialState();
+        final newState = orchestrator.removeField(
+          'username',
+          context: mockContext,
+          state: state,
+        );
+
+        expect(newState.values.containsKey('username'), isFalse);
+        expect(newState.fieldTypes.containsKey('username'), isFalse);
+      });
+
+      test('removeFields removes multiple fields', () {
+        final state = createInitialState();
+        final newState = orchestrator.removeFields(
+          ['username', 'email'],
+          context: mockContext,
+          state: state,
+        );
+
+        expect(newState.values.containsKey('username'), isFalse);
+        expect(newState.values.containsKey('email'), isFalse);
       });
     });
   });
