@@ -49,6 +49,14 @@ class FormFieldRegistry {
   /// Returns the [Validator] registered for [fieldName], or `null` if not found.
   Validator? getValidator(String fieldName) => _validators[fieldName];
 
+  /// Returns the list of [AsyncValidator] registered for [fieldName], or `null` if none.
+  List<AsyncValidator>? getAsyncValidators(String fieldName) {
+    for (final field in _fields) {
+      if (field.name == fieldName) return field.asyncValidators;
+    }
+    return null;
+  }
+
   /// Returns the [FormFieldDefinition] for [fieldName], or `null` if not found.
   FormFieldDefinition? getField(String fieldName) {
     for (final field in _fields) {
@@ -117,6 +125,7 @@ class FormFieldRegistry {
   void updateFieldValidators<T>({
     required String name,
     required List<Validator<T>> validators,
+    List<AsyncValidator<T>>? asyncValidators,
     required Map<String, Object?> currentValues,
   }) {
     checkFieldExists(name, currentValues: currentValues);
@@ -126,7 +135,13 @@ class FormFieldRegistry {
       final updatedField = FormFieldDefinition<T>(
         name: name,
         validators: validators,
+        asyncValidators: asyncValidators ??
+            (existingField.asyncValidators != null
+                ? List<AsyncValidator<T>>.from(
+                    existingField.asyncValidators!.cast<AsyncValidator<T>>())
+                : null),
         initialValue: existingField.initialValue as T?,
+        group: existingField.group,
       );
       _fields[fieldIndex] = updatedField;
       _validators[name] = updatedField.createValidator();
