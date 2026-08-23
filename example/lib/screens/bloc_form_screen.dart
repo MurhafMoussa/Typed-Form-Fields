@@ -184,15 +184,15 @@ class LoginFormView extends StatelessWidget {
                     );
                   }
                 },
-                builder: (context, value, error, hasError, isValidating, updateValue) {
+                builder: (context, field) {
                   return TextFormField(
-                    initialValue: value,
-                    onChanged: updateValue,
+                    initialValue: field.value,
+                    onChanged: field.updateValue,
                     decoration: InputDecoration(
                       labelText: 'Email',
                       hintText: 'Try: admin@example.com',
                       prefixIcon: const Icon(Icons.email),
-                      errorText: hasError ? error : null,
+                      errorText: field.displayError,
                       border: const OutlineInputBorder(),
                       helperText: 'Debounced validation (500ms)',
                     ),
@@ -206,15 +206,15 @@ class LoginFormView extends StatelessWidget {
               TypedFieldWrapper<String>(
                 fieldName: 'password',
                 debounceTime: const Duration(milliseconds: 300),
-                builder: (context, value, error, hasError, isValidating, updateValue) {
+                builder: (context, field) {
                   return TextFormField(
-                    initialValue: value,
-                    onChanged: updateValue,
+                    initialValue: field.value,
+                    onChanged: field.updateValue,
                     decoration: InputDecoration(
                       labelText: 'Password',
                       hintText: 'Try: password123',
                       prefixIcon: const Icon(Icons.lock),
-                      errorText: hasError ? error : null,
+                      errorText: field.displayError,
                       border: const OutlineInputBorder(),
                       helperText: 'Minimum 8 characters',
                     ),
@@ -227,22 +227,22 @@ class LoginFormView extends StatelessWidget {
               // Remember Me with TypedFieldWrapper
               TypedFieldWrapper<bool>(
                 fieldName: 'rememberMe',
-                builder: (context, value, error, hasError, isValidating, updateValue) {
+                builder: (context, field) {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       CheckboxListTile(
                         title: const Text('Remember me'),
-                        value: value ?? false,
-                        onChanged: updateValue,
+                        value: field.value ?? false,
+                        onChanged: field.updateValue,
                         controlAffinity: ListTileControlAffinity.leading,
                         contentPadding: EdgeInsets.zero,
                       ),
-                      if (hasError)
+                      if (field.hasError)
                         Padding(
                           padding: const EdgeInsets.only(left: 16, top: 4),
                           child: Text(
-                            error!,
+                            field.error!,
                             style: const TextStyle(color: Colors.red),
                           ),
                         ),

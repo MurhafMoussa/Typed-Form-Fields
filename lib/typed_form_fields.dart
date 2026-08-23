@@ -12,6 +12,7 @@ export 'src/core/typed_form_controller.dart';
 export 'src/core/validation_strategy.dart';
 // Models exports
 export 'src/models/form_field_definition.dart';
+export 'src/models/typed_field_state.dart';
 // Validators exports
 export 'src/validators/composite_validator.dart';
 export 'src/validators/validator_localizations.dart';

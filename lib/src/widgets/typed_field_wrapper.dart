@@ -30,14 +30,14 @@ import 'package:typed_form_fields/typed_form_fields.dart';
 ///     // React to field changes without rebuilding
 ///     print('Field changed: $value, hasError: $hasError');
 ///   },
-///   builder: (context, value, error, hasError, isValidating, updateValue) {
+///   builder: (context, field) {
 ///     return TextFormField(
-///       initialValue: value,
-///       onChanged: updateValue,
+///       initialValue: field.value,
+///       onChanged: field.updateValue,
 ///       decoration: InputDecoration(
 ///         labelText: 'Email',
-///         errorText: hasError ? error : null,
-///         suffixIcon: isValidating ? CircularProgressIndicator() : null,
+///         errorText: field.displayError,
+///         suffixIcon: field.isValidating ? CircularProgressIndicator() : null,
 ///       ),
 ///     );
 ///   },
@@ -62,18 +62,10 @@ class TypedFieldWrapper<T> extends StatefulWidget {
   ///
   /// Parameters:
   /// - `context`: Build context
-  /// - `value`: Current field value (can be null)
-  /// - `error`: Current error message (can be null)
-  /// - `hasError`: Whether the field has an error
-  /// - `isValidating`: Whether the field is currently undergoing async validation
-  /// - `updateValue`: Function to call when the field value changes
+  /// - `field`: Current field state containing `value`, `error`, `hasError`, `isValidating`, and `updateValue`
   final Widget Function(
     BuildContext context,
-    T? value,
-    String? error,
-    bool hasError,
-    bool isValidating,
-    void Function(T? value) updateValue,
+    TypedFieldState<T> field,
   ) builder;
 
   /// Initial value for the field.
@@ -212,14 +204,16 @@ class _TypedFieldWrapperState<T> extends State<TypedFieldWrapper<T>> {
         // Use form value if available, otherwise use current local value
         final effectiveValue = formValue ?? _currentValue;
 
-        return widget.builder(
-          context,
-          effectiveValue,
-          error,
-          hasError,
-          isValidating,
-          _updateValue,
+        final fieldState = TypedFieldState<T>(
+          fieldName: widget.fieldName,
+          value: effectiveValue,
+          error: error,
+          hasError: hasError,
+          isValidating: isValidating,
+          updateValue: _updateValue,
         );
+
+        return widget.builder(context, fieldState);
       },
     );
   }

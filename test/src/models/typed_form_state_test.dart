@@ -6,6 +6,60 @@ import 'package:typed_form_fields/src/core/validation_strategy.dart';
 import 'package:typed_form_fields/src/models/models.dart';
 
 void main() {
+  group('TypedFieldState', () {
+    test('creates state and returns displayError correctly', () {
+      final fieldState = TypedFieldState<String>(
+        fieldName: 'email',
+        value: 'test@example.com',
+        error: 'Invalid email',
+        hasError: true,
+        isValidating: false,
+        updateValue: (_) {},
+      );
+
+      expect(fieldState.fieldName, 'email');
+      expect(fieldState.value, 'test@example.com');
+      expect(fieldState.error, 'Invalid email');
+      expect(fieldState.hasError, isTrue);
+      expect(fieldState.isValidating, isFalse);
+      expect(fieldState.displayError, 'Invalid email');
+
+      final validFieldState = fieldState.copyWith(
+        error: null,
+        hasError: false,
+      );
+      expect(validFieldState.displayError, isNull);
+    });
+
+    test('copyWith, equality, hashCode, and toString', () {
+      final state1 = TypedFieldState<String>(
+        fieldName: 'email',
+        value: 'test@example.com',
+        error: null,
+        hasError: false,
+        isValidating: true,
+        updateValue: (_) {},
+      );
+      final state2 = TypedFieldState<String>(
+        fieldName: 'email',
+        value: 'test@example.com',
+        error: null,
+        hasError: false,
+        isValidating: true,
+        updateValue: (_) {},
+      );
+
+      expect(state1, equals(state2));
+      expect(state1.hashCode, equals(state2.hashCode));
+      expect(state1.toString(), contains('TypedFieldState<String>'));
+      expect(state1.toString(), contains('email'));
+
+      final updated = state1.copyWith(fieldName: 'username');
+      expect(updated.fieldName, 'username');
+      expect(state1, isNot(equals(updated)));
+    });
+  });
+
   group('FormFieldDefinition', () {
     test('copyWith updates properties correctly', () {
       const def = FormFieldDefinition<String>(

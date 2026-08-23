@@ -401,15 +401,15 @@ class _MultiStepFormViewState extends State<MultiStepFormView> {
             const SizedBox(height: 16),
             TypedFieldWrapper<String>(
               fieldName: 'fullName',
-              builder: (context, value, error, hasError, isValidating, updateValue) {
+              builder: (context, field) {
                 return TextFormField(
-                  initialValue: value,
-                  onChanged: updateValue,
+                  initialValue: field.value,
+                  onChanged: field.updateValue,
                   decoration: InputDecoration(
                     labelText: 'Full Name',
                     hintText: 'Enter your full name',
                     prefixIcon: const Icon(Icons.person),
-                    errorText: hasError ? error : null,
+                    errorText: field.displayError,
                     border: const OutlineInputBorder(),
                   ),
                 );
@@ -418,15 +418,15 @@ class _MultiStepFormViewState extends State<MultiStepFormView> {
             const SizedBox(height: 16),
             TypedFieldWrapper<String>(
               fieldName: 'email',
-              builder: (context, value, error, hasError, isValidating, updateValue) {
+              builder: (context, field) {
                 return TextFormField(
-                  initialValue: value,
-                  onChanged: updateValue,
+                  initialValue: field.value,
+                  onChanged: field.updateValue,
                   decoration: InputDecoration(
                     labelText: 'Email',
                     hintText: 'Enter your email address',
                     prefixIcon: const Icon(Icons.email),
-                    errorText: hasError ? error : null,
+                    errorText: field.displayError,
                     border: const OutlineInputBorder(),
                   ),
                   keyboardType: TextInputType.emailAddress,
@@ -454,15 +454,15 @@ class _MultiStepFormViewState extends State<MultiStepFormView> {
             const SizedBox(height: 16),
             TypedFieldWrapper<String>(
               fieldName: 'street',
-              builder: (context, value, error, hasError, isValidating, updateValue) {
+              builder: (context, field) {
                 return TextFormField(
-                  initialValue: value,
-                  onChanged: updateValue,
+                  initialValue: field.value,
+                  onChanged: field.updateValue,
                   decoration: InputDecoration(
                     labelText: 'Street Address',
                     hintText: 'e.g. 123 Main St',
                     prefixIcon: const Icon(Icons.home),
-                    errorText: hasError ? error : null,
+                    errorText: field.displayError,
                     border: const OutlineInputBorder(),
                   ),
                 );
@@ -471,15 +471,15 @@ class _MultiStepFormViewState extends State<MultiStepFormView> {
             const SizedBox(height: 16),
             TypedFieldWrapper<String>(
               fieldName: 'city',
-              builder: (context, value, error, hasError, isValidating, updateValue) {
+              builder: (context, field) {
                 return TextFormField(
-                  initialValue: value,
-                  onChanged: updateValue,
+                  initialValue: field.value,
+                  onChanged: field.updateValue,
                   decoration: InputDecoration(
                     labelText: 'City',
                     hintText: 'e.g. New York',
                     prefixIcon: const Icon(Icons.location_city),
-                    errorText: hasError ? error : null,
+                    errorText: field.displayError,
                     border: const OutlineInputBorder(),
                   ),
                 );
@@ -488,15 +488,15 @@ class _MultiStepFormViewState extends State<MultiStepFormView> {
             const SizedBox(height: 16),
             TypedFieldWrapper<String>(
               fieldName: 'zipCode',
-              builder: (context, value, error, hasError, isValidating, updateValue) {
+              builder: (context, field) {
                 return TextFormField(
-                  initialValue: value,
-                  onChanged: updateValue,
+                  initialValue: field.value,
+                  onChanged: field.updateValue,
                   decoration: InputDecoration(
                     labelText: 'ZIP Code',
                     hintText: 'e.g. 10001',
                     prefixIcon: const Icon(Icons.pin),
-                    errorText: hasError ? error : null,
+                    errorText: field.displayError,
                     border: const OutlineInputBorder(),
                   ),
                   keyboardType: TextInputType.number,
@@ -524,11 +524,11 @@ class _MultiStepFormViewState extends State<MultiStepFormView> {
             const SizedBox(height: 16),
             TypedFieldWrapper<bool>(
               fieldName: 'subscribeNewsletter',
-              builder: (context, value, error, hasError, isValidating, updateValue) {
+              builder: (context, field) {
                 return CheckboxListTile(
                   title: const Text('Subscribe to product updates and newsletter'),
-                  value: value ?? false,
-                  onChanged: updateValue,
+                  value: field.value ?? false,
+                  onChanged: field.updateValue,
                   controlAffinity: ListTileControlAffinity.leading,
                   contentPadding: EdgeInsets.zero,
                 );
@@ -537,23 +537,23 @@ class _MultiStepFormViewState extends State<MultiStepFormView> {
             const SizedBox(height: 8),
             TypedFieldWrapper<bool>(
               fieldName: 'acceptTerms',
-              builder: (context, value, error, hasError, isValidating, updateValue) {
+              builder: (context, field) {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     CheckboxListTile(
                       title: const Text('I accept the terms and conditions'),
                       subtitle: const Text('Required to complete registration'),
-                      value: value ?? false,
-                      onChanged: updateValue,
+                      value: field.value ?? false,
+                      onChanged: field.updateValue,
                       controlAffinity: ListTileControlAffinity.leading,
                       contentPadding: EdgeInsets.zero,
                     ),
-                    if (hasError)
+                    if (field.hasError)
                       Padding(
                         padding: const EdgeInsets.only(left: 16, top: 4),
                         child: Text(
-                          error!,
+                          field.error!,
                           style: const TextStyle(color: Colors.red, fontSize: 12),
                         ),
                       ),

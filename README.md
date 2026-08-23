@@ -46,14 +46,14 @@ class MyForm extends StatelessWidget {
           TypedFieldWrapper<String>(
             fieldName: 'email',
             debounceTime: Duration(milliseconds: 300),
-            builder: (context, value, error, hasError, isValidating, updateValue) {
+            builder: (context, field) {
               return TextFormField(
-                initialValue: value,
-                onChanged: updateValue,
+                initialValue: field.value,
+                onChanged: field.updateValue,
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
                   labelText: 'Email Address',
-                  errorText: hasError ? error : null,
+                  errorText: field.displayError,
                 ),
               );
             },
@@ -64,11 +64,11 @@ class MyForm extends StatelessWidget {
           // Checkbox field using TypedFieldWrapper
           TypedFieldWrapper<bool>(
             fieldName: 'subscribe',
-            builder: (context, value, error, hasError, isValidating, updateValue) {
+            builder: (context, field) {
               return CheckboxListTile(
                 title: Text('Subscribe to newsletter'),
-                value: value ?? false,
-                onChanged: (val) => updateValue(val ?? false),
+                value: field.value ?? false,
+                onChanged: (val) => field.updateValue(val ?? false),
               );
             },
           ),
@@ -161,14 +161,14 @@ TypedFieldWrapper<String>(
   fieldName: 'email',
   debounceTime: Duration(milliseconds: 300),
   transformValue: (value) => value.toLowerCase().trim(),
-  builder: (context, value, error, hasError, isValidating, updateValue) {
+  builder: (context, field) {
     return TextFormField(
-      initialValue: value,
-      onChanged: updateValue,
+      initialValue: field.value,
+      onChanged: field.updateValue,
       keyboardType: TextInputType.emailAddress,
       decoration: InputDecoration(
         labelText: 'Email Address',
-        errorText: hasError ? error : null,
+        errorText: field.displayError,
       ),
     );
   },
@@ -180,12 +180,12 @@ TypedFieldWrapper<String>(
 ```dart
 TypedFieldWrapper<bool>(
   fieldName: 'terms',
-  builder: (context, value, error, hasError, isValidating, updateValue) {
+  builder: (context, field) {
     return CheckboxListTile(
       title: Text('I agree to terms'),
-      value: value ?? false,
-      onChanged: (val) => updateValue(val ?? false),
-      subtitle: hasError ? Text(error!, style: TextStyle(color: Colors.red)) : null,
+      value: field.value ?? false,
+      onChanged: (val) => field.updateValue(val ?? false),
+      subtitle: field.hasError ? Text(field.error!, style: TextStyle(color: Colors.red)) : null,
     );
   },
 )
@@ -196,13 +196,13 @@ TypedFieldWrapper<bool>(
 ```dart
 TypedFieldWrapper<String>(
   fieldName: 'country',
-  builder: (context, value, error, hasError, isValidating, updateValue) {
+  builder: (context, field) {
     return DropdownButtonFormField<String>(
-      value: (value == null || value.isEmpty) ? null : value,
-      onChanged: updateValue,
+      value: (field.value == null || field.value!.isEmpty) ? null : field.value,
+      onChanged: field.updateValue,
       decoration: InputDecoration(
         labelText: 'Select Country',
-        errorText: hasError ? error : null,
+        errorText: field.displayError,
       ),
       items: ['USA', 'Canada', 'UK']
           .map((c) => DropdownMenuItem(value: c, child: Text(c)))
@@ -231,14 +231,15 @@ TypedFieldWrapper<String>(
     // React to changes without rebuilding
     print('Field changed: $value, hasError: $hasError');
   },
-  builder: (context, value, error, hasError, isValidating, updateValue) {
+  builder: (context, field) {
     // Use ANY Flutter widget here!
     return TextFormField(
-      initialValue: value,
-      onChanged: updateValue,
+      initialValue: field.value,
+      onChanged: field.updateValue,
       decoration: InputDecoration(
         labelText: 'Email',
-        errorText: hasError ? error : null,
+        errorText: field.displayError,
+        suffixIcon: field.isValidating ? CircularProgressIndicator() : null,
       ),
     );
   },
@@ -819,12 +820,12 @@ TypedFieldWrapper<String>(
   fieldName: 'email',
   debounceTime: Duration(milliseconds: 300),
   transformValue: (value) => value.toLowerCase().trim(),
-  builder: (context, value, error, hasError, isValidating, updateValue) {
+  builder: (context, field) {
     return TextFormField(
-      initialValue: value,
-      onChanged: updateValue,
+      initialValue: field.value,
+      onChanged: field.updateValue,
       decoration: InputDecoration(
-        errorText: hasError ? error : null,
+        errorText: field.displayError,
       ),
     );
   },

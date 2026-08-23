@@ -356,15 +356,15 @@ class StrategyExampleScreen extends StatelessWidget {
                   // Form Fields
                   TypedFieldWrapper<String>(
                     fieldName: 'email',
-                    builder: (context, value, error, hasError, isValidating, updateValue) {
+                    builder: (context, field) {
                       return TextFormField(
-                        initialValue: value,
-                        onChanged: updateValue,
+                        initialValue: field.value,
+                        onChanged: field.updateValue,
                         keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
                           labelText: 'Email Address',
                           prefixIcon: const Icon(Icons.email),
-                          errorText: hasError ? error : null,
+                          errorText: field.displayError,
                           border: const OutlineInputBorder(),
                         ),
                       );
@@ -373,15 +373,15 @@ class StrategyExampleScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   TypedFieldWrapper<String>(
                     fieldName: 'password',
-                    builder: (context, value, error, hasError, isValidating, updateValue) {
+                    builder: (context, field) {
                       return TextFormField(
-                        initialValue: value,
-                        onChanged: updateValue,
+                        initialValue: field.value,
+                        onChanged: field.updateValue,
                         obscureText: true,
                         decoration: InputDecoration(
                           labelText: 'Password',
                           prefixIcon: const Icon(Icons.lock),
-                          errorText: hasError ? error : null,
+                          errorText: field.displayError,
                           border: const OutlineInputBorder(),
                         ),
                       );
@@ -390,15 +390,15 @@ class StrategyExampleScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   TypedFieldWrapper<String>(
                     fieldName: 'confirmPassword',
-                    builder: (context, value, error, hasError, isValidating, updateValue) {
+                    builder: (context, field) {
                       return TextFormField(
-                        initialValue: value,
-                        onChanged: updateValue,
+                        initialValue: field.value,
+                        onChanged: field.updateValue,
                         obscureText: true,
                         decoration: InputDecoration(
                           labelText: 'Confirm Password',
                           prefixIcon: const Icon(Icons.lock_outline),
-                          errorText: hasError ? error : null,
+                          errorText: field.displayError,
                           border: const OutlineInputBorder(),
                         ),
                       );

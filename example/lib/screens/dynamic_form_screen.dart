@@ -331,14 +331,14 @@ class _DynamicFormScreenState extends State<DynamicFormScreen> {
         fieldType.toString() == 'String') {
       return TypedFieldWrapper<String>(
         fieldName: fieldName,
-        builder: (context, value, error, hasError, isValidating, updateValue) {
+        builder: (context, field) {
           return TextFormField(
-            initialValue: value ?? '',
-            onChanged: updateValue,
+            initialValue: field.value ?? '',
+            onChanged: field.updateValue,
             decoration: InputDecoration(
               labelText: _getFieldLabel(fieldName),
               hintText: _getFieldHint(fieldName),
-              errorText: hasError ? error : null,
+              errorText: field.displayError,
               border: const OutlineInputBorder(),
               prefixIcon: Icon(_getFieldIcon(fieldType)),
             ),
@@ -351,17 +351,17 @@ class _DynamicFormScreenState extends State<DynamicFormScreen> {
         fieldType.toString() == 'num') {
       return TypedFieldWrapper<num>(
         fieldName: fieldName,
-        builder: (context, value, error, hasError, isValidating, updateValue) {
+        builder: (context, field) {
           return TextFormField(
-            initialValue: value?.toString() ?? '0',
+            initialValue: field.value?.toString() ?? '0',
             onChanged: (text) {
               final numValue = num.tryParse(text) ?? 0;
-              updateValue(numValue);
+              field.updateValue(numValue);
             },
             decoration: InputDecoration(
               labelText: _getFieldLabel(fieldName),
               hintText: _getFieldHint(fieldName),
-              errorText: hasError ? error : null,
+              errorText: field.displayError,
               border: const OutlineInputBorder(),
               prefixIcon: Icon(_getFieldIcon(fieldType)),
             ),
@@ -374,14 +374,14 @@ class _DynamicFormScreenState extends State<DynamicFormScreen> {
         fieldType.toString() == 'bool') {
       return TypedFieldWrapper<bool>(
         fieldName: fieldName,
-        builder: (context, value, error, hasError, isValidating, updateValue) {
+        builder: (context, field) {
           return SwitchListTile(
             title: Text(_getFieldLabel(fieldName)),
-            subtitle: hasError
-                ? Text(error!, style: const TextStyle(color: Colors.red))
+            subtitle: field.hasError
+                ? Text(field.error!, style: const TextStyle(color: Colors.red))
                 : null,
-            value: value ?? false,
-            onChanged: updateValue,
+            value: field.value ?? false,
+            onChanged: field.updateValue,
             secondary: Icon(_getFieldIcon(fieldType)),
           );
         },

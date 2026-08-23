@@ -128,15 +128,15 @@ class TypedFieldWrapperView extends StatelessWidget {
             onFieldStateChanged: (value, error, hasError) {
               debugPrint('Text field changed: $value, hasError: $hasError');
             },
-            builder: (context, value, error, hasError, isValidating, updateValue) {
+            builder: (context, field) {
               return TextFormField(
-                initialValue: value,
-                onChanged: updateValue,
+                initialValue: field.value,
+                onChanged: field.updateValue,
                 decoration: InputDecoration(
                   labelText: 'Enter some text',
                   hintText: 'This field is required',
                   prefixIcon: const Icon(Icons.text_fields),
-                  errorText: hasError ? error : null,
+                  errorText: field.displayError,
                   border: const OutlineInputBorder(),
                   helperText: 'Debounced validation (300ms)',
                 ),
@@ -154,23 +154,23 @@ class TypedFieldWrapperView extends StatelessWidget {
           const SizedBox(height: 8),
           TypedFieldWrapper<bool>(
             fieldName: 'checkbox',
-            builder: (context, value, error, hasError, isValidating, updateValue) {
+            builder: (context, field) {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   CheckboxListTile(
                     title: const Text('I agree to the terms'),
                     subtitle: const Text('This checkbox must be checked'),
-                    value: value ?? false,
-                    onChanged: updateValue,
+                    value: field.value ?? false,
+                    onChanged: field.updateValue,
                     controlAffinity: ListTileControlAffinity.leading,
                     contentPadding: EdgeInsets.zero,
                   ),
-                  if (hasError)
+                  if (field.hasError)
                     Padding(
                       padding: const EdgeInsets.only(left: 16, top: 4),
                       child: Text(
-                        error!,
+                        field.error!,
                         style: const TextStyle(color: Colors.red),
                       ),
                     ),
@@ -189,12 +189,12 @@ class TypedFieldWrapperView extends StatelessWidget {
           const SizedBox(height: 8),
           TypedFieldWrapper<double>(
             fieldName: 'slider',
-            builder: (context, value, error, hasError, isValidating, updateValue) {
+            builder: (context, field) {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Value: ${value?.toStringAsFixed(1) ?? '0.0'}',
+                    'Value: ${field.value?.toStringAsFixed(1) ?? '0.0'}',
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -202,15 +202,15 @@ class TypedFieldWrapperView extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Slider(
-                    value: value ?? 50.0,
+                    value: field.value ?? 50.0,
                     min: 0.0,
                     max: 100.0,
                     divisions: 100,
-                    onChanged: updateValue,
-                    activeColor: hasError ? Colors.red : Colors.blue,
+                    onChanged: field.updateValue,
+                    activeColor: field.hasError ? Colors.red : Colors.blue,
                   ),
-                  if (hasError)
-                    Text(error!, style: const TextStyle(color: Colors.red)),
+                  if (field.hasError)
+                    Text(field.error!, style: const TextStyle(color: Colors.red)),
                 ],
               );
             },

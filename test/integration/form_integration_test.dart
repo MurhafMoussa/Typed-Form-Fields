@@ -75,13 +75,12 @@ void main() {
                   // First Name Field
                   TypedFieldWrapper<String>(
                     fieldName: 'firstName',
-                    builder: (context, value, error, hasError, isValidating, updateValue) =>
-                        TextFormField(
-                      initialValue: value ?? '',
-                      onChanged: updateValue,
+                    builder: (context, field) => TextFormField(
+                      initialValue: field.value ?? '',
+                      onChanged: field.updateValue,
                       decoration: InputDecoration(
                         labelText: 'First Name',
-                        errorText: hasError ? error : null,
+                        errorText: field.displayError,
                       ),
                     ),
                   ),
@@ -89,13 +88,12 @@ void main() {
                   // Last Name Field
                   TypedFieldWrapper<String>(
                     fieldName: 'lastName',
-                    builder: (context, value, error, hasError, isValidating, updateValue) =>
-                        TextFormField(
-                      initialValue: value ?? '',
-                      onChanged: (value) => updateValue(value),
+                    builder: (context, field) => TextFormField(
+                      initialValue: field.value ?? '',
+                      onChanged: field.updateValue,
                       decoration: InputDecoration(
                         labelText: 'Last Name',
-                        errorText: hasError ? error : null,
+                        errorText: field.displayError,
                       ),
                     ),
                   ),
@@ -103,13 +101,12 @@ void main() {
                   // Email Field
                   TypedFieldWrapper<String>(
                     fieldName: 'email',
-                    builder: (context, value, error, hasError, isValidating, updateValue) =>
-                        TextFormField(
-                      initialValue: value ?? '',
-                      onChanged: (value) => updateValue(value),
+                    builder: (context, field) => TextFormField(
+                      initialValue: field.value ?? '',
+                      onChanged: field.updateValue,
                       decoration: InputDecoration(
                         labelText: 'Email',
-                        errorText: hasError ? error : null,
+                        errorText: field.displayError,
                       ),
                     ),
                   ),
@@ -117,14 +114,13 @@ void main() {
                   // Password Field
                   TypedFieldWrapper<String>(
                     fieldName: 'password',
-                    builder: (context, value, error, hasError, isValidating, updateValue) =>
-                        TextFormField(
-                      initialValue: value ?? '',
+                    builder: (context, field) => TextFormField(
+                      initialValue: field.value ?? '',
                       obscureText: true,
-                      onChanged: (value) => updateValue(value),
+                      onChanged: field.updateValue,
                       decoration: InputDecoration(
                         labelText: 'Password',
-                        errorText: hasError ? error : null,
+                        errorText: field.displayError,
                       ),
                     ),
                   ),
@@ -132,14 +128,13 @@ void main() {
                   // Confirm Password Field
                   TypedFieldWrapper<String>(
                     fieldName: 'confirmPassword',
-                    builder: (context, value, error, hasError, isValidating, updateValue) =>
-                        TextFormField(
-                      initialValue: value ?? '',
+                    builder: (context, field) => TextFormField(
+                      initialValue: field.value ?? '',
                       obscureText: true,
-                      onChanged: (value) => updateValue(value),
+                      onChanged: field.updateValue,
                       decoration: InputDecoration(
                         labelText: 'Confirm Password',
-                        errorText: hasError ? error : null,
+                        errorText: field.displayError,
                       ),
                     ),
                   ),
@@ -147,14 +142,13 @@ void main() {
                   // Terms Checkbox
                   TypedFieldWrapper<bool>(
                     fieldName: 'acceptTerms',
-                    builder: (context, value, error, hasError, isValidating, updateValue) =>
-                        CheckboxListTile(
+                    builder: (context, field) => CheckboxListTile(
                       title: const Text('I accept the terms and conditions'),
-                      value: value ?? false,
-                      onChanged: (value) => updateValue(value),
-                      subtitle: hasError
+                      value: field.value ?? false,
+                      onChanged: (value) => field.updateValue(value),
+                      subtitle: field.hasError
                           ? Text(
-                              error!,
+                              field.error!,
                               style: const TextStyle(color: Colors.red),
                             )
                           : null,
@@ -251,25 +245,23 @@ void main() {
                 children: [
                   TypedFieldWrapper<String>(
                     fieldName: 'email',
-                    builder: (context, value, error, hasError, isValidating, updateValue) =>
-                        TextFormField(
-                      initialValue: value ?? '',
-                      onChanged: (value) => updateValue(value),
+                    builder: (context, field) => TextFormField(
+                      initialValue: field.value ?? '',
+                      onChanged: field.updateValue,
                       decoration: InputDecoration(
                         labelText: 'Email',
-                        errorText: hasError ? error : null,
+                        errorText: field.displayError,
                       ),
                     ),
                   ),
                   TypedFieldWrapper<String>(
                     fieldName: 'password',
-                    builder: (context, value, error, hasError, isValidating, updateValue) =>
-                        TextFormField(
-                      initialValue: value ?? '',
-                      onChanged: (value) => updateValue(value),
+                    builder: (context, field) => TextFormField(
+                      initialValue: field.value ?? '',
+                      onChanged: field.updateValue,
                       decoration: InputDecoration(
                         labelText: 'Password',
-                        errorText: hasError ? error : null,
+                        errorText: field.displayError,
                       ),
                     ),
                   ),
@@ -350,25 +342,23 @@ void main() {
                 children: [
                   TypedFieldWrapper<String>(
                     fieldName: 'name',
-                    builder: (context, value, error, hasError, isValidating, updateValue) =>
-                        TextFormField(
-                      initialValue: value ?? '',
-                      onChanged: (value) => updateValue(value),
+                    builder: (context, field) => TextFormField(
+                      initialValue: field.value ?? '',
+                      onChanged: field.updateValue,
                       decoration: InputDecoration(
                         labelText: 'Name',
-                        errorText: hasError ? error : null,
+                        errorText: field.displayError,
                       ),
                     ),
                   ),
                   TypedFieldWrapper<String>(
                     fieldName: 'email',
-                    builder: (context, value, error, hasError, isValidating, updateValue) =>
-                        TextFormField(
-                      initialValue: value ?? '',
-                      onChanged: (value) => updateValue(value),
+                    builder: (context, field) => TextFormField(
+                      initialValue: field.value ?? '',
+                      onChanged: field.updateValue,
                       decoration: InputDecoration(
                         labelText: 'Email',
-                        errorText: hasError ? error : null,
+                        errorText: field.displayError,
                       ),
                     ),
                   ),
@@ -424,13 +414,12 @@ void main() {
                 children: [
                   TypedFieldWrapper<String>(
                     fieldName: 'email',
-                    builder: (context, value, error, hasError, isValidating, updateValue) =>
-                        TextFormField(
-                      initialValue: value ?? '',
-                      onChanged: (value) => updateValue(value),
+                    builder: (context, field) => TextFormField(
+                      initialValue: field.value ?? '',
+                      onChanged: field.updateValue,
                       decoration: InputDecoration(
                         labelText: 'Email',
-                        errorText: hasError ? error : null,
+                        errorText: field.displayError,
                       ),
                     ),
                   ),
@@ -489,26 +478,24 @@ class DynamicFormTestWidgetState extends State<DynamicFormTestWidget> {
         children: [
           TypedFieldWrapper<String>(
             fieldName: 'name',
-            builder: (context, value, error, hasError, isValidating, updateValue) =>
-                TextFormField(
-              initialValue: value ?? '',
-              onChanged: updateValue,
+            builder: (context, field) => TextFormField(
+              initialValue: field.value ?? '',
+              onChanged: field.updateValue,
               decoration: InputDecoration(
                 labelText: 'Name',
-                errorText: hasError ? error : null,
+                errorText: field.displayError,
               ),
             ),
           ),
           if (_showEmailField)
             TypedFieldWrapper<String>(
               fieldName: 'email',
-              builder: (context, value, error, hasError, isValidating, updateValue) =>
-                  TextFormField(
-                initialValue: value ?? '',
-                onChanged: updateValue,
+              builder: (context, field) => TextFormField(
+                initialValue: field.value ?? '',
+                onChanged: field.updateValue,
                 decoration: InputDecoration(
                   labelText: 'Email',
-                  errorText: hasError ? error : null,
+                  errorText: field.displayError,
                 ),
               ),
             ),

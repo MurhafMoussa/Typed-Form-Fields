@@ -162,15 +162,15 @@ class RegistrationFormView extends StatelessWidget {
           TypedFieldWrapper<String>(
             fieldName: 'firstName',
             transformValue: (value) => value.trim(),
-            builder: (context, value, error, hasError, isValidating, updateValue) {
+            builder: (context, field) {
               return TextFormField(
-                initialValue: value,
-                onChanged: updateValue,
+                initialValue: field.value,
+                onChanged: field.updateValue,
                 decoration: InputDecoration(
                   labelText: 'First Name',
                   hintText: 'Enter your first name',
                   prefixIcon: const Icon(Icons.person),
-                  errorText: hasError ? error : null,
+                  errorText: field.displayError,
                   border: const OutlineInputBorder(),
                   helperText: 'Alphabetic characters only',
                 ),
@@ -184,15 +184,15 @@ class RegistrationFormView extends StatelessWidget {
           TypedFieldWrapper<String>(
             fieldName: 'lastName',
             transformValue: (value) => value.trim(),
-            builder: (context, value, error, hasError, isValidating, updateValue) {
+            builder: (context, field) {
               return TextFormField(
-                initialValue: value,
-                onChanged: updateValue,
+                initialValue: field.value,
+                onChanged: field.updateValue,
                 decoration: InputDecoration(
                   labelText: 'Last Name',
                   hintText: 'Enter your last name',
                   prefixIcon: const Icon(Icons.person_outline),
-                  errorText: hasError ? error : null,
+                  errorText: field.displayError,
                   border: const OutlineInputBorder(),
                   helperText: 'Alphabetic characters only',
                 ),
@@ -206,15 +206,15 @@ class RegistrationFormView extends StatelessWidget {
           TypedFieldWrapper<String>(
             fieldName: 'email',
             transformValue: (value) => value.toLowerCase().trim(),
-            builder: (context, value, error, hasError, isValidating, updateValue) {
+            builder: (context, field) {
               return TextFormField(
-                initialValue: value,
-                onChanged: updateValue,
+                initialValue: field.value,
+                onChanged: field.updateValue,
                 decoration: InputDecoration(
                   labelText: 'Email',
                   hintText: 'Enter your email address',
                   prefixIcon: const Icon(Icons.email),
-                  errorText: hasError ? error : null,
+                  errorText: field.displayError,
                   border: const OutlineInputBorder(),
                   helperText: 'We\'ll never share your email',
                 ),
@@ -228,15 +228,15 @@ class RegistrationFormView extends StatelessWidget {
           TypedFieldWrapper<String>(
             fieldName: 'phone',
             transformValue: (value) => value.replaceAll(RegExp(r'[^\d+]'), ''),
-            builder: (context, value, error, hasError, isValidating, updateValue) {
+            builder: (context, field) {
               return TextFormField(
-                initialValue: value,
-                onChanged: updateValue,
+                initialValue: field.value,
+                onChanged: field.updateValue,
                 decoration: InputDecoration(
                   labelText: 'Phone Number',
                   hintText: 'Enter your phone number',
                   prefixIcon: const Icon(Icons.phone),
-                  errorText: hasError ? error : null,
+                  errorText: field.displayError,
                   border: const OutlineInputBorder(),
                   helperText: 'Format: +1234567890',
                 ),
@@ -249,15 +249,15 @@ class RegistrationFormView extends StatelessWidget {
           // Password with TypedFieldWrapper
           TypedFieldWrapper<String>(
             fieldName: 'password',
-            builder: (context, value, error, hasError, isValidating, updateValue) {
+            builder: (context, field) {
               return TextFormField(
-                initialValue: value,
-                onChanged: updateValue,
+                initialValue: field.value,
+                onChanged: field.updateValue,
                 decoration: InputDecoration(
                   labelText: 'Password',
                   hintText: 'Create a strong password',
                   prefixIcon: const Icon(Icons.lock),
-                  errorText: hasError ? error : null,
+                  errorText: field.displayError,
                   border: const OutlineInputBorder(),
                   helperText: 'Min 8 chars, uppercase, lowercase, digit',
                 ),
@@ -270,15 +270,15 @@ class RegistrationFormView extends StatelessWidget {
           // Confirm Password with TypedFieldWrapper
           TypedFieldWrapper<String>(
             fieldName: 'confirmPassword',
-            builder: (context, value, error, hasError, isValidating, updateValue) {
+            builder: (context, field) {
               return TextFormField(
-                initialValue: value,
-                onChanged: updateValue,
+                initialValue: field.value,
+                onChanged: field.updateValue,
                 decoration: InputDecoration(
                   labelText: 'Confirm Password',
                   hintText: 'Re-enter your password',
                   prefixIcon: const Icon(Icons.lock_outline),
-                  errorText: hasError ? error : null,
+                  errorText: field.displayError,
                   border: const OutlineInputBorder(),
                   helperText: 'Must match your password',
                 ),
@@ -291,23 +291,23 @@ class RegistrationFormView extends StatelessWidget {
           // Terms Agreement with TypedFieldWrapper
           TypedFieldWrapper<bool>(
             fieldName: 'agreeToTerms',
-            builder: (context, value, error, hasError, isValidating, updateValue) {
+            builder: (context, field) {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   CheckboxListTile(
                     title: const Text('I agree to the Terms and Conditions'),
                     subtitle: const Text('You must agree to continue'),
-                    value: value ?? false,
-                    onChanged: updateValue,
+                    value: field.value ?? false,
+                    onChanged: field.updateValue,
                     controlAffinity: ListTileControlAffinity.leading,
                     contentPadding: EdgeInsets.zero,
                   ),
-                  if (hasError)
+                  if (field.hasError)
                     Padding(
                       padding: const EdgeInsets.only(left: 16, top: 4),
                       child: Text(
-                        error!,
+                        field.error!,
                         style: const TextStyle(color: Colors.red),
                       ),
                     ),
