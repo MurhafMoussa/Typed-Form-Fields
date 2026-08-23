@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:go_router/go_router.dart';
 import 'package:typed_form_fields/typed_form_fields.dart';
 
 import 'src/docs/doc_viewer_widget.dart';
@@ -34,19 +35,112 @@ class TypedFormFieldsExampleApp extends StatefulWidget {
 class _TypedFormFieldsExampleAppState
     extends State<TypedFormFieldsExampleApp> {
   late final ThemeController _themeController;
-  late Locale _currentLocale;
+  late final ValueNotifier<Locale> _localeNotifier;
+  late final GoRouter _router;
 
   @override
   void initState() {
     super.initState();
     _themeController = widget.themeController ?? ThemeController();
-    _currentLocale = widget.initialLocale ?? const Locale('en');
+    _localeNotifier = ValueNotifier<Locale>(
+      widget.initialLocale ?? const Locale('en'),
+    );
+
+    _router = GoRouter(
+      initialLocation: AppRoutes.initial,
+      refreshListenable: _localeNotifier,
+      routes: [
+        ShellRoute(
+          builder: (context, state, child) {
+            final path = state.uri.path;
+            final normalizedRoute = path.isEmpty ? AppRoutes.initial : path;
+
+            return ValueListenableBuilder<Locale>(
+              valueListenable: _localeNotifier,
+              builder: (context, currentLocale, _) {
+                return AppShell(
+                  currentRoute: normalizedRoute,
+                  onNavigate: (route) => context.go(route),
+                  themeController: _themeController,
+                  currentLocale: currentLocale,
+                  onLocaleChanged: _changeLocale,
+                  child: child,
+                );
+              },
+            );
+          },
+          routes: [
+            GoRoute(
+              path: AppRoutes.registration,
+              builder: (context, state) => const RegistrationFormScreen(),
+            ),
+            GoRoute(
+              path: AppRoutes.widgetGallery,
+              builder: (context, state) => const WidgetGalleryScreen(),
+            ),
+            GoRoute(
+              path: AppRoutes.multiStep,
+              builder: (context, state) => const MultiStepFormScreen(),
+            ),
+            GoRoute(
+              path: AppRoutes.dynamicForm,
+              builder: (context, state) => const DynamicFormScreen(),
+            ),
+            GoRoute(
+              path: '/docs/:docId',
+              builder: (context, state) {
+                final docId = state.pathParameters['docId'] ?? 'getting-started';
+                final docRoute = '/docs/$docId';
+                return ValueListenableBuilder<Locale>(
+                  valueListenable: _localeNotifier,
+                  builder: (context, currentLocale, _) {
+                    return DocViewerWidget(
+                      docRoute: docRoute,
+                      locale: currentLocale,
+                      onNavigate: (route) => context.go(route),
+                    );
+                  },
+                );
+              },
+            ),
+            GoRoute(
+              path: '/login-form',
+              redirect: (context, state) => AppRoutes.registration,
+            ),
+            GoRoute(
+              path: '/bloc-form',
+              redirect: (context, state) => AppRoutes.registration,
+            ),
+            GoRoute(
+              path: '/widget-showcase',
+              redirect: (context, state) => AppRoutes.widgetGallery,
+            ),
+            GoRoute(
+              path: '/field-wrapper',
+              redirect: (context, state) => AppRoutes.widgetGallery,
+            ),
+            GoRoute(
+              path: '/validation-strategies',
+              redirect: (context, state) => AppRoutes.widgetGallery,
+            ),
+            GoRoute(
+              path: '/multi-step-form',
+              redirect: (context, state) => AppRoutes.multiStep,
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  @override
+  void dispose() {
+    _localeNotifier.dispose();
+    super.dispose();
   }
 
   void _changeLocale(Locale locale) {
-    setState(() {
-      _currentLocale = locale;
-    });
+    _localeNotifier.value = locale;
   }
 
   @override
@@ -54,87 +148,30 @@ class _TypedFormFieldsExampleAppState
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: _themeController,
       builder: (context, themeMode, _) {
-        return MaterialApp(
-          title: 'Typed Form Fields Showcase & Docs',
-          debugShowCheckedModeBanner: false,
-          theme: AppTheme.lightTheme,
-          darkTheme: AppTheme.darkTheme,
-          themeMode: themeMode,
-          locale: _currentLocale,
-          localizationsDelegates: const [
-            ValidatorLocalizationsDelegate.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-          ],
-          supportedLocales: const [
-            Locale('en'),
-            Locale('es'),
-            Locale('fr'),
-            Locale('de'),
-            Locale('ar'),
-          ],
-          initialRoute: AppRoutes.initial,
-          onGenerateRoute: (settings) {
-            final name = settings.name ?? AppRoutes.initial;
-            final normalizedRoute =
-                (name == '/') ? AppRoutes.initial : name;
-
-            Widget page;
-
-            switch (normalizedRoute) {
-              case AppRoutes.registration:
-              case '/login-form':
-              case '/bloc-form':
-                page = const RegistrationFormScreen();
-                break;
-              case AppRoutes.widgetGallery:
-              case '/widget-showcase':
-              case '/field-wrapper':
-              case '/validation-strategies':
-                page = const WidgetGalleryScreen();
-                break;
-              case AppRoutes.multiStep:
-              case '/multi-step-form':
-                page = const MultiStepFormScreen();
-                break;
-              case AppRoutes.dynamicForm:
-                page = const DynamicFormScreen();
-                break;
-              case AppRoutes.docsGettingStarted:
-              case AppRoutes.docsCoreConcepts:
-              case AppRoutes.docsValidationStrategies:
-              case AppRoutes.docsAsyncValidation:
-              case AppRoutes.docsFieldGrouping:
-              case AppRoutes.docsCustomWidgets:
-                page = DocViewerWidget(
-                  docRoute: normalizedRoute,
-                  locale: _currentLocale,
-                  onNavigate: (route) {
-                    if (ModalRoute.of(context)?.settings.name != route) {
-                      Navigator.of(context).pushReplacementNamed(route);
-                    }
-                  },
-                );
-                break;
-              default:
-                page = const RegistrationFormScreen();
-            }
-
-            return MaterialPageRoute(
-              settings: settings,
-              builder: (context) => AppShell(
-                currentRoute: normalizedRoute,
-                onNavigate: (route) {
-                  if (ModalRoute.of(context)?.settings.name != route) {
-                    Navigator.of(context).pushReplacementNamed(route);
-                  }
-                },
-                themeController: _themeController,
-                currentLocale: _currentLocale,
-                onLocaleChanged: _changeLocale,
-                child: page,
-              ),
+        return ValueListenableBuilder<Locale>(
+          valueListenable: _localeNotifier,
+          builder: (context, currentLocale, _) {
+            return MaterialApp.router(
+              title: 'Typed Form Fields Showcase & Docs',
+              debugShowCheckedModeBanner: false,
+              theme: AppTheme.lightTheme,
+              darkTheme: AppTheme.darkTheme,
+              themeMode: themeMode,
+              locale: currentLocale,
+              localizationsDelegates: const [
+                ValidatorLocalizationsDelegate.delegate,
+                GlobalMaterialLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+              ],
+              supportedLocales: const [
+                Locale('en'),
+                Locale('es'),
+                Locale('fr'),
+                Locale('de'),
+                Locale('ar'),
+              ],
+              routerConfig: _router,
             );
           },
         );

@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.0.0 - Major Refactor: 100% UI-Agnostic Architecture, TypedFieldState, Async Validation & Field Grouping
+## 2.0.0 - Major Refactor: 100% UI-Agnostic Architecture, Async Validation Pipeline, Field Grouping & State Inspection
 
 ### 🚀 **Breaking Changes**
 
@@ -19,24 +19,38 @@
 
 ### ✨ **New Features**
 
-- **Field State Encapsulation (`TypedFieldState<T>`)**: Introduced lightweight immutable field state class containing `fieldName`, `value`, `error`, `hasError`, `isValidating`, `updateValue`, and convenience getter `displayError`.
-- **Form-Level Async Validating State**: Added `validatingFields` (`Set<String>`) and `isValidating` getter to `TypedFormState`.
-- **Async Validator Interface (`AsyncValidator<T>`)**: Introduced `AsyncValidator<T>` signature `FutureOr<String?> validate(T? value, BuildContext context)` and `asyncValidators` list on `FormFieldDefinition<T>`.
-- **Field Grouping Metadata**: Added optional `group` (`String?`) parameter to `FormFieldDefinition<T>` for tagging multi-step form fields.
-- **Group & Subset Validation APIs**: Added `validateGroup` and `validateFields` on `TypedFormController` and `BuildContext` extensions for validating step groups and field subsets.
-- **Passive Group & Subset Validity Checks**: Added `isGroupValid` and `areFieldsValid` for non-intrusive step status checks.
-- **Group Touching API (`touchGroup`)**: Added `touchGroup` for marking entire field groups as touched.
-- **Multi-Step Form Wizard Example**: Added interactive multi-step form screen and showcase in example app.
+- **Async Validation Pipeline & Debouncing**:
+  - Introduced `AsyncValidator<T>` interface (`FutureOr<String?> validate(T? value, BuildContext context)`) and `asyncValidators` list on `FormFieldDefinition<T>`.
+  - Added configurable debouncing delay (`asyncDebounceDelay`, default 300ms) that executes async validators only after static sync validators pass.
+  - Implemented async submission flushing: `validateForm()` automatically flushes pending async debouncers and awaits in-flight async tasks before completing.
+  - Implemented async cancellation on form reset and exception handling via `onAsyncValidationError`.
+  - Added real-time tracking with `validatingFields` (`Set<String>`) on `TypedFormState` and `field.isValidating` on `TypedFieldState<T>`.
+- **Form State Inspection & Tracking**:
+  - Added `isDirty` getter to `TypedFormController` indicating whether current form values differ from initial values.
+  - Exposed `initialValues` map on `TypedFormController`.
+  - Added `touchedFields` map and `isTouched(fieldName)` query method.
+- **Field Grouping Metadata & Multi-step Wizard**:
+  - Added optional `group` (`String?`) parameter to `FormFieldDefinition<T>` for tagging multi-step form fields.
+  - Added `validateGroup` and `validateFields` APIs on `TypedFormController` and `BuildContext` extensions.
+  - Added passive group checks `isGroupValid` and `areFieldsValid` for non-intrusive step status checks.
+  - Added `touchGroup` for marking entire field groups as touched.
+- **Rebuilt Interactive Example Application & Embedded Documentation Hub**:
+  - Rebuilt example application featuring Live State Inspector, diagnostic panels, and multi-step form showcase.
+  - Added embedded Documentation Hub with interactive markdown rendering, search overlay, and topic filter.
+- **Official AI Agent Skill**:
+  - Created `.agents/skills/typed-form-fields/SKILL.md` skill containing comprehensive usage patterns, API cheat-sheets, and integration workflows for AI coding assistants.
 
 ### 🛠 **Architectural & Core Improvements**
 
 - **100% UI-Agnostic Core**: Completely decoupled from Material/Cupertino design systems.
-- **Registry & Tracker Delegation**: Modularized `TypedFormController` state logic into dedicated `FormFieldRegistry` and `FormTouchedTracker` helpers with O(1)/O(N) group lookups.
-- **Dynamic Localization**: Added `asyncValidationError` string and Arabic/English localizations across validator delegate.
+- **Modular Architecture**: Delegated controller logic to dedicated `FormValidationOrchestrator`, `FormFieldRegistry`, and `FormTouchedTracker` components.
+- **Standalone `TypedFormState`**: Extracted form state into its own file with immutable copy methods.
+- **Dynamic Localizations**: Updated localizations delegate with async validation error strings and Arabic/English translations.
 
 ### 🧪 **Testing & Quality**
 
-- **Comprehensive Test Suite**: 520+ unit, widget, and integration tests covering field wrapper rebuilds, field grouping, multi-step navigation, and state immutability.
+- **100% Core Test Coverage**: Achieved 100% unit test coverage for `FormValidationOrchestrator`, `TypedFormController`, `FormValidator`, and `FormFieldRegistry`.
+- **Comprehensive Integration Suite**: Over 560 passing unit, widget, and integration tests covering debounced async validation, submission flushing, reset cancellation, field wrapper rebuilds, and multi-step wizard navigation.
 
 ## 1.3.3 - Dynamic Validator Localization & Comprehensive Test Suite
 

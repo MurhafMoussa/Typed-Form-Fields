@@ -11,10 +11,10 @@ Create `.github/workflows/deploy-example.yml` configured to build `flutter build
 - `ai_specs/0005-example-application-ui-ux-rebuild/spec.md`
 
 ## Acceptance criteria
-- [ ] Workflow file `.github/workflows/deploy-example.yml` created.
-- [ ] Triggers automatically on push to `main` or `production` branches.
-- [ ] Configured with `permissions: contents: write`.
-- [ ] Runs Flutter web release build with base href `/Typed-Form-Fields/` and publishes artifact to `gh-pages` branch.
+- [x] Workflow file `.github/workflows/deploy-example.yml` created.
+- [x] Triggers automatically on push to `main` or `production` branches.
+- [x] Configured with `permissions: contents: write`.
+- [x] Runs Flutter web release build with base href `/Typed-Form-Fields/` and publishes artifact to `gh-pages` branch.
 
 ## Covers
 - User Stories: 6

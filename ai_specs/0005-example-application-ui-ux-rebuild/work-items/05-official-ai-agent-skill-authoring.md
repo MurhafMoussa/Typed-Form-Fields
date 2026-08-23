@@ -12,8 +12,8 @@ Create `.agents/skills/typed-form-fields/SKILL.md` containing LLM-optimized pack
 - `GLOSSARY.md`
 
 ## Acceptance criteria
-- [ ] Official AI agent skill created at `.agents/skills/typed-form-fields/SKILL.md`.
-- [ ] Covers `TypedFormController` lifecycle, state reactivity, validation strategies, async validation pipeline, field grouping, state management integration (BLoC/Provider), and custom widget wrapping with `FieldWrapper`.
+- [x] Official AI agent skill created at `.agents/skills/typed-form-fields/SKILL.md`.
+- [x] Covers `TypedFormController` lifecycle, state reactivity, validation strategies, async validation pipeline, field grouping, state management integration (BLoC/Provider), and custom widget wrapping with `FieldWrapper`.
 
 ## Covers
 - User Stories: 5
