@@ -208,6 +208,20 @@ void main() {
         expect(newState.isValid, isFalse);
       });
 
+      test('allFieldsRealTime cancels async validation if field fails sync validation', () {
+        final state = createInitialState(strategy: ValidationStrategy.allFieldsRealTime);
+        final newState = orchestrator.updateField<String>(
+          fieldName: 'username',
+          value: '',
+          context: mockContext,
+          state: state,
+          getState: () => state,
+          emitState: (_) {},
+        );
+
+        expect(newState.errors['username'], 'Username required');
+      });
+
       test('realTimeOnly validates single field synchronously', () {
         final state = createInitialState(strategy: ValidationStrategy.realTimeOnly);
         final newState = orchestrator.updateField<String>(
@@ -392,6 +406,29 @@ void main() {
         expect(state.errors['username'], 'Username required');
       });
 
+      test('allFieldsRealTime debounces validation without async validators when sync validation passes', () async {
+        var state = createInitialState(strategy: ValidationStrategy.allFieldsRealTime);
+        final emissions = <TypedFormState>[];
+
+        orchestrator.updateFieldWithDebounce<String>(
+          fieldName: 'username',
+          value: 'john',
+          context: mockContext,
+          state: state,
+          getState: () => state,
+          emitState: (s) {
+            state = s;
+            emissions.add(s);
+          },
+        );
+
+        await Future<void>.delayed(const Duration(milliseconds: 50));
+
+        expect(emissions.isNotEmpty, isTrue);
+        expect(state.values['username'], 'john');
+        expect(state.errors.containsKey('username'), isFalse);
+      });
+
       test('allFieldsRealTime schedules async validation if sync validation passes', () async {
         final asyncField = FormFieldDefinition<String>(
           name: 'asyncUsername',
@@ -457,6 +494,28 @@ void main() {
 
         expect(emissions.isNotEmpty, isTrue);
         expect(state.errors['email'], 'Invalid email');
+      });
+
+      test('realTimeOnly debounces single field validation without async validators when sync passes', () async {
+        var state = createInitialState(strategy: ValidationStrategy.realTimeOnly);
+        final emissions = <TypedFormState>[];
+
+        orchestrator.updateFieldWithDebounce<String>(
+          fieldName: 'email',
+          value: 'john@example.com',
+          context: mockContext,
+          state: state,
+          getState: () => state,
+          emitState: (s) {
+            state = s;
+            emissions.add(s);
+          },
+        );
+
+        await Future<void>.delayed(const Duration(milliseconds: 50));
+
+        expect(emissions.isNotEmpty, isTrue);
+        expect(state.errors.containsKey('email'), isFalse);
       });
 
       test('realTimeOnly schedules async validation when sync validation passes', () async {
@@ -566,6 +625,103 @@ void main() {
         expect(newState.errors.containsKey('email'), isFalse);
       });
 
+      test('allFieldsRealTime in updateFields cancels async validation when field fails sync validation', () {
+        final state = createInitialState(strategy: ValidationStrategy.allFieldsRealTime);
+        final newState = orchestrator.updateFields(
+          fieldValues: {'username': ''},
+          context: mockContext,
+          state: state,
+          getState: () => state,
+          emitState: (_) {},
+        );
+
+        expect(newState.errors['username'], 'Username required');
+      });
+
+      test('allFieldsRealTime in updateFields schedules async validation for fields with async validators', () async {
+        final asyncField = FormFieldDefinition<String>(
+          name: 'asyncField',
+          initialValue: '',
+          validators: [TestValidator<String>((v, c) => null)],
+          asyncValidators: [
+            TestAsyncValidator<String>((v, c) async => 'Async Error'),
+          ],
+        );
+
+        final testReg = FormFieldRegistry([asyncField]);
+        final testTracker = FormTouchedTracker(['asyncField']);
+        final testVal = FormValidator(debounceDelay: Duration.zero);
+        final testOrch = FormValidationOrchestrator(
+          registry: testReg,
+          touchedTracker: testTracker,
+          validator: testVal,
+          asyncDebounceDelay: Duration.zero,
+        );
+
+        var currentState = TypedFormState(
+          values: testReg.initialValues,
+          errors: const {},
+          isValid: true,
+          validationStrategy: ValidationStrategy.allFieldsRealTime,
+          fieldTypes: testReg.fieldTypes,
+        );
+
+        currentState = testOrch.updateFields(
+          fieldValues: {'asyncField': 'val'},
+          context: mockContext,
+          state: currentState,
+          getState: () => currentState,
+          emitState: (s) => currentState = s,
+        );
+
+        await Future<void>.delayed(const Duration(milliseconds: 50));
+
+        expect(currentState.errors['asyncField'], 'Async Error');
+        testVal.dispose();
+      });
+
+      test('realTimeOnly in updateFields schedules async validation for fields with async validators', () async {
+        final asyncField = FormFieldDefinition<String>(
+          name: 'asyncField',
+          initialValue: '',
+          validators: [TestValidator<String>((v, c) => null)],
+          asyncValidators: [
+            TestAsyncValidator<String>((v, c) async => 'Async Error'),
+          ],
+        );
+
+        final testReg = FormFieldRegistry([asyncField]);
+        final testTracker = FormTouchedTracker(['asyncField']);
+        final testVal = FormValidator(debounceDelay: Duration.zero);
+        final testOrch = FormValidationOrchestrator(
+          registry: testReg,
+          touchedTracker: testTracker,
+          validator: testVal,
+          asyncDebounceDelay: Duration.zero,
+        );
+
+        var currentState = TypedFormState(
+          values: testReg.initialValues,
+          errors: const {},
+          isValid: true,
+          validationStrategy: ValidationStrategy.realTimeOnly,
+          fieldTypes: testReg.fieldTypes,
+        );
+
+        currentState = testOrch.updateFields(
+          fieldValues: {'asyncField': 'val'},
+          context: mockContext,
+          state: currentState,
+          getState: () => currentState,
+          emitState: (s) => currentState = s,
+        );
+
+        await Future<void>.delayed(const Duration(milliseconds: 50));
+
+        expect(currentState.errors['asyncField'], 'Async Error');
+        testVal.dispose();
+      });
+
       test('disabled clears all errors for multiple fields', () {
         final state = createInitialState(strategy: ValidationStrategy.disabled);
         final newState = orchestrator.updateFields(
@@ -596,6 +752,20 @@ void main() {
         );
 
         expect(newState.errors['optionalNote'], 'Note required');
+      });
+
+      test('updates validators without async validators when field passes sync validation', () {
+        final state = createInitialState();
+        final newState = orchestrator.updateFieldValidators<String>(
+          name: 'optionalNote',
+          validators: [TestValidator<String>((v, c) => null)],
+          context: mockContext,
+          state: state,
+          getState: () => state,
+          emitState: (_) {},
+        );
+
+        expect(newState.errors.containsKey('optionalNote'), isFalse);
       });
 
       test('schedules async validation when new async validators provided', () async {
@@ -834,6 +1004,22 @@ void main() {
           expect(newState.errors['username'], 'Username required');
           expect(newState.errors['email'], 'Invalid email');
         });
+
+        test('removes errors when touchGroup encounters a valid field that previously had error', () {
+          final state = createInitialState().copyWith(
+            values: {
+              'username': 'john',
+              'email': 'john@example.com',
+              'age': 0,
+              'optionalNote': '',
+            },
+            errors: {'username': 'Old error'},
+          );
+
+          final newState = orchestrator.touchGroup('account', context: mockContext, state: state);
+
+          expect(newState.errors.containsKey('username'), isFalse);
+        });
       });
     });
 
@@ -887,6 +1073,49 @@ void main() {
         expect(capturedAsyncError, isA<FormatException>());
         expect(capturedAsyncStackTrace, isNotNull);
         expect(capturedAsyncFieldName, 'throwingField');
+        testVal.dispose();
+      });
+
+      test('removes field error when async validator completes with null', () async {
+        final asyncField = FormFieldDefinition<String>(
+          name: 'asyncUsername',
+          initialValue: '',
+          validators: [TestValidator<String>((v, c) => null)],
+          asyncValidators: [
+            TestAsyncValidator<String>((v, c) async => null),
+          ],
+        );
+
+        final testReg = FormFieldRegistry([asyncField]);
+        final testTracker = FormTouchedTracker(['asyncUsername']);
+        final testVal = FormValidator(debounceDelay: Duration.zero);
+        final testOrch = FormValidationOrchestrator(
+          registry: testReg,
+          touchedTracker: testTracker,
+          validator: testVal,
+          asyncDebounceDelay: Duration.zero,
+        );
+
+        var currentState = TypedFormState(
+          values: testReg.initialValues,
+          errors: const {'asyncUsername': 'Previous Error'},
+          isValid: false,
+          validationStrategy: ValidationStrategy.allFieldsRealTime,
+          fieldTypes: testReg.fieldTypes,
+        );
+
+        testOrch.scheduleFieldAsyncValidation<String>(
+          fieldName: 'asyncUsername',
+          value: 'validValue',
+          asyncValidators: asyncField.asyncValidators!.cast<AsyncValidator<String>>(),
+          context: mockContext,
+          getState: () => currentState,
+          emitState: (s) => currentState = s,
+        );
+
+        await Future<void>.delayed(const Duration(milliseconds: 50));
+
+        expect(currentState.errors.containsKey('asyncUsername'), isFalse);
         testVal.dispose();
       });
     });
