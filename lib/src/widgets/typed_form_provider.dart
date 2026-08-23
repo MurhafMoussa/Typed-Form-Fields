@@ -253,4 +253,56 @@ extension TypedFormProviderExtension on BuildContext {
       onValidationFail: onValidationFail,
     );
   }
+
+  /// Validates all fields in a named group.
+  void validateGroup(
+    String groupName, {
+    VoidCallback? onValidationPass,
+    VoidCallback? onValidationFail,
+  }) {
+    TypedFormProvider.of(this).validateGroup(
+      groupName,
+      context: this,
+      onValidationPass: onValidationPass,
+      onValidationFail: onValidationFail,
+    );
+  }
+
+  /// Validates a specific subset of fields by name.
+  void validateFields(
+    List<String> fieldNames, {
+    VoidCallback? onValidationPass,
+    VoidCallback? onValidationFail,
+  }) {
+    TypedFormProvider.of(this).validateFields(
+      fieldNames,
+      context: this,
+      onValidationPass: onValidationPass,
+      onValidationFail: onValidationFail,
+    );
+  }
+
+  /// Passively checks validity of all fields in [groupName].
+  bool isGroupValid(String groupName) {
+    return TypedFormProvider.of(this).isGroupValid(
+      groupName,
+      context: this,
+    );
+  }
+
+  /// Passively checks validity of a list of fields by name.
+  bool areFieldsValid(List<String> fieldNames) {
+    return TypedFormProvider.of(this).areFieldsValid(
+      fieldNames,
+      context: this,
+    );
+  }
+
+  /// Marks all fields in [groupName] as touched and updates form state.
+  void touchGroup(String groupName) {
+    TypedFormProvider.of(this).touchGroup(
+      groupName,
+      context: this,
+    );
+  }
 }

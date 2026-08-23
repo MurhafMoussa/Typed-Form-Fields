@@ -723,6 +723,257 @@ void main() {
         expect(formCubit.state.errors['email'], isNull);
       });
     });
+
+    group('Group and Subset Validation', () {
+      late MockValidator<String> requiredValidator;
+
+      setUp(() {
+        requiredValidator = MockValidator<String>();
+        requiredValidator.mockValidate = (val, ctx) =>
+            (val == null || val.isEmpty) ? 'Field is required' : null;
+
+        formCubit = TypedFormController(
+          fields: [
+            FormFieldDefinition<String>(
+              name: 'firstName',
+              group: 'personal',
+              validators: [requiredValidator],
+              initialValue: '',
+            ),
+            FormFieldDefinition<String>(
+              name: 'lastName',
+              group: 'personal',
+              validators: [requiredValidator],
+              initialValue: 'Doe',
+            ),
+            FormFieldDefinition<String>(
+              name: 'address',
+              group: 'addressGroup',
+              validators: [requiredValidator],
+              initialValue: '',
+            ),
+          ],
+          validationStrategy: ValidationStrategy.onSubmitThenRealTime,
+        );
+      });
+
+      group('validateGroup', () {
+        test('should trigger onValidationFail and switch strategy on error', () {
+          bool passCalled = false;
+          bool failCalled = false;
+
+          formCubit.validateGroup(
+            'personal',
+            context: mockContext,
+            onValidationPass: () => passCalled = true,
+            onValidationFail: () => failCalled = true,
+          );
+
+          expect(passCalled, isFalse);
+          expect(failCalled, isTrue);
+          expect(formCubit.state.errors['firstName'], equals('Field is required'));
+          expect(formCubit.state.validationStrategy,
+              equals(ValidationStrategy.realTimeOnly));
+        });
+
+        test('should trigger onValidationPass when all group fields are valid', () {
+          formCubit.updateField(
+            fieldName: 'firstName',
+            value: 'John',
+            context: mockContext,
+          );
+
+          bool passCalled = false;
+          bool failCalled = false;
+
+          formCubit.validateGroup(
+            'personal',
+            context: mockContext,
+            onValidationPass: () => passCalled = true,
+            onValidationFail: () => failCalled = true,
+          );
+
+          expect(passCalled, isTrue);
+          expect(failCalled, isFalse);
+          expect(formCubit.state.errors['firstName'], isNull);
+          expect(formCubit.state.errors['lastName'], isNull);
+          expect(formCubit.state.validationStrategy,
+              equals(ValidationStrategy.onSubmitThenRealTime));
+        });
+
+        test('should preserve existing errors on unvalidated fields', () {
+          formCubit.updateError(
+            fieldName: 'address',
+            errorMessage: 'Existing error',
+            context: mockContext,
+          );
+
+          formCubit.validateGroup(
+            'personal',
+            context: mockContext,
+          );
+
+          expect(formCubit.state.errors['address'], equals('Existing error'));
+        });
+
+        test('should pass validation for unknown or empty group', () {
+          bool passCalled = false;
+          bool failCalled = false;
+
+          formCubit.validateGroup(
+            'unknownGroup',
+            context: mockContext,
+            onValidationPass: () => passCalled = true,
+            onValidationFail: () => failCalled = true,
+          );
+
+          expect(passCalled, isTrue);
+          expect(failCalled, isFalse);
+        });
+      });
+
+      group('validateFields', () {
+        test('should validate specified fields and trigger callbacks', () {
+          bool passCalled = false;
+          bool failCalled = false;
+
+          formCubit.validateFields(
+            ['firstName', 'lastName'],
+            context: mockContext,
+            onValidationPass: () => passCalled = true,
+            onValidationFail: () => failCalled = true,
+          );
+
+          expect(passCalled, isFalse);
+          expect(failCalled, isTrue);
+          expect(formCubit.state.errors['firstName'], equals('Field is required'));
+          expect(formCubit.state.validationStrategy,
+              equals(ValidationStrategy.realTimeOnly));
+        });
+
+        test('should throw FormFieldError.fieldNotFound if field missing', () {
+          expect(
+            () => formCubit.validateFields(
+              ['nonExistentField'],
+              context: mockContext,
+            ),
+            throwsA(isA<FormFieldError>()),
+          );
+        });
+
+        test('should handle empty field list cleanly', () {
+          bool passCalled = false;
+
+          formCubit.validateFields(
+            [],
+            context: mockContext,
+            onValidationPass: () => passCalled = true,
+          );
+
+          expect(passCalled, isTrue);
+        });
+
+        test('should deduplicate input list', () {
+          bool failCalled = false;
+
+          formCubit.validateFields(
+            ['firstName', 'firstName'],
+            context: mockContext,
+            onValidationFail: () => failCalled = true,
+          );
+
+          expect(failCalled, isTrue);
+          expect(formCubit.state.errors['firstName'], equals('Field is required'));
+        });
+      });
+
+      group('isGroupValid', () {
+        test('should return false if any field in group is invalid', () {
+          final result = formCubit.isGroupValid('personal', context: mockContext);
+          expect(result, isFalse);
+        });
+
+        test('should return true if all fields in group are valid', () {
+          formCubit.updateField(
+            fieldName: 'firstName',
+            value: 'John',
+            context: mockContext,
+          );
+
+          final result = formCubit.isGroupValid('personal', context: mockContext);
+          expect(result, isTrue);
+        });
+
+        test('should return true for empty or unknown group', () {
+          final result = formCubit.isGroupValid('unknownGroup', context: mockContext);
+          expect(result, isTrue);
+        });
+
+        test('should be passive and not modify state or touched tracker', () {
+          final initialErrors = formCubit.state.errors;
+
+          final result = formCubit.isGroupValid('personal', context: mockContext);
+
+          expect(result, isFalse);
+          expect(formCubit.state.errors, equals(initialErrors));
+        });
+      });
+
+      group('areFieldsValid', () {
+        test('should return false if any field is invalid', () {
+          final result =
+              formCubit.areFieldsValid(['firstName', 'lastName'], context: mockContext);
+          expect(result, isFalse);
+        });
+
+        test('should return true if all fields are valid', () {
+          formCubit.updateField(
+            fieldName: 'firstName',
+            value: 'John',
+            context: mockContext,
+          );
+
+          final result =
+              formCubit.areFieldsValid(['firstName', 'lastName'], context: mockContext);
+          expect(result, isTrue);
+        });
+
+        test('should return false if field does not exist', () {
+          final result = formCubit
+              .areFieldsValid(['firstName', 'nonExistent'], context: mockContext);
+          expect(result, isFalse);
+        });
+
+        test('should return true for empty list', () {
+          final result = formCubit.areFieldsValid([], context: mockContext);
+          expect(result, isTrue);
+        });
+
+        test('should be passive and not modify state', () {
+          final initialErrors = formCubit.state.errors;
+
+          formCubit.areFieldsValid(['firstName'], context: mockContext);
+
+          expect(formCubit.state.errors, equals(initialErrors));
+        });
+      });
+
+      group('touchGroup', () {
+        test('should mark group fields as touched and update errors', () {
+          formCubit.touchGroup('personal', context: mockContext);
+
+          expect(formCubit.state.errors['firstName'], equals('Field is required'));
+          // Does not switch strategy
+          expect(formCubit.state.validationStrategy,
+              equals(ValidationStrategy.onSubmitThenRealTime));
+        });
+
+        test('should handle unknown group cleanly', () {
+          formCubit.touchGroup('unknownGroup', context: mockContext);
+          expect(formCubit.state.errors, isEmpty);
+        });
+      });
+    });
   });
 }
 

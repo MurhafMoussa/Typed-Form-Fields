@@ -306,6 +306,238 @@ class TypedFormController extends Cubit<TypedFormState> {
     );
   }
 
+  /// Validates all fields in a named group.
+  ///
+  /// Marks fields in the group as touched, calculates validation errors for them,
+  /// merges errors into state, re-evaluates overall form validity, invokes callbacks,
+  /// and switches validation strategy from [ValidationStrategy.onSubmitThenRealTime] to
+  /// [ValidationStrategy.realTimeOnly] if group validation fails.
+  ///
+  /// Returns cleanly without error if [groupName] matches no fields (empty or unknown group).
+  void validateGroup(
+    String groupName, {
+    required BuildContext context,
+    VoidCallback? onValidationPass,
+    VoidCallback? onValidationFail,
+  }) {
+    final groupFields = _registry.getFieldsByGroup(groupName);
+    if (groupFields.isEmpty) {
+      onValidationPass?.call();
+      return;
+    }
+
+    for (final field in groupFields) {
+      _touchedTracker.markTouched(field.name);
+    }
+
+    final newErrors = Map<String, String>.from(state.errors);
+    for (final field in groupFields) {
+      final error = _validator.validateFieldByName(
+        fieldName: field.name,
+        values: state.values,
+        validators: _registry.validators,
+        context: context,
+      );
+      if (error != null) {
+        newErrors[field.name] = error;
+      } else {
+        newErrors.remove(field.name);
+      }
+    }
+
+    final isValid = _validator.computeOverallValidityWithErrors(
+      values: state.values,
+      errors: newErrors,
+      touchedFields: _touchedTracker.touchedFields,
+      validators: _registry.validators,
+      context: context,
+    );
+
+    _emitIfChanged(
+      state.copyWith(
+        errors: newErrors,
+        isValid: isValid,
+      ),
+    );
+
+    final hasGroupErrors = groupFields.any((f) => newErrors.containsKey(f.name));
+    if (hasGroupErrors) {
+      onValidationFail?.call();
+      if (state.validationStrategy == ValidationStrategy.onSubmitThenRealTime) {
+        setValidationStrategy(ValidationStrategy.realTimeOnly);
+      }
+    } else {
+      onValidationPass?.call();
+    }
+  }
+
+  /// Validates a specific subset of fields by name.
+  ///
+  /// Marks specified fields as touched, calculates validation errors for them,
+  /// merges errors into state, re-evaluates overall form validity, invokes callbacks,
+  /// and switches validation strategy from [ValidationStrategy.onSubmitThenRealTime] to
+  /// [ValidationStrategy.realTimeOnly] if subset validation fails.
+  ///
+  /// Throws [FormFieldError.fieldNotFound] if any specified field does not exist.
+  /// Input list is deduplicated. Empty list passes validation cleanly.
+  void validateFields(
+    List<String> fieldNames, {
+    required BuildContext context,
+    VoidCallback? onValidationPass,
+    VoidCallback? onValidationFail,
+  }) {
+    if (fieldNames.isEmpty) {
+      onValidationPass?.call();
+      return;
+    }
+
+    final uniqueNames = fieldNames.toSet().toList();
+
+    for (final fieldName in uniqueNames) {
+      _registry.checkFieldExists(fieldName, currentValues: state.values);
+    }
+
+    for (final fieldName in uniqueNames) {
+      _touchedTracker.markTouched(fieldName);
+    }
+
+    final newErrors = Map<String, String>.from(state.errors);
+    for (final fieldName in uniqueNames) {
+      final error = _validator.validateFieldByName(
+        fieldName: fieldName,
+        values: state.values,
+        validators: _registry.validators,
+        context: context,
+      );
+      if (error != null) {
+        newErrors[fieldName] = error;
+      } else {
+        newErrors.remove(fieldName);
+      }
+    }
+
+    final isValid = _validator.computeOverallValidityWithErrors(
+      values: state.values,
+      errors: newErrors,
+      touchedFields: _touchedTracker.touchedFields,
+      validators: _registry.validators,
+      context: context,
+    );
+
+    _emitIfChanged(
+      state.copyWith(
+        errors: newErrors,
+        isValid: isValid,
+      ),
+    );
+
+    final hasSubsetErrors =
+        uniqueNames.any((name) => newErrors.containsKey(name));
+    if (hasSubsetErrors) {
+      onValidationFail?.call();
+      if (state.validationStrategy == ValidationStrategy.onSubmitThenRealTime) {
+        setValidationStrategy(ValidationStrategy.realTimeOnly);
+      }
+    } else {
+      onValidationPass?.call();
+    }
+  }
+
+  /// Passively checks validity of all fields in [groupName].
+  ///
+  /// Returns `true` if all fields in group pass validation or if [groupName] is empty/unknown.
+  /// Does not alter touched state, trigger debouncing, or emit state updates.
+  bool isGroupValid(
+    String groupName, {
+    required BuildContext context,
+  }) {
+    final groupFields = _registry.getFieldsByGroup(groupName);
+    if (groupFields.isEmpty) return true;
+
+    for (final field in groupFields) {
+      final error = _validator.validateFieldByName(
+        fieldName: field.name,
+        values: state.values,
+        validators: _registry.validators,
+        context: context,
+      );
+      if (error != null) return false;
+    }
+    return true;
+  }
+
+  /// Passively checks validity of a list of fields by name.
+  ///
+  /// Returns `true` if all fields pass validation or if [fieldNames] is empty.
+  /// Returns `false` if any field fails validation or is missing.
+  /// Does not alter touched state, trigger debouncing, or emit state updates.
+  bool areFieldsValid(
+    List<String> fieldNames, {
+    required BuildContext context,
+  }) {
+    if (fieldNames.isEmpty) return true;
+
+    final uniqueNames = fieldNames.toSet();
+    for (final fieldName in uniqueNames) {
+      if (!_registry.containsField(fieldName)) return false;
+      final error = _validator.validateFieldByName(
+        fieldName: fieldName,
+        values: state.values,
+        validators: _registry.validators,
+        context: context,
+      );
+      if (error != null) return false;
+    }
+    return true;
+  }
+
+  /// Marks all fields in [groupName] as touched and updates form state.
+  ///
+  /// Re-evaluates form state errors and overall form validity.
+  /// Does not invoke callbacks or switch validation strategies.
+  /// Returns cleanly without error if [groupName] matches no fields.
+  void touchGroup(
+    String groupName, {
+    required BuildContext context,
+  }) {
+    final groupFields = _registry.getFieldsByGroup(groupName);
+    if (groupFields.isEmpty) return;
+
+    for (final field in groupFields) {
+      _touchedTracker.markTouched(field.name);
+    }
+
+    final newErrors = Map<String, String>.from(state.errors);
+    for (final field in groupFields) {
+      final error = _validator.validateFieldByName(
+        fieldName: field.name,
+        values: state.values,
+        validators: _registry.validators,
+        context: context,
+      );
+      if (error != null) {
+        newErrors[field.name] = error;
+      } else {
+        newErrors.remove(field.name);
+      }
+    }
+
+    final isValid = _validator.computeOverallValidityWithErrors(
+      values: state.values,
+      errors: newErrors,
+      touchedFields: _touchedTracker.touchedFields,
+      validators: _registry.validators,
+      context: context,
+    );
+
+    _emitIfChanged(
+      state.copyWith(
+        errors: newErrors,
+        isValid: isValid,
+      ),
+    );
+  }
+
   /// Emits new state only if it's different from the current state
   void _emitIfChanged(TypedFormState newState) {
     if (newState != state) {
