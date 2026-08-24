@@ -2,6 +2,7 @@
 
 [![pub version](https://img.shields.io/pub/v/typed_form_fields.svg)](https://pub.dev/packages/typed_form_fields)
 [![pub points](https://img.shields.io/pub/points/typed_form_fields.svg)](https://pub.dev/packages/typed_form_fields/score)
+[![Live Web Demo](https://img.shields.io/badge/Live_Demo-GitHub_Pages-2ea44f?logo=github)](https://murhafmoussa.github.io/Typed-Form-Fields/)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Flutter](https://img.shields.io/badge/Flutter-02569B?logo=flutter&logoColor=white)](https://flutter.dev)
 
@@ -48,6 +49,8 @@ A **production-ready**, highly performant Flutter package for **type-safe form v
 - [License & Author](#license--author)
 
 ---
+
+🌐 **Live Web Demo & Interactive Documentation Hub:** [murhafmoussa.github.io/Typed-Form-Fields/](https://murhafmoussa.github.io/Typed-Form-Fields/)
 
 ## Installation
 
