@@ -42,3 +42,5 @@ jobs:
         run: flutter test example/test
 
 
+      - name: Publish to pub.dev
+        run: dart pub publish --force
