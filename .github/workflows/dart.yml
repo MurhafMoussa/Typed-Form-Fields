@@ -39,8 +39,5 @@ jobs:
         run: flutter test
 
       - name: Run example app tests
-        run: flutter test example/test
-
-
-      - name: Publish to pub.dev
-        run: dart pub publish --force
+        working-directory: example
+        run: flutter test
