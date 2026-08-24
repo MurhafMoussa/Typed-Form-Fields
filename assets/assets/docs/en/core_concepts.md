@@ -1,13 +1,108 @@
 # Core Concepts & State Management
 
-`Typed-Form-Fields` decouples form state and validation logic from UI rendering using reactive state architecture, ensuring type safety and fine-grained UI rebuilds.
+`Typed-Form-Fields` decouples form state and validation logic from UI rendering using reactive BLoC state architecture, ensuring type safety, immutability, and fine-grained UI rebuilds.
 
-## Overview & Prerequisites
+## Overview & Architecture
 
-To effectively manage form state, understand the following core concepts:
-- **Type-Safe Value Retrieval**: Use `getValue<T>('fieldName')` to safely extract values without casting errors.
-- **Form Inspection Flags**: Monitor `isDirty`, `initialValues`, `touchedFields`, and `isTouched(fieldName)` for user activity tracking.
-- **Internal BLoC Optimization**: Under the hood, state updates are powered by BLoC reactivity (`buildWhen` and `listenWhen`), avoiding full-screen re-renders when individual fields change.
+Form state management in `Typed-Form-Fields` is structured around three core primitives:
+1. `FormFieldDefinition<T>`: Declarative schema defining a field's name, initial value, validation rules, group tag, and generic data type.
+2. `TypedFormController`: A specialized BLoC `Cubit<TypedFormState>` managing central state, async debounce timers, group validation, and runtime field modifications.
+3. `TypedFormState`: An immutable snapshot containing current raw values, active error messages, dirty/touched status, and pending async validation tasks.
+
+---
+
+## Detailed API Breakdown
+
+### 1. `FormFieldDefinition<T>`
+
+`FormFieldDefinition<T>` defines field metadata and validation rules declaratively.
+
+#### Properties & Methods
+
+| Property / Method | Type | Description |
+| --- | --- | --- |
+| `name` | `String` | **Required.** Unique field key identifier. |
+| `validators` | `List<Validator<T>>` | Synchronous validation rules executing in order. |
+| `asyncValidators` | `List<AsyncValidator<T>>` | Asynchronous validation rules executing with debouncing. |
+| `initialValue` | `T?` | Starting value assigned when controller initializes or resets. |
+| `group` | `String?` | Group tag identifier for multi-step or tabbed validation. |
+| `valueType` | `Type` | Returns runtime type `T`. |
+| `createValidator()` | `String? Function(Object?, BuildContext)` | Compiles combined synchronous validator execution block. |
+| `copyWith(...)` | `FormFieldDefinition<T>` | Creates modified copy of field definition. |
+
+---
+
+### 2. `TypedFormController` (`Cubit<TypedFormState>`)
+
+`TypedFormController` is the central Cubit governing state updates, validation triggers, and dynamic field modifications.
+
+#### Constructor Parameters
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `fields` | `List<FormFieldDefinition>` | List of initial field definitions. |
+| `validationStrategy` | `ValidationStrategy` | Active validation timing strategy. |
+| `asyncDebounceDelay` | `Duration` | Delay before executing async validators (default: `300ms`). |
+| `onAsyncValidationError` | `void Function(Object, StackTrace, String)?` | Callback for uncaught exceptions in async validators. |
+
+#### Controller Properties
+
+| Property | Type | Description |
+| --- | --- | --- |
+| `asyncDebounceDelay` | `Duration` | Active async debounce duration. |
+| `onAsyncValidationError` | `Function?` | Active uncaught async error callback. |
+| `touchedFields` | `Map<String, bool>` | Map of field names to user interaction (touched) booleans. |
+| `initialValues` | `Map<String, Object?>` | Map of original starting field values. |
+| `isDirty` | `bool` | `true` if current values differ from `initialValues`. |
+
+#### Complete Method Catalog
+
+| Method | Parameters | Description |
+| --- | --- | --- |
+| `getValue<T>()` | `String fieldName` | Safely retrieves typed value for `fieldName`. |
+| `updateField<T>()` | `fieldName`, `value`, `context` | Updates field value and executes synchronous validation. |
+| `updateFieldWithDebounce<T>()` | `fieldName`, `value`, `context` | Updates field value and triggers debounced async validation. |
+| `updateFields()` | `fieldValues`, `context` | Programmatically updates multiple field values in batch. |
+| `updateFieldValidators<T>()` | `name`, `validators`, `context` | Replaces validation rules for a field at runtime. |
+| `validateGroup()` | `groupName`, `context`, `onPass`, `onFail` | Validates all fields matching `groupName`. |
+| `validateFields()` | `fields`, `context`, `onPass`, `onFail` | Validates a specific list of field names. |
+| `isGroupValid()` | `groupName` | Passive check returning `true` if group has no errors. |
+| `areFieldsValid()` | `fields` | Passive check returning `true` if field list has no errors. |
+| `touchGroup()` | `groupName`, `context` | Marks all fields in `groupName` as touched. |
+| `setValidationStrategy()` | `ValidationStrategy strategy` | Dynamically switches active validation timing rule. |
+| `validateForm()` | `context`, `onPass`, `onFail` | Flushes pending async checks and validates entire form. |
+| `validateFieldImmediately()` | `fieldName`, `context` | Forces immediate evaluation of field validators. |
+| `resetForm()` | *(none)* | Resets values to `initialValues` and clears errors/touched status. |
+| `touchAllFields()` | `context` | Marks every field in the form as touched. |
+| `updateError()` | `fieldName`, `errorMessage`, `context` | Manually injects an error message (e.g., from server API). |
+| `updateErrors()` | `errors`, `context` | Manually injects map of field errors from server response. |
+| `addField<T>()` | `field`, `context` | Adds a new field definition to form dynamically. |
+| `addFields()` | `fields`, `context` | Adds multiple new field definitions dynamically. |
+| `removeField()` | `fieldName`, `context` | Removes field definition and cleans up its state. |
+| `removeFields()` | `fieldNames`, `context` | Removes multiple fields dynamically. |
+| `isTouched()` | `String fieldName` | Returns `true` if user has interacted with `fieldName`. |
+
+---
+
+### 3. `TypedFormState`
+
+`TypedFormState` is an immutable state snapshot produced by `TypedFormController`.
+
+#### State Properties & Helpers
+
+| Property / Method | Type | Description |
+| --- | --- | --- |
+| `values` | `Map<String, Object?>` | Raw map of all field values. |
+| `errors` | `Map<String, String>` | Map of active field error strings. |
+| `isValid` | `bool` | `true` if `errors` map is empty. |
+| `validationStrategy` | `ValidationStrategy` | Active validation timing mode. |
+| `fieldTypes` | `Map<String, Type>` | Map of registered field name to Dart Type. |
+| `validatingFields` | `Set<String>` | Set of field names currently undergoing async validation. |
+| `isValidating` | `bool` | `true` if `validatingFields.isNotEmpty`. |
+| `getValue<T>(fieldName)` | `T?` | Extracts value cast to `T` safely. |
+| `getError(fieldName)` | `String?` | Gets active error string for field. |
+| `hasError(fieldName)` | `bool` | Returns `true` if error exists for field. |
+| `copyWith(...)` | `TypedFormState` | Returns modified immutable copy. |
 
 ---
 

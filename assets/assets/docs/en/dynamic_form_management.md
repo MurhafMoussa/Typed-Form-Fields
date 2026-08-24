@@ -1,15 +1,64 @@
 # Dynamic Form Management
 
-Manage dynamically changing form arrays, update values and validators at runtime, inject external errors, and reset form state seamlessly with `TypedFormController`.
+Manage dynamically changing form arrays, update field values and validators at runtime, inject external server errors, and reset form state seamlessly with `TypedFormController`.
 
-## Overview & Prerequisites
+## Overview & Architecture
 
-Dynamic form management APIs allow applications to alter form structure and state at runtime:
-- **Field Addition & Removal**: `addField<T>()` and `removeField()`.
-- **Programmatic Value Updates**: `updateFormField<T>()` and `updateFields()`.
-- **Runtime Validator Updates**: `updateFieldValidators<T>()`.
-- **External Error Injection**: `updateError()` and `updateErrors()` (ideal for backend response errors).
-- **Form Reset**: `resetForm()`.
+Dynamic forms require altering form structures and error states at runtime without destroying existing user inputs or re-instantiating state controllers:
+1. **Dynamic Schema Modifications**: Register or remove field definitions on the fly via `addField()` and `removeField()`.
+2. **Programmatic State Updates**: Mutate single or batch field values via `updateFormField()` and `updateFields()`.
+3. **Runtime Validator Updates**: Adjust rules dynamically using `updateFieldValidators()`.
+4. **Server Error Binding**: Inject backend API validation responses directly into form error state via `updateError()` and `updateErrors()`.
+5. **Form Lifecycle Reset**: Restore original values and clear error/touched state via `resetForm()`.
+
+---
+
+## Detailed API Breakdown
+
+### 1. Dynamic Field Registration & Removal
+
+Dynamically modify the set of fields managed by `TypedFormController`:
+
+| Method | Parameters | Description |
+| --- | --- | --- |
+| `controller.addField<T>()` | `field`, `context` | Registers a new `FormFieldDefinition<T>` and initializes its value and validation state. |
+| `controller.addFields()` | `fields`, `context` | Registers multiple new `FormFieldDefinition` instances in batch. |
+| `controller.removeField()` | `fieldName`, `context` | Removes field definition, value, error, and touched state for `fieldName`. |
+| `controller.removeFields()` | `fieldNames`, `context` | Removes multiple field definitions and cleans up state in batch. |
+
+---
+
+### 2. Programmatic Value Mutators
+
+Update field values programmatically from controllers, API responses, or auto-fill routines:
+
+| Method | Parameters | Description |
+| --- | --- | --- |
+| `context.updateFormField<T>()` | `fieldName`, `value` | Context extension method to update a single field value. |
+| `controller.updateField<T>()` | `fieldName`, `value`, `context` | Controller method to update single field value and run sync validators. |
+| `controller.updateFieldWithDebounce<T>()` | `fieldName`, `value`, `context` | Updates field value and schedules debounced async validation. |
+| `controller.updateFields()` | `fieldValues`, `context` | Programmatically updates multiple field values in a single batch state mutation. |
+
+---
+
+### 3. Dynamic Validators & Server Error Injection
+
+Inject backend validation errors or update field rules at runtime:
+
+| Method | Parameters | Description |
+| --- | --- | --- |
+| `controller.updateFieldValidators<T>()` | `name`, `validators`, `context` | Replaces validation rules for field `name` at runtime. |
+| `controller.updateError()` | `fieldName`, `errorMessage`, `context` | Manually injects a custom error message onto `fieldName`. |
+| `controller.updateErrors()` | `errors`, `context` | Injects a map of field errors (e.g., from a HTTP 422 API response) into form state. |
+
+---
+
+### 4. Lifecycle Reset & Touch Methods
+
+| Method | Parameters | Description |
+| --- | --- | --- |
+| `controller.resetForm()` | *(none)* | Resets all field values to `initialValues` and clears all errors and touched flags. |
+| `controller.touchAllFields()` | `context` | Programmatically marks every registered field in the form as touched. |
 
 ---
 
@@ -17,7 +66,7 @@ Dynamic form management APIs allow applications to alter form structure and stat
 
 ### Step 1: Adding and Removing Fields at Runtime
 
-Add or remove fields dynamically without recreating the `TypedFormController`:
+Add or remove fields dynamically without recreating `TypedFormController`:
 
 ```dart
 final controller = context.formCubit;
@@ -38,7 +87,7 @@ controller.removeField('item_$targetId', context: context);
 
 ### Step 2: Updating Form Field Values Programmatically
 
-Update single or multiple field values:
+Update single or multiple field values programmatically:
 
 ```dart
 // Update single field value
@@ -54,7 +103,7 @@ controller.updateFields(
 );
 ```
 
-### Step 3: Updating Validators & External Errors
+### Step 3: Updating Validators & Server Error Binding
 
 Dynamically change validation rules or inject backend API error messages:
 
@@ -69,7 +118,7 @@ controller.updateFieldValidators<String>(
   context: context,
 );
 
-// Inject custom external error message (e.g. from backend API)
+// Inject custom external error message (e.g. from HTTP 422 backend response)
 controller.updateError(
   fieldName: 'email',
   errorMessage: 'Email is already registered on our server',
