@@ -30,13 +30,14 @@ import 'package:typed_form_fields/typed_form_fields.dart';
 ///     // React to field changes without rebuilding
 ///     print('Field changed: $value, hasError: $hasError');
 ///   },
-///   builder: (context, value, error, hasError, updateValue) {
+///   builder: (context, field) {
 ///     return TextFormField(
-///       initialValue: value,
-///       onChanged: updateValue,
+///       initialValue: field.value,
+///       onChanged: field.updateValue,
 ///       decoration: InputDecoration(
 ///         labelText: 'Email',
-///         errorText: hasError ? error : null,
+///         errorText: field.displayError,
+///         suffixIcon: field.isValidating ? CircularProgressIndicator() : null,
 ///       ),
 ///     );
 ///   },
@@ -61,16 +62,10 @@ class TypedFieldWrapper<T> extends StatefulWidget {
   ///
   /// Parameters:
   /// - `context`: Build context
-  /// - `value`: Current field value (can be null)
-  /// - `error`: Current error message (can be null)
-  /// - `hasError`: Whether the field has an error
-  /// - `updateValue`: Function to call when the field value changes
+  /// - `field`: Current field state containing `value`, `error`, `hasError`, `isValidating`, and `updateValue`
   final Widget Function(
     BuildContext context,
-    T? value,
-    String? error,
-    bool hasError,
-    void Function(T? value) updateValue,
+    TypedFieldState<T> field,
   ) builder;
 
   /// Initial value for the field.
@@ -107,10 +102,12 @@ class _TypedFieldWrapperState<T> extends State<TypedFieldWrapper<T>> {
     super.initState();
     _currentValue = widget.initialValue;
 
-    // Update form state with initial value if provided
+    // Update form state with initial value if provided while preserving untouched state
     if (_currentValue != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        _updateFormState(_currentValue);
+        if (mounted) {
+          _updateFormState(_currentValue, touched: false);
+        }
       });
     }
   }
@@ -133,14 +130,14 @@ class _TypedFieldWrapperState<T> extends State<TypedFieldWrapper<T>> {
     if (widget.debounceTime != null) {
       _debounceTimer?.cancel();
       _debounceTimer = Timer(widget.debounceTime!, () {
-        _updateFormState(value);
+        _updateFormState(value, touched: true);
       });
     } else {
-      _updateFormState(value);
+      _updateFormState(value, touched: true);
     }
   }
 
-  void _updateFormState(T? value) {
+  void _updateFormState(T? value, {bool touched = true}) {
     final transformedValue = value != null && widget.transformValue != null
         ? widget.transformValue!(value)
         : value;
@@ -149,6 +146,7 @@ class _TypedFieldWrapperState<T> extends State<TypedFieldWrapper<T>> {
       fieldName: widget.fieldName,
       value: transformedValue,
       context: context,
+      touched: touched,
     );
   }
 
@@ -159,13 +157,19 @@ class _TypedFieldWrapperState<T> extends State<TypedFieldWrapper<T>> {
     return BlocConsumer<TypedFormController, TypedFormState>(
       bloc: cubit,
       buildWhen: (previous, current) {
-        // Only rebuild if this specific field's value or error changed
+        // Only rebuild if this specific field's value, error, or validation state changed
         final prevValue = previous.values[widget.fieldName];
         final currValue = current.values[widget.fieldName];
         final prevError = previous.errors[widget.fieldName];
         final currError = current.errors[widget.fieldName];
+        final prevValidating =
+            previous.validatingFields.contains(widget.fieldName);
+        final currValidating =
+            current.validatingFields.contains(widget.fieldName);
 
-        return prevValue != currValue || prevError != currError;
+        return prevValue != currValue ||
+            prevError != currError ||
+            prevValidating != currValidating;
       },
       listenWhen: (previous, current) {
         // Only listen if this specific field's state changed
@@ -173,8 +177,14 @@ class _TypedFieldWrapperState<T> extends State<TypedFieldWrapper<T>> {
         final currValue = current.values[widget.fieldName];
         final prevError = previous.errors[widget.fieldName];
         final currError = current.errors[widget.fieldName];
+        final prevValidating =
+            previous.validatingFields.contains(widget.fieldName);
+        final currValidating =
+            current.validatingFields.contains(widget.fieldName);
 
-        return prevValue != currValue || prevError != currError;
+        return prevValue != currValue ||
+            prevError != currError ||
+            prevValidating != currValidating;
       },
       listener: (context, state) {
         // Call the field state change listener if provided
@@ -191,17 +201,21 @@ class _TypedFieldWrapperState<T> extends State<TypedFieldWrapper<T>> {
         final error = state.errors[widget.fieldName];
         final hasError = error != null && error.isNotEmpty;
         final formValue = state.values[widget.fieldName] as T?;
+        final isValidating = state.validatingFields.contains(widget.fieldName);
 
         // Use form value if available, otherwise use current local value
         final effectiveValue = formValue ?? _currentValue;
 
-        return widget.builder(
-          context,
-          effectiveValue,
-          error,
-          hasError,
-          _updateValue,
+        final fieldState = TypedFieldState<T>(
+          fieldName: widget.fieldName,
+          value: effectiveValue,
+          error: error,
+          hasError: hasError,
+          isValidating: isValidating,
+          updateValue: _updateValue,
         );
+
+        return widget.builder(context, fieldState);
       },
     );
   }

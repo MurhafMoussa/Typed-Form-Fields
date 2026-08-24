@@ -1,0 +1,45 @@
+name: Deploy Example App to GitHub Pages
+
+on:
+  push:
+    branches:
+      - production
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Install dependencies
+        run: |
+          flutter pub get
+          cd example && flutter pub get
+
+      - name: Build Flutter Web Example
+        run: flutter build web --release --base-href "/Typed-Form-Fields/"
+        working-directory: example
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./example/build/web

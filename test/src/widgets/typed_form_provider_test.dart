@@ -502,6 +502,80 @@ void main() {
       expect(validationPassed, isTrue);
       expect(validationFailed, isFalse);
     });
+
+    testWidgets('should provide validateGroup and touchGroup methods',
+        (tester) async {
+      final testFields = [
+        FormFieldDefinition<String>(
+          name: 'email',
+          group: 'step1',
+          validators: [TypedCommonValidators.required<String>()],
+          initialValue: '',
+        ),
+      ];
+
+      bool validationFailed = false;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: TypedFormProvider(
+            fields: testFields,
+            child: (context) => Builder(
+              builder: (context) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  expect(context.isGroupValid('step1'), isFalse);
+                  context.touchGroup('step1');
+                  context.validateGroup(
+                    'step1',
+                    onValidationFail: () => validationFailed = true,
+                  );
+                });
+                return const SizedBox();
+              },
+            ),
+          ),
+        ),
+      );
+
+      await tester.pump();
+      expect(validationFailed, isTrue);
+    });
+
+    testWidgets('should provide validateFields and areFieldsValid methods',
+        (tester) async {
+      final testFields = [
+        FormFieldDefinition<String>(
+          name: 'email',
+          validators: [TypedCommonValidators.required<String>()],
+          initialValue: 'test@example.com',
+        ),
+      ];
+
+      bool validationPassed = false;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: TypedFormProvider(
+            fields: testFields,
+            child: (context) => Builder(
+              builder: (context) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  expect(context.areFieldsValid(['email']), isTrue);
+                  context.validateFields(
+                    ['email'],
+                    onValidationPass: () => validationPassed = true,
+                  );
+                });
+                return const SizedBox();
+              },
+            ),
+          ),
+        ),
+      );
+
+      await tester.pump();
+      expect(validationPassed, isTrue);
+    });
   });
 }
 

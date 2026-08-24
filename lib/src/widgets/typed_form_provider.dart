@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:typed_form_fields/src/core/typed_form_controller.dart';
+import 'package:typed_form_fields/src/core/validation_strategy.dart';
 import 'package:typed_form_fields/src/models/models.dart';
 
 /// A widget that provides form state management to its descendants.
@@ -233,23 +236,80 @@ extension TypedFormProviderExtension on BuildContext {
       TypedFormProvider.of(this).getValue<T>(fieldName);
 
   /// Updates a form field value.
-  void updateFormField<T>(String fieldName, T? value) {
+  void updateFormField<T>(
+    String fieldName,
+    T? value, {
+    bool touched = true,
+  }) {
     TypedFormProvider.of(this).updateField(
       fieldName: fieldName,
       value: value,
       context: this,
+      touched: touched,
     );
   }
 
   /// Validates the entire form.
-  void validateForm({
+  FutureOr<void> validateForm({
     required VoidCallback onValidationPass,
     VoidCallback? onValidationFail,
   }) {
-    TypedFormProvider.of(this).validateForm(
+    return TypedFormProvider.of(this).validateForm(
       this,
       onValidationPass: onValidationPass,
       onValidationFail: onValidationFail,
+    );
+  }
+
+  /// Validates all fields in a named group.
+  void validateGroup(
+    String groupName, {
+    VoidCallback? onValidationPass,
+    VoidCallback? onValidationFail,
+  }) {
+    TypedFormProvider.of(this).validateGroup(
+      groupName,
+      context: this,
+      onValidationPass: onValidationPass,
+      onValidationFail: onValidationFail,
+    );
+  }
+
+  /// Validates a specific subset of fields by name.
+  void validateFields(
+    List<String> fieldNames, {
+    VoidCallback? onValidationPass,
+    VoidCallback? onValidationFail,
+  }) {
+    TypedFormProvider.of(this).validateFields(
+      fieldNames,
+      context: this,
+      onValidationPass: onValidationPass,
+      onValidationFail: onValidationFail,
+    );
+  }
+
+  /// Passively checks validity of all fields in [groupName].
+  bool isGroupValid(String groupName) {
+    return TypedFormProvider.of(this).isGroupValid(
+      groupName,
+      context: this,
+    );
+  }
+
+  /// Passively checks validity of a list of fields by name.
+  bool areFieldsValid(List<String> fieldNames) {
+    return TypedFormProvider.of(this).areFieldsValid(
+      fieldNames,
+      context: this,
+    );
+  }
+
+  /// Marks all fields in [groupName] as touched and updates form state.
+  void touchGroup(String groupName) {
+    TypedFormProvider.of(this).touchGroup(
+      groupName,
+      context: this,
     );
   }
 }

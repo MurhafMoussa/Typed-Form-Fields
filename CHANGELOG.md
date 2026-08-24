@@ -1,5 +1,69 @@
 # Changelog
 
+## 2.0.0 - Major Refactor: 100% UI-Agnostic Architecture, Async Validation Pipeline, Field Grouping & State Inspection
+
+### 🚀 **Breaking Changes**
+
+- **Decoupled Built-in Material Widgets**: Removed design-system coupled widgets (`TypedTextField`, `TypedCheckbox`, `TypedSwitch`, `TypedDropdown`, `TypedSlider`, `TypedDatePicker`, `TypedTimePicker`) to achieve 100% zero UI-coupling. Use `TypedFieldWrapper<T>` with any widget or design system.
+- **`TypedFieldWrapper<T>` Builder Refactor**: Replaced multi-parameter positional callback with a single clean `TypedFieldState<T>` object parameter:
+  ```dart
+  // Before
+  builder: (context, value, error, hasError, isValidating, updateValue)
+  // After
+  builder: (context, field) => TextFormField(
+    initialValue: field.value,
+    onChanged: field.updateValue,
+    decoration: InputDecoration(errorText: field.displayError),
+  )
+  ```
+
+### ✨ **New Features**
+
+- **Async Validation Pipeline & Debouncing**:
+  - Introduced `AsyncValidator<T>` interface (`FutureOr<String?> validate(T? value, BuildContext context)`) and `asyncValidators` list on `FormFieldDefinition<T>`.
+  - Added configurable debouncing delay (`asyncDebounceDelay`, default 300ms) that executes async validators only after static sync validators pass.
+  - Implemented async submission flushing: `validateForm()` automatically flushes pending async debouncers and awaits in-flight async tasks before completing.
+  - Implemented async cancellation on form reset and exception handling via `onAsyncValidationError`.
+  - Added real-time tracking with `validatingFields` (`Set<String>`) on `TypedFormState` and `field.isValidating` on `TypedFieldState<T>`.
+- **Form State Inspection & Tracking**:
+  - Added `isDirty` getter to `TypedFormController` indicating whether current form values differ from initial values.
+  - Exposed `initialValues` map on `TypedFormController`.
+  - Added `touchedFields` map and `isTouched(fieldName)` query method.
+- **Field Grouping Metadata & Multi-step Wizard**:
+  - Added optional `group` (`String?`) parameter to `FormFieldDefinition<T>` for tagging multi-step form fields.
+  - Added `validateGroup` and `validateFields` APIs on `TypedFormController` and `BuildContext` extensions.
+  - Added passive group checks `isGroupValid` and `areFieldsValid` for non-intrusive step status checks.
+  - Added `touchGroup` for marking entire field groups as touched.
+- **Rebuilt Interactive Example Application & Embedded Documentation Hub**:
+  - Rebuilt example application featuring Live State Inspector, diagnostic panels, and multi-step form showcase.
+  - Added embedded Documentation Hub with interactive markdown rendering, search overlay, and topic filter.
+- **Official AI Agent Skill**:
+  - Created `.agents/skills/typed-form-fields/SKILL.md` skill containing comprehensive usage patterns, API cheat-sheets, and integration workflows for AI coding assistants.
+
+### 🛠 **Architectural & Core Improvements**
+
+- **100% UI-Agnostic Core**: Completely decoupled from Material/Cupertino design systems.
+- **Modular Architecture**: Delegated controller logic to dedicated `FormValidationOrchestrator`, `FormFieldRegistry`, and `FormTouchedTracker` components.
+- **Standalone `TypedFormState`**: Extracted form state into its own file with immutable copy methods.
+- **Dynamic Localizations**: Updated localizations delegate with async validation error strings and Arabic/English translations.
+
+### 🧪 **Testing & Quality**
+
+- **100% Core Test Coverage**: Achieved 100% unit test coverage for `FormValidationOrchestrator`, `TypedFormController`, `FormValidator`, and `FormFieldRegistry`.
+- **Comprehensive Integration Suite**: Over 560 passing unit, widget, and integration tests covering debounced async validation, submission flushing, reset cancellation, field wrapper rebuilds, and multi-step wizard navigation.
+
+## 1.3.3 - Dynamic Validator Localization & Comprehensive Test Suite
+
+### 🌍 **Localization & Validator Enhancements**
+
+- **Dynamic Localized Resolution**: Refactored `min`, `max`, `url`, `creditCard`, `dateString`, `ipAddress`, `uuid`, `json`, and `alphanumeric` validators to evaluate `ValidatorLocalizations.of(context)` dynamically at runtime (`validate(value, context)`), supporting instant app locale changes without re-instantiating validators.
+- **Type Compatibility Fix**: Updated `isValueCompatibleWithExpectedType` in `FormValidator` to correctly support `dynamic` and custom object runtime types.
+
+### 🧪 **Testing & Quality**
+
+- **Expanded Test Suite**: Added 30+ new unit and edge case tests covering `ValidationStrategy` helpers, `TypedFormController` edge cases (`realTimeOnly` error clearing, `updateFields`, `updateErrors`), `FormFieldDefinition.copyWith()`, and private helper constructors.
+- **99.62% Line Coverage**: Achieved near 100% line coverage on all core library files (excluding localizations delegate).
+
 ## 1.3.2 - Localization Fix & Improvements
 
 ### 🌍 **Localization Fixes**

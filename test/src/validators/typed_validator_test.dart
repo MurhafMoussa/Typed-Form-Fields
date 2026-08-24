@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:typed_form_fields/src/validators/typed_common_validators.dart';
@@ -71,6 +73,33 @@ void main() {
       expect(validator.validate('test', mockContext), isNull);
     });
   });
+
+  group('AsyncValidator', () {
+    late MockBuildContext mockContext;
+
+    setUp(() {
+      mockContext = MockBuildContext();
+    });
+
+    test('should create async validator instance and validate asynchronously',
+        () async {
+      const validator = ConcreteAsyncValidator();
+      expect(validator, isA<AsyncValidator<String>>());
+
+      final result = await validator.validate('taken@example.com', mockContext);
+      expect(result, equals('Email is already taken'));
+
+      final validResult =
+          await validator.validate('available@example.com', mockContext);
+      expect(validResult, isNull);
+    });
+
+    test('should support synchronous return in FutureOr', () {
+      const validator = SyncReturnAsyncValidator();
+      final result = validator.validate('invalid', mockContext);
+      expect(result, equals('Invalid value'));
+    });
+  });
 }
 
 class MockBuildContext extends BuildContext {
@@ -102,5 +131,30 @@ class AnotherValidator extends Validator<int> {
   @override
   String? validate(int? value, BuildContext context) {
     return value == null ? 'Required' : null;
+  }
+}
+
+class ConcreteAsyncValidator extends AsyncValidator<String> {
+  const ConcreteAsyncValidator();
+
+  @override
+  FutureOr<String?> validate(String? value, BuildContext context) async {
+    await Future<void>.delayed(Duration.zero);
+    if (value == 'taken@example.com') {
+      return 'Email is already taken';
+    }
+    return null;
+  }
+}
+
+class SyncReturnAsyncValidator extends AsyncValidator<String> {
+  const SyncReturnAsyncValidator();
+
+  @override
+  FutureOr<String?> validate(String? value, BuildContext context) {
+    if (value == 'invalid') {
+      return 'Invalid value';
+    }
+    return null;
   }
 }

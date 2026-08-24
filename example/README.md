@@ -31,8 +31,8 @@ flutter run
 ## Package Information
 
 - **Package**: [typed_form_fields](https://pub.dev/packages/typed_form_fields)
-- **Version**: 1.3.0
-- **Tests**: 564 tests with comprehensive coverage
+- **Version**: 1.3.3
+- **Tests**: 494+ tests with 99.62% core line coverage
 - **Quality**: Zero linting issues, production-ready
 
 ## Author

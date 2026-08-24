@@ -27,7 +27,7 @@ class ValidatorLocalizationsDelegate
   }
 
   @override
-  bool shouldReload(ValidatorLocalizationsDelegate old) => true;
+  bool shouldReload(ValidatorLocalizationsDelegate old) => false;
 
   /// List of supported language codes.
   static const List<String> _supportedLocales = [
@@ -66,7 +66,7 @@ class EnglishValidatorLocalizations extends ValidatorLocalizations {
   Locale get locale => const Locale('en');
 
   @override
-  String get asyncValidationError => 'The validation failed.';
+  String get asyncValidationError => 'Validation failed.';
 
   @override
   String get atLeastOneRequiredError =>
@@ -88,7 +88,7 @@ class EnglishValidatorLocalizations extends ValidatorLocalizations {
   }
 
   @override
-  String get fieldsMismatchError => 'The fields do not match.';
+  String get fieldsMismatchError => 'Fields do not match.';
 
   @override
   String greaterThanFieldError(String fieldName) {
@@ -116,13 +116,13 @@ class EnglishValidatorLocalizations extends ValidatorLocalizations {
   String get invalidIpError => 'Please enter a valid IP address.';
 
   @override
-  String get invalidJsonError => 'Please enter a valid JSON.';
+  String get invalidJsonError => 'Please enter valid JSON.';
 
   @override
   String get invalidNumberError => 'Please enter a valid number.';
 
   @override
-  String get invalidPatternError => 'Please enter a valid pattern.';
+  String get invalidPatternError => 'Please enter a valid format.';
 
   @override
   String get invalidPhoneError => 'Please enter a valid phone number.';
@@ -140,26 +140,26 @@ class EnglishValidatorLocalizations extends ValidatorLocalizations {
 
   @override
   String maxLengthError(int maxLength) {
-    return 'The value must be less than $maxLength.';
+    return 'Must be at most $maxLength characters long.';
   }
 
   @override
   String maxValueError(num maxValue) {
-    return 'The value must be less than $maxValue.';
+    return 'Must be at most $maxValue.';
   }
 
   @override
   String minLengthError(int minLength) {
-    return 'The value must be more than $minLength.';
+    return 'Must be at least $minLength characters long.';
   }
 
   @override
   String minValueError(num minValue) {
-    return 'The value must be more than $minValue.';
+    return 'Must be at least $minValue.';
   }
 
   @override
-  String get mustBeTrueError => 'This field must be true.';
+  String get mustBeTrueError => 'This field must be checked.';
 
   @override
   String get requiredFieldError => 'This field is required.';

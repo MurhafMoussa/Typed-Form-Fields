@@ -1,11 +1,115 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:typed_form_fields/src/core/typed_form_controller.dart';
+import 'package:typed_form_fields/src/core/validation_strategy.dart';
 import 'package:typed_form_fields/src/models/form_field_definition.dart';
 import 'package:typed_form_fields/src/validators/typed_common_validators.dart';
 
 void main() {
-  group('ValidationStrategy', () {
+  group('ValidationStrategy Enum methods and properties', () {
+    test('isSubmissionSpecific', () {
+      expect(ValidationStrategy.onSubmitOnly.isSubmissionSpecific, isTrue);
+      expect(
+          ValidationStrategy.onSubmitThenRealTime.isSubmissionSpecific, isTrue);
+      expect(
+          ValidationStrategy.allFieldsRealTime.isSubmissionSpecific, isFalse);
+      expect(ValidationStrategy.realTimeOnly.isSubmissionSpecific, isFalse);
+      expect(ValidationStrategy.disabled.isSubmissionSpecific, isFalse);
+    });
+
+    test('initialValidationState', () {
+      expect(ValidationStrategy.onSubmitOnly.initialValidationState, isTrue);
+      expect(ValidationStrategy.onSubmitThenRealTime.initialValidationState,
+          isTrue);
+      expect(ValidationStrategy.disabled.initialValidationState, isTrue);
+      expect(ValidationStrategy.realTimeOnly.initialValidationState, isFalse);
+      expect(
+          ValidationStrategy.allFieldsRealTime.initialValidationState, isFalse);
+    });
+
+    test('shouldValidateOnFieldUpdate', () {
+      expect(
+          ValidationStrategy.disabled.shouldValidateOnFieldUpdate(), isFalse);
+      expect(ValidationStrategy.onSubmitOnly.shouldValidateOnFieldUpdate(),
+          isTrue);
+      expect(
+          ValidationStrategy.onSubmitThenRealTime.shouldValidateOnFieldUpdate(),
+          isTrue);
+      expect(ValidationStrategy.realTimeOnly.shouldValidateOnFieldUpdate(),
+          isTrue);
+      expect(ValidationStrategy.allFieldsRealTime.shouldValidateOnFieldUpdate(),
+          isTrue);
+    });
+
+    test('shouldValidateOnSubmission', () {
+      expect(ValidationStrategy.disabled.shouldValidateOnSubmission(), isFalse);
+      expect(
+          ValidationStrategy.onSubmitOnly.shouldValidateOnSubmission(), isTrue);
+      expect(
+          ValidationStrategy.onSubmitThenRealTime.shouldValidateOnSubmission(),
+          isTrue);
+      expect(
+          ValidationStrategy.realTimeOnly.shouldValidateOnSubmission(), isTrue);
+      expect(ValidationStrategy.allFieldsRealTime.shouldValidateOnSubmission(),
+          isTrue);
+    });
+
+    test('shouldSwitchAfterValidationFailure', () {
+      expect(
+          ValidationStrategy.onSubmitThenRealTime
+              .shouldSwitchAfterValidationFailure(),
+          isTrue);
+      expect(
+          ValidationStrategy.onSubmitOnly.shouldSwitchAfterValidationFailure(),
+          isFalse);
+      expect(
+          ValidationStrategy.realTimeOnly.shouldSwitchAfterValidationFailure(),
+          isFalse);
+      expect(
+          ValidationStrategy.allFieldsRealTime
+              .shouldSwitchAfterValidationFailure(),
+          isFalse);
+      expect(ValidationStrategy.disabled.shouldSwitchAfterValidationFailure(),
+          isFalse);
+    });
+
+    test('getStrategyAfterValidationFailure', () {
+      expect(
+        ValidationStrategy.onSubmitThenRealTime
+            .getStrategyAfterValidationFailure(),
+        equals(ValidationStrategy.realTimeOnly),
+      );
+      expect(
+        ValidationStrategy.onSubmitOnly.getStrategyAfterValidationFailure(),
+        isNull,
+      );
+    });
+
+    test('hasValidationErrorsFromEmptyValues', () {
+      expect(
+        ValidationStrategy.onSubmitOnly
+            .hasValidationErrorsFromEmptyValues({'field': ''}),
+        isFalse,
+      );
+      expect(
+        ValidationStrategy.onSubmitThenRealTime
+            .hasValidationErrorsFromEmptyValues({'field': 'valid'}),
+        isFalse,
+      );
+      expect(
+        ValidationStrategy.onSubmitThenRealTime
+            .hasValidationErrorsFromEmptyValues({'field': ''}),
+        isTrue,
+      );
+      expect(
+        ValidationStrategy.onSubmitThenRealTime
+            .hasValidationErrorsFromEmptyValues({'field': null}),
+        isTrue,
+      );
+    });
+  });
+
+  group('ValidationStrategy Integration', () {
     late TypedFormController formController;
 
     tearDown(() {

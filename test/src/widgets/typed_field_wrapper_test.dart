@@ -42,14 +42,14 @@ void main() {
             TypedFieldWrapper<String>(
               fieldName: 'email',
               initialValue: 'test@example.com',
-              builder: (context, value, error, hasError, updateValue) {
+              builder: (context, field) {
                 return TextFormField(
                   key: const Key('email_field'),
-                  initialValue: value,
-                  onChanged: updateValue,
+                  initialValue: field.value,
+                  onChanged: field.updateValue,
                   decoration: InputDecoration(
                     labelText: 'Email',
-                    errorText: hasError ? error : null,
+                    errorText: field.displayError,
                   ),
                 );
               },
@@ -66,20 +66,57 @@ void main() {
         expect(formCubit.state.values['email'], equals('test@example.com'));
       });
 
+      testWidgets(
+          'should preserve untouched status (isTouched == false) on initial value registration',
+          (tester) async {
+        await tester.pumpWidget(
+          createTestWidget(
+            TypedFieldWrapper<String>(
+              fieldName: 'email',
+              initialValue: 'test@example.com',
+              builder: (context, field) {
+                return TextFormField(
+                  key: const Key('email_field'),
+                  initialValue: field.value,
+                  onChanged: field.updateValue,
+                  decoration: InputDecoration(
+                    labelText: 'Email',
+                    errorText: field.displayError,
+                  ),
+                );
+              },
+            ),
+          ),
+        );
+
+        await tester.pump();
+
+        // Initial field value registration preserves untouched status
+        expect(formCubit.state.values['email'], equals('test@example.com'));
+        expect(formCubit.isTouched('email'), isFalse);
+
+        // User interaction marks field as touched
+        await tester.enterText(
+            find.byKey(const Key('email_field')), 'updated@example.com');
+        await tester.pump();
+
+        expect(formCubit.isTouched('email'), isTrue);
+      });
+
       testWidgets('should update value when user input changes',
           (tester) async {
         await tester.pumpWidget(
           createTestWidget(
             TypedFieldWrapper<String>(
               fieldName: 'email',
-              builder: (context, value, error, hasError, updateValue) {
+              builder: (context, field) {
                 return TextFormField(
                   key: const Key('email_field'),
-                  initialValue: value,
-                  onChanged: updateValue,
+                  initialValue: field.value,
+                  onChanged: field.updateValue,
                   decoration: InputDecoration(
                     labelText: 'Email',
-                    errorText: hasError ? error : null,
+                    errorText: field.displayError,
                   ),
                 );
               },
@@ -103,14 +140,14 @@ void main() {
           createTestWidget(
             TypedFieldWrapper<String>(
               fieldName: 'email',
-              builder: (context, value, error, hasError, updateValue) {
+              builder: (context, field) {
                 return TextFormField(
                   key: const Key('email_field'),
-                  initialValue: value,
-                  onChanged: updateValue,
+                  initialValue: field.value,
+                  onChanged: field.updateValue,
                   decoration: InputDecoration(
                     labelText: 'Email',
-                    errorText: hasError ? error : null,
+                    errorText: field.displayError,
                   ),
                 );
               },
@@ -149,15 +186,15 @@ void main() {
           createTestWidget(
             TypedFieldWrapper<String>(
               fieldName: 'email',
-              builder: (context, value, error, hasError, updateValue) {
+              builder: (context, field) {
                 buildCount++;
                 return TextFormField(
                   key: const Key('email_field'),
-                  initialValue: value,
-                  onChanged: updateValue,
+                  initialValue: field.value,
+                  onChanged: field.updateValue,
                   decoration: InputDecoration(
                     labelText: 'Email',
-                    errorText: hasError ? error : null,
+                    errorText: field.displayError,
                   ),
                 );
               },
@@ -201,22 +238,22 @@ void main() {
               children: [
                 TypedFieldWrapper<String>(
                   fieldName: 'email',
-                  builder: (context, value, error, hasError, updateValue) {
+                  builder: (context, field) {
                     buildCount++;
                     return TextFormField(
                       key: const Key('email_field'),
-                      initialValue: value,
-                      onChanged: updateValue,
+                      initialValue: field.value,
+                      onChanged: field.updateValue,
                     );
                   },
                 ),
                 TypedFieldWrapper<int>(
                   fieldName: 'age',
-                  builder: (context, value, error, hasError, updateValue) {
+                  builder: (context, field) {
                     return TextFormField(
                       key: const Key('age_field'),
-                      initialValue: value?.toString(),
-                      onChanged: (val) => updateValue(int.tryParse(val)),
+                      initialValue: field.value?.toString(),
+                      onChanged: (val) => field.updateValue(int.tryParse(val)),
                     );
                   },
                 ),
@@ -255,14 +292,14 @@ void main() {
                 lastHasError = hasError;
                 listenerCallCount++;
               },
-              builder: (context, value, error, hasError, updateValue) {
+              builder: (context, field) {
                 return TextFormField(
                   key: const Key('email_field'),
-                  initialValue: value,
-                  onChanged: updateValue,
+                  initialValue: field.value,
+                  onChanged: field.updateValue,
                   decoration: InputDecoration(
                     labelText: 'Email',
-                    errorText: hasError ? error : null,
+                    errorText: field.displayError,
                   ),
                 );
               },
@@ -314,21 +351,21 @@ void main() {
                   onFieldStateChanged: (value, error, hasError) {
                     emailListenerCallCount++;
                   },
-                  builder: (context, value, error, hasError, updateValue) {
+                  builder: (context, field) {
                     return TextFormField(
                       key: const Key('email_field'),
-                      initialValue: value,
-                      onChanged: updateValue,
+                      initialValue: field.value,
+                      onChanged: field.updateValue,
                     );
                   },
                 ),
                 TypedFieldWrapper<int>(
                   fieldName: 'age',
-                  builder: (context, value, error, hasError, updateValue) {
+                  builder: (context, field) {
                     return TextFormField(
                       key: const Key('age_field'),
-                      initialValue: value?.toString(),
-                      onChanged: (val) => updateValue(int.tryParse(val)),
+                      initialValue: field.value?.toString(),
+                      onChanged: (val) => field.updateValue(int.tryParse(val)),
                     );
                   },
                 ),
@@ -357,11 +394,11 @@ void main() {
             TypedFieldWrapper<String>(
               fieldName: 'email',
               debounceTime: const Duration(milliseconds: 300),
-              builder: (context, value, error, hasError, updateValue) {
+              builder: (context, field) {
                 return TextFormField(
                   key: const Key('email_field'),
-                  initialValue: value,
-                  onChanged: updateValue,
+                  initialValue: field.value,
+                  onChanged: field.updateValue,
                 );
               },
             ),
@@ -403,11 +440,11 @@ void main() {
               onValueChanged: (value) {
                 lastImmediateValue = value;
               },
-              builder: (context, value, error, hasError, updateValue) {
+              builder: (context, field) {
                 return TextFormField(
                   key: const Key('email_field'),
-                  initialValue: value,
-                  onChanged: updateValue,
+                  initialValue: field.value,
+                  onChanged: field.updateValue,
                 );
               },
             ),
@@ -438,11 +475,11 @@ void main() {
             TypedFieldWrapper<String>(
               fieldName: 'email',
               transformValue: (value) => value.toLowerCase().trim(),
-              builder: (context, value, error, hasError, updateValue) {
+              builder: (context, field) {
                 return TextFormField(
                   key: const Key('email_field'),
-                  initialValue: value,
-                  onChanged: updateValue,
+                  initialValue: field.value,
+                  onChanged: field.updateValue,
                 );
               },
             ),
@@ -466,11 +503,11 @@ void main() {
             TypedFieldWrapper<String>(
               fieldName: 'email',
               transformValue: (value) => value.toLowerCase(),
-              builder: (context, value, error, hasError, updateValue) {
+              builder: (context, field) {
                 return TextFormField(
                   key: const Key('email_field'),
-                  initialValue: value,
-                  onChanged: updateValue,
+                  initialValue: field.value,
+                  onChanged: field.updateValue,
                 );
               },
             ),
@@ -494,11 +531,11 @@ void main() {
           createTestWidget(
             TypedFieldWrapper<String>(
               fieldName: 'email',
-              builder: (context, value, error, hasError, updateValue) {
+              builder: (context, field) {
                 return TextFormField(
                   key: const Key('email_field'),
-                  initialValue: value,
-                  onChanged: updateValue,
+                  initialValue: field.value,
+                  onChanged: field.updateValue,
                 );
               },
             ),
@@ -526,11 +563,11 @@ void main() {
           createTestWidget(
             TypedFieldWrapper<String>(
               fieldName: 'email',
-              builder: (context, value, error, hasError, updateValue) {
+              builder: (context, field) {
                 return TextFormField(
                   key: const Key('email_field'),
-                  initialValue: value,
-                  onChanged: updateValue,
+                  initialValue: field.value,
+                  onChanged: field.updateValue,
                 );
               },
             ),
@@ -559,11 +596,11 @@ void main() {
             TypedFieldWrapper<String>(
               fieldName: 'email',
               debounceTime: const Duration(milliseconds: 1000),
-              builder: (context, value, error, hasError, updateValue) {
+              builder: (context, field) {
                 return TextFormField(
                   key: const Key('email_field'),
-                  initialValue: value,
-                  onChanged: updateValue,
+                  initialValue: field.value,
+                  onChanged: field.updateValue,
                 );
               },
             ),
@@ -605,14 +642,14 @@ void main() {
                 capturedError = error;
                 capturedHasError = hasError;
               },
-              builder: (context, value, error, hasError, updateValue) {
+              builder: (context, field) {
                 return TextFormField(
                   key: const Key('email_field'),
-                  initialValue: value,
-                  onChanged: updateValue,
+                  initialValue: field.value,
+                  onChanged: field.updateValue,
                   decoration: InputDecoration(
                     labelText: 'Email',
-                    errorText: hasError ? error : null,
+                    errorText: field.displayError,
                   ),
                 );
               },
@@ -633,6 +670,79 @@ void main() {
         expect(capturedValue, equals('initial@test.com'));
         expect(capturedError, isNull);
         expect(capturedHasError, isFalse);
+      });
+    });
+
+    group('Validating State & Rebuilds', () {
+      testWidgets(
+          'should pass isValidating to builder and rebuild when validatingFields changes',
+          (tester) async {
+        bool? receivedIsValidating;
+        int buildCount = 0;
+
+        await tester.pumpWidget(
+          createTestWidget(
+            TypedFieldWrapper<String>(
+              fieldName: 'email',
+              builder: (context, field) {
+                buildCount++;
+                receivedIsValidating = field.isValidating;
+                return Text(field.isValidating ? 'Validating...' : 'Idle');
+              },
+            ),
+          ),
+        );
+
+        await tester.pump();
+        expect(receivedIsValidating, isFalse);
+        expect(find.text('Idle'), findsOneWidget);
+        final initialBuildCount = buildCount;
+
+        // Emit state where email is validating
+        formCubit.emit(formCubit.state.copyWith(validatingFields: {'email'}));
+        await tester.pump();
+        await tester.pump();
+
+        expect(receivedIsValidating, isTrue);
+        expect(find.text('Validating...'), findsOneWidget);
+        expect(buildCount, equals(initialBuildCount + 1));
+
+        // Emit state where email is no longer validating
+        formCubit.emit(formCubit.state.copyWith(validatingFields: {}));
+        await tester.pump();
+        await tester.pump();
+
+        expect(receivedIsValidating, isFalse);
+        expect(find.text('Idle'), findsOneWidget);
+        expect(buildCount, equals(initialBuildCount + 2));
+      });
+
+      testWidgets(
+          'should not rebuild when another field enters validatingFields',
+          (tester) async {
+        int buildCount = 0;
+
+        await tester.pumpWidget(
+          createTestWidget(
+            TypedFieldWrapper<String>(
+              fieldName: 'email',
+              builder: (context, field) {
+                buildCount++;
+                return Text('Email Widget');
+              },
+            ),
+          ),
+        );
+
+        await tester.pump();
+        final initialBuildCount = buildCount;
+
+        // Emit state where a different field ('age') is validating
+        formCubit.emit(formCubit.state.copyWith(validatingFields: {'age'}));
+        await tester.pump();
+
+        // Email field build count should not increase
+        expect(buildCount, equals(initialBuildCount));
       });
     });
   });
