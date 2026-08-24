@@ -1,13 +1,72 @@
 # Field Grouping & Multi-Step Forms
 
-Group related form fields using `group` metadata tags to build multi-step wizards, tabbed forms, or segmented checkout processes with partial step validation.
+Field grouping allows segmenting a large form into logical subsets via `group` metadata tags, enabling partial validation for multi-step wizards, tabbed inputs, or segmented checkout cards.
 
-## Overview & Prerequisites
+## Overview & Architecture
 
 Multi-step workflows require validating individual steps before allowing users to proceed:
-- **Group Metadata Tag**: Assign `group: 'step_name'` to `FormFieldDefinition`.
-- **Group Validation**: Invoke `context.validateGroup('step_name')` or `context.isGroupValid('step_name')`.
-- **Group Touch**: Use `context.touchGroup('step_name')` to mark all fields in a group as touched.
+1. **Group Metadata Tagging**: Assign `group: 'step_name'` to each `FormFieldDefinition`.
+2. **Partial Step Validation**: Trigger validation specifically on fields belonging to a given group via `validateGroup()`.
+3. **Passive Validity Checks**: Inspect step readiness via `isGroupValid()` without marking untouched fields.
+4. **Group Touch Control**: Force display of validation messages across a group via `touchGroup()`.
+
+---
+
+## Detailed API Breakdown
+
+### 1. Group Tagging in `FormFieldDefinition`
+
+Assign string identifiers to the `group` property of field definitions:
+
+```dart
+final fields = [
+  // Group 1: Personal Information
+  FormFieldDefinition<String>(
+    name: 'firstName',
+    group: 'personal',
+    validators: [TypedCommonValidators.required<String>()],
+    initialValue: '',
+  ),
+  FormFieldDefinition<String>(
+    name: 'lastName',
+    group: 'personal',
+    validators: [TypedCommonValidators.required<String>()],
+    initialValue: '',
+  ),
+  // Group 2: Shipping Address
+  FormFieldDefinition<String>(
+    name: 'street',
+    group: 'shipping',
+    validators: [TypedCommonValidators.required<String>()],
+    initialValue: '',
+  ),
+];
+```
+
+---
+
+### 2. Group & Subset Validation Methods
+
+Validate specific subsets of fields without evaluating the entire form state:
+
+| Method | Parameters | Description |
+| --- | --- | --- |
+| `context.validateGroup()` | `groupName`, `onPass`, `onFail` | Marks fields in `groupName` touched and executes validation rules for that group. |
+| `controller.validateGroup()` | `groupName`, `context`, `onPass`, `onFail` | Controller-level group validation method. |
+| `context.validateFields()` | `fields`, `onPass`, `onFail` | Marks listed field names touched and executes validation rules for those fields. |
+| `controller.validateFields()` | `fields`, `context`, `onPass`, `onFail` | Controller-level subset validation method. |
+
+---
+
+### 3. Passive Group Inspection & Touch APIs
+
+Check if a step is valid before enabling a "Next" button without triggering visual error messages:
+
+| Method | Return Type | Description |
+| --- | --- | --- |
+| `context.isGroupValid(groupName)` | `bool` | Returns `true` if all fields in `groupName` pass validation, without marking untouched fields. |
+| `context.areFieldsValid(fieldNames)` | `bool` | Returns `true` if all listed `fieldNames` pass validation, without touching. |
+| `context.touchGroup(groupName)` | `void` | Programmatically marks all fields belonging to `groupName` as touched. |
 
 ---
 
@@ -40,7 +99,7 @@ TypedFormProvider(
       initialValue: '',
     ),
   ],
-  child: (context) => MultiStepWizardWidget(),
+  child: (context) => const MultiStepWizardWidget(),
 )
 ```
 

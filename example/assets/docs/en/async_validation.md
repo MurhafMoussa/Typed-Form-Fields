@@ -1,15 +1,92 @@
 # Asynchronous Validation & Debouncing
 
-Asynchronous validation allows validating user input against remote APIs, databases, or delayed operations (such as checking username availability or promo code validity) without freezing the UI.
+Asynchronous validation enables validating user input against remote REST APIs, databases, or delayed operations (such as verifying username availability or checking coupon codes) without freezing the UI or overwhelming backend servers with network requests.
 
-## Overview & Prerequisites
+## Overview & Architecture
 
 Key features of the `Typed-Form-Fields` async validation pipeline:
-- **`AsyncValidator<T>` Class**: Abstract class for defining custom asynchronous validation checks.
-- **Debounce Delay**: Built-in debouncing (default 300ms) ensures network requests are delayed until typing stops.
-- **Loading State Visibility**: Form state exposes `validatingFields` and `field.isValidating` for rendering spinners.
-- **Submission Flushing**: Invoking `context.validateForm()` flushes active debouncers and awaits pending network operations before completing.
-- **Exception Safety**: Uncaught exceptions during async checks are safely captured via `onAsyncValidationError`.
+1. **`AsyncValidator<T>` Class**: Abstract interface for defining asynchronous validation checks.
+2. **Per-Field Debouncing**: Configurable delay (`asyncDebounceDelay`, default 300ms) delays API execution until typing pauses.
+3. **Execution Pipeline Order**: Synchronous validators execute instantly; async validation triggers *only* if synchronous checks pass.
+4. **In-Flight Visual Feedback**: Reactive `validatingFields` set and `field.isValidating` helper enable displaying loading spinners.
+5. **Submission Flushing**: Calling `context.validateForm()` flushes pending debounce timers and awaits all active network checks before proceeding.
+6. **Exception Safety**: Uncaught exceptions during network calls are safely caught via `onAsyncValidationError`.
+
+---
+
+## Detailed API Breakdown
+
+### 1. `AsyncValidator<T>` Class Signature
+
+To construct an asynchronous validator, create a class implementing `AsyncValidator<T>`:
+
+```dart
+abstract class AsyncValidator<T> {
+  const AsyncValidator();
+
+  /// Evaluates value asynchronously. Returns error message String on failure or null on success.
+  FutureOr<String?> validate(T? value, BuildContext context);
+}
+```
+
+#### Parameters & Return Values
+
+| Component | Type | Description |
+| --- | --- | --- |
+| `value` | `T?` | Current input value passed to the validator. |
+| `context` | `BuildContext` | BuildContext giving access to themes, localizations, or form state. |
+| **Returns** | `FutureOr<String?>` | `Future` resolving to error string `String` if invalid, or `null` if valid. |
+
+---
+
+### 2. Debouncing & Execution Order
+
+```
+[User Input] ──> [Run Sync Validators]
+                      │
+                      ├──> (If Sync Fails)  ──> Display Sync Error Immediately
+                      │
+                      └──> (If Sync Passes) ──> Start/Reset Debounce Timer (300ms)
+                                                     │
+                                                     └──> (Timer Expires) ──> Set field.isValidating = true
+                                                                                   │
+                                                                                   └──> Execute AsyncValidator
+                                                                                             │
+                                                                                             └──> Set field.isValidating = false & Update Error
+```
+
+#### Key Properties & Parameters
+
+| Property / Parameter | Location | Description |
+| --- | --- | --- |
+| `asyncDebounceDelay` | `TypedFormProvider` / `TypedFormController` | Global debounce duration (default: `Duration(milliseconds: 300)`). |
+| `state.validatingFields` | `TypedFormState` | `Set<String>` of field names currently executing async checks. |
+| `state.isValidating` | `TypedFormState` | `bool` helper returning `true` if any field in the form is validating. |
+| `field.isValidating` | `TypedFieldState<T>` | `bool` helper inside `TypedFieldWrapper` for field-specific loading indicators. |
+
+---
+
+### 3. Submission Flushing & Reset Safety
+
+- **Flushing on Submit**: When calling `context.validateForm()` or `controller.validateForm()`, any active debounce timers are cancelled immediately and their underlying async validation tasks are executed and awaited.
+- **Reset Safety**: Calling `controller.resetForm()` cancels all pending async timers, discards pending futures, and clears `state.validatingFields`.
+
+---
+
+### 4. Exception Handling with `onAsyncValidationError`
+
+Provide `onAsyncValidationError` when initializing `TypedFormProvider` or `TypedFormController` to capture uncaught network or socket errors during async checks:
+
+```dart
+TypedFormProvider(
+  asyncDebounceDelay: const Duration(milliseconds: 400),
+  onAsyncValidationError: (error, stackTrace, fieldName) {
+    debugPrint('Async validation failed on $fieldName: $error');
+  },
+  fields: [ /* ... */ ],
+  child: (context) => const FormWidget(),
+)
+```
 
 ---
 
@@ -86,9 +163,32 @@ TypedFieldWrapper<String>(
 )
 ```
 
-### Step 4: Submission Flushing & Reset Safety
+### Step 4: Submission Flushing & Form Submission
 
-When calling `validateForm()`, the form controller flushes pending timers and awaits all in-flight async validators before invoking `onValidationPass` or `onValidationFail`. Calling `resetForm()` immediately cancels active timers and resets async state.
+When calling `validateForm()`, the form controller flushes pending timers and awaits all in-flight async validators before invoking `onValidationPass` or `onValidationFail`.
+
+```dart
+TypedFormBuilder(
+  builder: (context, state) {
+    return ElevatedButton(
+      onPressed: state.isValidating
+          ? null
+          : () {
+              context.validateForm(
+                onValidationPass: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Async check passed!')),
+                  );
+                },
+              );
+            },
+      child: state.isValidating
+          ? const Text('Flushing & Validating...')
+          : const Text('Submit Form'),
+    );
+  },
+)
+```
 
 ---
 
@@ -123,6 +223,10 @@ class AsyncValidationExampleForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TypedFormProvider(
+      asyncDebounceDelay: const Duration(milliseconds: 400),
+      onAsyncValidationError: (error, stackTrace, fieldName) {
+        debugPrint('Async exception on $fieldName: $error');
+      },
       fields: [
         FormFieldDefinition<String>(
           name: 'email',
