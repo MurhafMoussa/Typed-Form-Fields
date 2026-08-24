@@ -73,7 +73,18 @@ abstract class AsyncValidator<T> {
 
 ---
 
-### 4. Exception Handling with `onAsyncValidationError`
+### 4. Coexistence & Precedence of Sync and Async Validators
+
+When a form field definition includes both `validators` (synchronous) and `asyncValidators` (asynchronous):
+
+1. **Synchronous Validation First**: Synchronous static validators execute **instantly** when the user modifies input.
+2. **Short-Circuiting on Sync Failure**: If any synchronous validator fails (e.g., required check fails), the synchronous error displays immediately. Any active or pending async validation tasks for that field are **automatically cancelled** without sending network requests.
+3. **Async Scheduling on Sync Success**: Async validators are debounced and executed **only after** all synchronous checks pass cleanly.
+4. **Error Precedence**: Synchronous errors take immediate priority over async errors, automatically overriding them whenever input changes into an invalid synchronous state.
+
+---
+
+### 5. Exception Handling with `onAsyncValidationError`
 
 Provide `onAsyncValidationError` when initializing `TypedFormProvider` or `TypedFormController` to capture uncaught network or socket errors during async checks:
 

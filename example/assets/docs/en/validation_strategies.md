@@ -76,7 +76,64 @@ All common validators accept optional `BuildContext` for localization and `Strin
 
 ---
 
-### 4. Advanced & Conditional Validator Combinators
+### 4. Creating Custom Synchronous Validators
+
+Custom synchronous validators can be authored either by creating reusable classes extending `Validator<T>` or by using `TypedCommonValidators.custom<T>` for inline rules.
+
+#### Option A: Class-Based (`extends Validator<T>`)
+Extend `Validator<T>` and override `validate(T? value, BuildContext context)`:
+
+```dart
+class AgeRestrictionValidator extends Validator<int> {
+  const AgeRestrictionValidator({this.minAge = 18, this.errorText});
+  final int minAge;
+  final String? errorText;
+
+  @override
+  String? validate(int? value, BuildContext context) {
+    if (value == null) return null; // Defer null check to required validator
+    if (value < minAge) {
+      return errorText ?? 'You must be at least $minAge years old';
+    }
+    return null;
+  }
+}
+
+// Usage in FormFieldDefinition
+FormFieldDefinition<int>(
+  name: 'age',
+  validators: const [
+    TypedCommonValidators.required<int>(),
+    AgeRestrictionValidator(minAge: 21),
+  ],
+  initialValue: 0,
+)
+```
+
+#### Option B: Closure-Based (`TypedCommonValidators.custom<T>`)
+Pass an inline validation function to `TypedCommonValidators.custom<T>`:
+
+```dart
+FormFieldDefinition<String>(
+  name: 'handle',
+  validators: [
+    TypedCommonValidators.required<String>(),
+    TypedCommonValidators.custom<String>(
+      (value, context) {
+        if (value != null && !value.startsWith('@')) {
+          return 'Social handle must start with @ symbol';
+        }
+        return null;
+      },
+    ),
+  ],
+  initialValue: '',
+)
+```
+
+---
+
+### 5. Advanced & Conditional Validator Combinators
 
 | Combinator | Description | Usage Example |
 | --- | --- | --- |
@@ -88,7 +145,18 @@ All common validators accept optional `BuildContext` for localization and `Strin
 
 ---
 
-### 5. Localizations & Structured Diagnostics
+### 6. Coexistence of Synchronous and Asynchronous Validators
+
+When a developer provides both `validators` (synchronous) and `asyncValidators` (asynchronous) in the same field or form definition:
+
+1. **Synchronous Validation Executes First**: Synchronous static validators evaluate immediately on every input change.
+2. **Short-Circuiting on Failure**: If any synchronous validator fails (e.g., required or minLength fails), the synchronous error displays immediately. Active or pending async validators for that field are **automatically cancelled** without making API or database calls.
+3. **Async Scheduling on Success**: Async validators are debounced and executed **only after** all synchronous checks return `null`.
+4. **Error Precedence**: Synchronous errors take immediate precedence over async errors, automatically overriding them whenever the user edits input into a state violating synchronous rules.
+
+---
+
+### 7. Localizations & Structured Diagnostics
 
 `Typed-Form-Fields` provides multi-language support out of the box via `ValidatorLocalizations` (supported locales: `en`, `es`, `fr`, `de`, `ar`).
 
