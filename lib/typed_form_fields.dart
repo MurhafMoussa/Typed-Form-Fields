@@ -1,29 +1,24 @@
-/// A type-safe, universal form field wrapper with BLoC integration.
+/// A type-safe, universal form field wrapper with zero dependencies and high performance.
 ///
-/// This library provides generic FieldWrapper&lt;T&gt; for any data type with built-in
-/// validation, debouncing, and performance optimizations.
+/// This library provides generic `TypedFieldWrapper<T>` for any data type with built-in
+/// validation, debouncing, and performance optimizations. Uses TypedFormProvider for
+/// clean, dependency-free form state management with BLoC internally for maximum performance.
 library;
 
 // Core exports
-export 'src/core/core_form_cubit.dart';
 export 'src/core/form_errors.dart';
+export 'src/core/form_validator.dart';
+export 'src/core/typed_form_controller.dart';
+export 'src/core/typed_form_state.dart';
+export 'src/core/validation_strategy.dart';
 // Models exports
-export 'src/models/typed_form_field.dart';
-export 'src/services/form_debounced_validation_service.dart';
-export 'src/services/form_field_manager.dart';
-export 'src/services/form_state_computer.dart';
-// Services exports
-export 'src/services/form_validation_service.dart';
-export 'src/validators/composite_validator.dart';
+export 'src/models/form_field_definition.dart';
+export 'src/models/typed_field_state.dart';
 // Validators exports
+export 'src/validators/composite_validator.dart';
+export 'src/validators/validator_localizations.dart';
+export 'src/validators/validator_localizations_delegate.dart';
 export 'src/validators/validators.dart';
 // Widgets exports
-export 'src/widgets/field_wrapper.dart';
-export 'src/widgets/typed_checkbox.dart';
-export 'src/widgets/typed_date_picker.dart';
-export 'src/widgets/typed_dropdown.dart';
-export 'src/widgets/typed_slider.dart';
-export 'src/widgets/typed_switch.dart';
-// Pre-built widgets
-export 'src/widgets/typed_text_field.dart';
-export 'src/widgets/typed_time_picker.dart';
+export 'src/widgets/typed_field_wrapper.dart';
+export 'src/widgets/typed_form_provider.dart';

@@ -1,5 +1,7 @@
 import 'package:flutter/widgets.dart';
 
+import 'validator_localizations_delegate.dart';
+
 /// Abstract class that defines the interface for validator localizations.
 ///
 /// This class provides localized error messages for form validators.
@@ -13,192 +15,79 @@ abstract class ValidatorLocalizations {
   /// Retrieves the [ValidatorLocalizations] from the given [context].
   ///
   /// Returns the localized validator messages for the current locale.
-  /// If no localizations are found, returns [DefaultValidatorLocalizations].
+  /// If no localizations are found, returns [EnglishValidatorLocalizations].
   static ValidatorLocalizations of(BuildContext context) {
-    final localizations = Localizations.of(context, ValidatorLocalizations);
-    return localizations ?? const DefaultValidatorLocalizations();
+    try {
+      final localizations = Localizations.of(context, ValidatorLocalizations);
+      if (localizations != null) {
+        return localizations;
+      }
+    } catch (_) {}
+    // Fallback to English if no localizations found
+    return const EnglishValidatorLocalizations();
   }
 
   // Required field validation messages
-  String get requiredFieldError => 'This field is required.';
+  String get requiredFieldError;
+  String get mustBeTrueError;
 
   // Email validation messages
-  String get invalidEmailError => 'Please enter a valid email address.';
+  String get invalidEmailError;
 
   // Length validation messages
-  String minLengthError(int minLength) =>
-      'Must be at least $minLength characters long.';
-  String maxLengthError(int maxLength) =>
-      'Must be at most $maxLength characters long.';
+  String minLengthError(int minLength);
+
+  String maxLengthError(int maxLength);
 
   // Numeric validation messages
-  String get invalidNumberError => 'Please enter a valid number.';
-  String minValueError(num minValue) => 'Must be at least $minValue.';
-  String maxValueError(num maxValue) => 'Must be at most $maxValue.';
+  String get invalidNumberError;
+  String minValueError(num minValue);
+  String maxValueError(num maxValue);
 
   // Pattern validation messages
-  String get invalidPatternError => 'Please enter a valid format.';
+  String get invalidPatternError;
 
   // URL validation messages
-  String get invalidUrlError => 'Please enter a valid URL.';
+  String get invalidUrlError;
 
   // Phone validation messages
-  String get invalidPhoneError => 'Please enter a valid phone number.';
+  String get invalidPhoneError;
 
   // Credit card validation messages
-  String get invalidCreditCardError =>
-      'Please enter a valid credit card number.';
+  String get invalidCreditCardError;
 
   // Date validation messages
-  String get invalidDateError => 'Please enter a valid date.';
+  String get invalidDateError;
 
   // IP address validation messages
-  String get invalidIpError => 'Please enter a valid IP address.';
+  String get invalidIpError;
 
   // UUID validation messages
-  String get invalidUuidError => 'Please enter a valid UUID.';
+  String get invalidUuidError;
 
   // JSON validation messages
-  String get invalidJsonError => 'Please enter valid JSON.';
+  String get invalidJsonError;
 
   // Alphanumeric validation messages
-  String get invalidAlphanumericError =>
-      'Only letters and numbers are allowed.';
+  String get invalidAlphanumericError;
 
   // Alphabetic validation messages
-  String get invalidAlphabeticError => 'Only letters are allowed.';
+  String get invalidAlphabeticError;
 
   // Conditional validation messages
-  String get conditionalValidationError =>
-      'This field is required based on other selections.';
+  String get conditionalValidationError;
 
   // Cross-field validation messages
-  String get fieldsMismatchError => 'Fields do not match.';
-  String fieldsDifferentError(String fieldName) =>
-      'This field must be different from $fieldName.';
-  String requiredWhenFieldValueError(String fieldName, String value) =>
-      'This field is required when $fieldName is $value.';
-  String requiredWhenFieldNotEmptyError(String fieldName) =>
-      'This field is required when $fieldName is provided.';
-  String get dateBeforeError => 'Start date must be before end date.';
-  String get dateAfterError => 'End date must be after start date.';
-  String greaterThanFieldError(String fieldName) =>
-      'Value must be greater than $fieldName.';
-  String lessThanFieldError(String fieldName) =>
-      'Value must be less than $fieldName.';
-  String get sumConditionError => 'Sum condition not met.';
-  String get atLeastOneRequiredError =>
-      'At least one field in this group is required.';
-
+  String get fieldsMismatchError;
+  String fieldsDifferentError(String fieldName);
+  String requiredWhenFieldValueError(String fieldName, String value);
+  String requiredWhenFieldNotEmptyError(String fieldName);
+  String get dateBeforeError;
+  String get dateAfterError;
+  String greaterThanFieldError(String fieldName);
+  String lessThanFieldError(String fieldName);
+  String get sumConditionError;
+  String get atLeastOneRequiredError;
   // Async validation messages
-  String get asyncValidationError => 'Validation failed.';
-}
-
-/// Default English implementation of [ValidatorLocalizations].
-///
-/// This class provides English error messages for all validators.
-/// It serves as the fallback when no other localizations are available.
-class DefaultValidatorLocalizations extends ValidatorLocalizations {
-  const DefaultValidatorLocalizations();
-
-  @override
-  Locale get locale => const Locale('en');
-
-  @override
-  String get requiredFieldError => 'This field is required.';
-
-  @override
-  String get invalidEmailError => 'Please enter a valid email address.';
-
-  @override
-  String minLengthError(int minLength) =>
-      'Must be at least $minLength characters long.';
-
-  @override
-  String maxLengthError(int maxLength) =>
-      'Must be at most $maxLength characters long.';
-
-  @override
-  String get invalidNumberError => 'Please enter a valid number.';
-
-  @override
-  String minValueError(num minValue) => 'Must be at least $minValue.';
-
-  @override
-  String maxValueError(num maxValue) => 'Must be at most $maxValue.';
-
-  @override
-  String get invalidPatternError => 'Please enter a valid format.';
-
-  @override
-  String get invalidUrlError => 'Please enter a valid URL.';
-
-  @override
-  String get invalidPhoneError => 'Please enter a valid phone number.';
-
-  @override
-  String get invalidCreditCardError =>
-      'Please enter a valid credit card number.';
-
-  @override
-  String get invalidDateError => 'Please enter a valid date.';
-
-  @override
-  String get invalidIpError => 'Please enter a valid IP address.';
-
-  @override
-  String get invalidUuidError => 'Please enter a valid UUID.';
-
-  @override
-  String get invalidJsonError => 'Please enter valid JSON.';
-
-  @override
-  String get invalidAlphanumericError =>
-      'Only letters and numbers are allowed.';
-
-  @override
-  String get invalidAlphabeticError => 'Only letters are allowed.';
-
-  @override
-  String get conditionalValidationError =>
-      'This field is required based on other selections.';
-
-  @override
-  String get fieldsMismatchError => 'Fields do not match.';
-
-  @override
-  String fieldsDifferentError(String fieldName) =>
-      'This field must be different from $fieldName.';
-
-  @override
-  String requiredWhenFieldValueError(String fieldName, String value) =>
-      'This field is required when $fieldName is $value.';
-
-  @override
-  String requiredWhenFieldNotEmptyError(String fieldName) =>
-      'This field is required when $fieldName is provided.';
-
-  @override
-  String get dateBeforeError => 'Start date must be before end date.';
-
-  @override
-  String get dateAfterError => 'End date must be after start date.';
-
-  @override
-  String greaterThanFieldError(String fieldName) =>
-      'Value must be greater than $fieldName.';
-
-  @override
-  String lessThanFieldError(String fieldName) =>
-      'Value must be less than $fieldName.';
-
-  @override
-  String get sumConditionError => 'Sum condition not met.';
-
-  @override
-  String get atLeastOneRequiredError =>
-      'At least one field in this group is required.';
-
-  @override
-  String get asyncValidationError => 'Validation failed.';
+  String get asyncValidationError;
 }

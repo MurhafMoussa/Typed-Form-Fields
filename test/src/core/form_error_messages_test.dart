@@ -4,7 +4,7 @@ import 'package:typed_form_fields/typed_form_fields.dart';
 
 void main() {
   group('Improved Error Messages', () {
-    late CoreFormCubit formCubit;
+    late TypedFormController formCubit;
     late BuildContext context;
 
     setUpAll(() {
@@ -12,16 +12,16 @@ void main() {
     });
 
     setUp(() {
-      formCubit = CoreFormCubit(
+      formCubit = TypedFormController(
         fields: [
-          TypedFormField<String>(
+          FormFieldDefinition<String>(
             name: 'email',
-            validators: [CommonValidators.required<String>()],
+            validators: [TypedCommonValidators.required<String>()],
             initialValue: '',
           ),
-          TypedFormField<int>(
+          FormFieldDefinition<int>(
             name: 'age',
-            validators: [CommonValidators.required<int>()],
+            validators: [TypedCommonValidators.required<int>()],
             initialValue: 0,
           ),
         ],

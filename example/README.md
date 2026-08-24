@@ -1,16 +1,44 @@
-# example
+# Typed Form Fields - Example App
 
-A new Flutter project.
+This example app demonstrates the usage of the `typed_form_fields` package with various form scenarios and validation strategies.
 
-## Getting Started
+## Features Demonstrated
 
-This project is a starting point for a Flutter application.
+- **Login Form**: Basic email and password validation with real-time feedback
+- **Registration Form**: Complex form with multiple field types and cross-field validation
+- **Widget Showcase**: Demonstration of all pre-built widgets (TextField, Checkbox, Switch, Dropdown, Slider, DatePicker, TimePicker)
+- **Field Wrapper Examples**: Custom widget integration using TypedFieldWrapper
+- **BLoC Form**: Advanced form management with BLoC pattern
 
-A few resources to get you started if this is your first Flutter project:
+## Validation Strategies
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+The example includes demonstrations of all validation strategies:
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- `ValidationStrategy.onSubmitOnly`
+- `ValidationStrategy.onSubmitThenRealTime`
+- `ValidationStrategy.realTimeOnly`
+- `ValidationStrategy.allFieldsRealTime`
+- `ValidationStrategy.disabled`
+
+## Running the Example
+
+```bash
+cd example
+flutter pub get
+flutter run
+```
+
+## Package Information
+
+- **Package**: [typed_form_fields](https://pub.dev/packages/typed_form_fields)
+- **Version**: 1.3.3
+- **Tests**: 494+ tests with 99.62% core line coverage
+- **Quality**: Zero linting issues, production-ready
+
+## Author
+
+**Murhaf Moussa** - Software Engineer
+
+- 🌐 **GitHub**: [@MurhafMoussa](https://github.com/MurhafMoussa)
+- 💼 **LinkedIn**: [murhaf-n-moussa](https://www.linkedin.com/in/murhaf-n-moussa/)
+- 📺 **YouTube**: [@QualityAddict](https://www.youtube.com/@QualityAddict)

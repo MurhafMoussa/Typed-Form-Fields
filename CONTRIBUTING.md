@@ -113,6 +113,14 @@ chore: update dependencies
 
 If your commit message does not follow the Conventional Commits format, it will be rejected by the commit-msg hook.
 
+## Contact
+
+If you have any questions or need help getting started, feel free to reach out:
+
+- **GitHub**: [@MurhafMoussa](https://github.com/MurhafMoussa)
+- **LinkedIn**: [murhaf-n-moussa](https://www.linkedin.com/in/murhaf-n-moussa/)
+- **YouTube**: [@QualityAddict](https://www.youtube.com/@QualityAddict)
+
 ---
 
 Thank you again for your interest in making typed_form_fields better!
