@@ -1,13 +1,13 @@
 # Getting Started with Typed Form Fields
 
-`Typed-Form-Fields` provides strongly-typed, reactive, and accessible form management for Flutter applications using zero-boilerplate form field wrappers and reactive providers.
+`Typed-Form-Fields` provides strongly-typed, reactive, and accessible form management for Flutter applications using zero-boilerplate form field wrappers, BLoC-powered state reactivity, and ergonomic provider widgets.
 
 ## Overview & Prerequisites
 
-Before building forms with `Typed-Form-Fields`, ensure your environment meets the following requirements:
+Before building forms with `Typed-Form-Fields`, ensure your development environment satisfies:
 - **Flutter SDK**: `>=3.0.0`
 - **Dart SDK**: `>=3.0.0`
-- **Dependencies**: Add `typed_form_fields` to your `pubspec.yaml`:
+- **Package Dependency**: Add `typed_form_fields` to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
@@ -16,9 +16,119 @@ dependencies:
   typed_form_fields: ^1.0.0
 ```
 
-`Typed-Form-Fields` relies on two core building blocks:
-1. `TypedFormProvider`: Top-level widget providing form definitions and validation strategy to descendants.
-2. `TypedFieldWrapper<T>`: Reactive wrapper connecting any UI widget (`TextFormField`, `Checkbox`, `DropdownButtonFormField`, etc.) to form state.
+`Typed-Form-Fields` simplifies form architecture through four primary UI building blocks:
+1. `TypedFormProvider`: Injects `TypedFormController` into the widget tree with automated lifecycle management.
+2. `TypedFieldWrapper<T>`: Attaches individual form controls (`TextFormField`, `Checkbox`, `DropdownButtonFormField`, custom widgets) to form state with targeted rebuilds.
+3. `TypedFormBuilder` & `TypedFormListener`: React to form-wide state changes or trigger non-rebuilding side effects (e.g., displaying SnackBars or navigating).
+4. `TypedFormProviderExtension`: Provides context-based convenience methods (`context.validateForm()`, `context.getFormValue<T>()`, `context.formCubit`) to eliminate boilerplate.
+
+---
+
+## Core Component API Reference
+
+### 1. `TypedFormProvider`
+
+`TypedFormProvider` creates and manages a `TypedFormController` for its subtree without requiring manual BLoC lifecycle handling.
+
+#### Parameters
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `fields` | `List<FormFieldDefinition>` | **Required.** List of declarative field definitions. |
+| `validationStrategy` | `ValidationStrategy` | Validation timing mode (default: `onSubmitThenRealTime`). |
+| `onFormStateChanged` | `void Function(TypedFormState)?` | Optional callback invoked on every form state change. |
+| `asyncDebounceDelay` | `Duration` | Debounce duration for async validation (default: `300ms`). |
+| `onAsyncValidationError` | `void Function(Object, StackTrace, String)?` | Callback for uncaught exceptions during async validation. |
+| `child` | `Widget Function(BuildContext)` | **Required.** Builder function constructing the form UI tree. |
+| `key` | `Key?` | Widget identifier key. |
+
+#### Usage Benefits
+- Automatically disposes internal controller/cubit on widget unmount.
+- Exposes form state and controller methods to all descendant widgets via `BuildContext`.
+
+---
+
+### 2. `TypedFieldWrapper<T>` & `TypedFieldState<T>`
+
+`TypedFieldWrapper<T>` selectively listens to state changes for a single field using BLoC `buildWhen` logic, preventing unnecessary full-form rebuilds.
+
+#### Parameters
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `fieldName` | `String` | **Required.** Unique identifier matching a `FormFieldDefinition.name`. |
+| `builder` | `Widget Function(BuildContext, TypedFieldState<T>)` | **Required.** Builder function receiving local field state. |
+| `initialValue` | `T?` | Optional local override value for field initialization. |
+| `debounceTime` | `Duration?` | Delay before propagating input changes to central form state. |
+| `transformValue` | `T Function(T)?` | Input processing callback (e.g. `.trim()`, `.toLowerCase()`). |
+| `onValueChanged` | `void Function(T?)?` | Immediate callback triggered whenever input changes. |
+| `onFieldStateChanged` | `void Function(T?, String?, bool)?` | Side-effect listener receiving `(value, error, isValidating)`. |
+| `key` | `Key?` | Widget key. |
+
+#### `TypedFieldState<T>` Properties
+
+| Property | Type | Description |
+| --- | --- | --- |
+| `fieldName` | `String` | Name of the field. |
+| `value` | `T?` | Current typed value of the field. |
+| `error` | `String?` | Active error message string, if any. |
+| `hasError` | `bool` | `true` if `error` is non-null and non-empty. |
+| `isValidating` | `bool` | `true` if async validator is currently executing for this field. |
+| `displayError` | `String?` | Helper returning `error` only when `hasError` is true. |
+| `updateValue` | `void Function(T?)` | Callback to update field value in form controller. |
+
+---
+
+### 3. `TypedFormBuilder` & `TypedFormListener`
+
+`TypedFormBuilder` rebuilds UI based on form-wide state (`isValid`, `validatingFields`), while `TypedFormListener` executes side-effects without triggering widget rebuilds.
+
+```dart
+// Reactive Submit Button with TypedFormBuilder
+TypedFormBuilder(
+  builder: (context, state) {
+    return ElevatedButton(
+      onPressed: state.isValid && state.validatingFields.isEmpty
+          ? () => context.validateForm(onValidationPass: _submit)
+          : null,
+      child: state.validatingFields.isNotEmpty
+          ? const CircularProgressIndicator()
+          : const Text('Submit'),
+    );
+  },
+)
+
+// Non-rebuilding Side Effects with TypedFormListener
+TypedFormListener(
+  listener: (context, state) {
+    if (state.errors.containsKey('email')) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(state.errors['email']!)),
+      );
+    }
+  },
+  child: const FormBody(),
+)
+```
+
+---
+
+### 4. Context Extension API (`TypedFormProviderExtension`)
+
+Convenience extensions on `BuildContext` simplify form interactions from anywhere in the widget subtree:
+
+| Method / Property | Return Type | Description |
+| --- | --- | --- |
+| `context.formCubit` | `TypedFormController` | Retrieves the active `TypedFormController`. |
+| `context.formState` | `TypedFormState` | Retrieves the current `TypedFormState`. |
+| `context.getFormValue<T>(name)` | `T?` | Extracts strongly-typed value for field `name`. |
+| `context.updateFormField<T>(name, value)` | `void` | Programmatically updates value for field `name`. |
+| `context.validateForm(...)` | `Future<bool>` | Triggers full form validation with pass/fail callbacks. |
+| `context.validateGroup(group, ...)` | `Future<bool>` | Validates only fields tagged with `group`. |
+| `context.validateFields(fields, ...)` | `Future<bool>` | Validates specific list of field names. |
+| `context.isGroupValid(group)` | `bool` | Returns `true` if all fields in `group` are valid without touching. |
+| `context.areFieldsValid(fields)` | `bool` | Returns `true` if listed fields are valid without touching. |
+| `context.touchGroup(group)` | `void` | Marks all fields in `group` as touched. |
 
 ---
 
@@ -45,7 +155,7 @@ TypedFormProvider(
       initialValue: false,
     ),
   ],
-  child: (context) => FormContent(),
+  child: (context) => const FormContentWidget(),
 )
 ```
 

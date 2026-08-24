@@ -3,7 +3,7 @@ name: typed_form_fields
 description: >-
   Type-safe, universal form field wrapper for Flutter with zero dependencies, high performance, and validation optimizations.
 
-version: 2.0.0
+version: 2.0.1
 
 homepage: https://github.com/MurhafMoussa/typed_form_fields
 repository: https://github.com/MurhafMoussa/typed_form_fields
