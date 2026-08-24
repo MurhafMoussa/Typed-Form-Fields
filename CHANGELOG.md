@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.0.1 - Exhaustive Documentation Revamp & Custom Validator Expansion
+
+### 📚 **Documentation Revamp**
+
+- **100% Exhaustive API Documentation**: Revamped `README.md`, `.agents/skills/typed-form-fields/SKILL.md`, and all 6 English example app guides (`getting_started.md`, `core_concepts.md`, `validation_strategies.md`, `async_validation.md`, `field_grouping.md`, `dynamic_form_management.md`).
+- **Custom Synchronous Validator Creation**: Documented class-based (`extends Validator<T>`) and closure-based (`TypedCommonValidators.custom<T>`) custom validator authoring patterns across all documentation assets.
+- **Sync & Async Validator Coexistence**: Detailed the two-stage execution pipeline where static synchronous validators execute instantly, short-circuiting on failure to automatically cancel pending async tasks and prevent unnecessary network calls.
+- **GitHub Pages Deep-Linking**: Documented direct route mappings (`/#/docs/:docId`) for GitHub Pages web documentation hub.
+
 ## 2.0.0 - Major Refactor: 100% UI-Agnostic Architecture, Async Validation Pipeline, Field Grouping & State Inspection
 
 ### 🚀 **Breaking Changes**
