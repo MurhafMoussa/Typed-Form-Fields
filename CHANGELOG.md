@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.0.2 - Live GitHub Pages Documentation & Web Showcase
+
+### 🌐 **Live Web & Documentation Integration**
+
+- **Live GitHub Pages Link & Badges**: Added live Web Example App & Interactive Documentation Hub URL (`https://murhafmoussa.github.io/Typed-Form-Fields/`) to `pubspec.yaml` (`documentation:` property) and `README.md` badge header.
+- **GitHub Pages Setup Guidance**: Documented repository settings configuration for deploying from `gh-pages` branch (`Deploy from a branch` -> `gh-pages` branch at root `/`).
+
 ## 2.0.1 - Exhaustive Documentation Revamp & Custom Validator Expansion
 
 ### 📚 **Documentation Revamp**
