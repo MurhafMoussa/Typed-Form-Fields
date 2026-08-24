@@ -1,12 +1,12 @@
 # .github/workflows/dart.yml
 
-name: Dart CI & Publish
+name: Dart CI
 
 on:
   pull_request:
     branches: [production, development]
   push:
-    branches: [development, production]
+    branches: [production, development]
   workflow_dispatch:
 
 jobs:
@@ -41,27 +41,4 @@ jobs:
       - name: Run example app tests
         run: flutter test example/test
 
-  deploy:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/production'
-    needs: analyze_and_test
-    permissions:
-      id-token: write # Required for secure pub.dev authentication
-      contents: read
-    runs-on: ubuntu-latest
-    name: Deploy to pub.dev
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: 'stable'
-          cache: true
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Publish to pub.dev
-        run: dart pub publish --force
 

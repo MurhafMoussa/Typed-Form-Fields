@@ -3,8 +3,6 @@ name: Deploy Example App to GitHub Pages
 on:
   push:
     branches:
-      - main
-      - development
       - production
   workflow_dispatch:
 
